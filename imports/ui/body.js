@@ -110,8 +110,6 @@ Template.history.helpers({
     },
 });
 
-var helperFunction = [{ name: 'abc.csv', progress: 0 }];
-
 Template.readCSV.onCreated(function() {
     this.files = new ReactiveVar([]);
 });
