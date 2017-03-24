@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
-import { Products } from '../imports/api/tasks.js';
-import { Csvfiles } from '../imports/api/tasks.js';
+import { Products } from '../imports/api/collections.js';
+import { Csvfiles } from '../imports/api/collections.js';
 
 Meteor.methods({
     'products.insertCSVData': function(data) {
