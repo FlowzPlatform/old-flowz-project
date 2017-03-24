@@ -1,0 +1,58 @@
+<body>
+</body>
+<template name="header">
+        <header>
+            <h1>CSV Upload</h1>
+            {{> loginButtons}}
+        </header>
+</template>
+
+<template name="readCSV">
+    <div class="container">
+        {{> header}}
+        {{#if currentUser}}
+            <input type="file" id="csv-file" name="files"/>
+            <button type="submit" class="btn btn-primary btnReadCsv">Read</button>
+            <div>
+                <span>Progress:&nbsp;</span>
+                <span id="progress">0</span>%
+            </div>
+        {{/if}}
+     </div>
+</template>
+
+<template name="history">
+    <div class="container">
+        {{> header}}
+        {{#if currentUser}}
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>File size</th>
+                        <th>Progress</th>
+                        <th>No of records</th>
+                        <th>Last modified</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each files}}
+                        {{> file}}
+                    {{/each}}
+                </tbody>
+            </table>
+        {{/if}}
+    </div>
+</template>
+
+<template name="file">
+    <tr>
+        <td>{{_id}}</td>
+        <td>{{name}}</td>
+        <td>{{size}}</td>
+        <td>{{progress}}</td>
+        <td>{{noOfRecords}}</td>
+        <td>{{createdAt}}</td>
+    </tr>
+</template>
