@@ -11,12 +11,14 @@
     <div class="container">
         {{> header}}
         {{#if currentUser}}
-            <input type="file" id="csv-file" name="files"/>
+            <input type="file" id="csv-file" name="files" accept=".csv" multiple/>
             <button type="submit" class="btn btn-primary btnReadCsv">Read</button>
-            <div>
-                <span>Progress:&nbsp;</span>
-                <span id="progress">0</span>%
-            </div>
+            {{#each files}}
+                <div>
+                    <span>{{name}} &nbsp;:&nbsp;</span>
+                    <span>{{progress}}%</span>
+                </div>
+            {{/each}}
         {{/if}}
      </div>
 </template>
