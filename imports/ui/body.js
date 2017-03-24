@@ -23,6 +23,8 @@ Template.readCSV.events({
     "click .btnReadCsv": function(event, template) {
         Papa.LocalChunkSize = 1000000; // 1000kb
 
+        template.find('#progress').innerHTML = 0;
+
         let file = {
             name: template.find('#csv-file').files[0].name,
             size: template.find('#csv-file').files[0].size,
@@ -64,7 +66,7 @@ Template.readCSV.events({
 
                     // insert chunk data in mongo db
                     streamer.pause();
-                    Meteor.call('products.insertCSVData', results.data, function() {
+                    Meteor.call('products.insertCSVData', fileID, results.data, function() {
                         // update file progress
                         Meteor.call('products.updateCSVDetails', fileID, { progress, noOfRecords }, function(e, res) {
                             if (progress < 100)
