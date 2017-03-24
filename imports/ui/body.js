@@ -28,7 +28,7 @@ Template.readCSV.events({
 
             // view file progress
             let existFiles = template.files.get();
-            existFiles.push({ name: template.find('#csv-file').files[i].name, progress: 0 });
+            existFiles.splice(0, 0, { name: template.find('#csv-file').files[i].name, progress: 0 });
             template.files.set(existFiles);
 
             _files.push(template.find('#csv-file').files[i]);
