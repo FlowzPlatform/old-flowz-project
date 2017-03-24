@@ -15,6 +15,10 @@ Router.route('/history', function() {
     this.render('history');
 });
 
+Template.registerHelper('formatDate', function(date) {
+    return moment(date).format('lll');
+});
+
 Template.readCSV.events({
     "click .btnReadCsv": function(event, template) {
         Papa.LocalChunkSize = 1000000; // 1000kb
