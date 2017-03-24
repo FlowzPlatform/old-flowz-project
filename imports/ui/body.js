@@ -88,6 +88,6 @@ Template.readCSV.events({
 
 Template.history.helpers({
     files() {
-        return Csvfiles.find({}, { sort: { createdAt: -1 } });
+        return Csvfiles.find({ owner: Meteor.userId() }, { sort: { createdAt: -1 } });
     },
 });
