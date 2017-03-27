@@ -8,14 +8,6 @@ import { Csvfiles } from '../api/collections.js';
 
 import './body.html';
 
-Router.route('/', function() {
-    this.render('readCSV');
-});
-
-Router.route('/history', function() {
-    this.render('history');
-});
-
 Template.registerHelper('formatDate', function(date) {
     return moment(date).format('lll');
 });
