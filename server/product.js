@@ -14,13 +14,5 @@ Meteor.methods({
             });
         });
         return Products.batchInsert(_data);
-    },
-    'products.insertCSVDetails': function(data) {
-        data.owner = Meteor.userId();
-        data.username = Meteor.user().username;
-        return Csvfiles.insert(data);
-    },
-    'products.updateCSVDetails': function(id, data) {
-        return Csvfiles.update(id, { $set: data });
     }
 });

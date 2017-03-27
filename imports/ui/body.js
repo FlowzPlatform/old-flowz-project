@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveDict } from 'meteor/reactive-dict';
 
+import { Products } from '../api/collections.js';
 import { Csvfiles } from '../api/collections.js';
 
 
@@ -48,11 +49,14 @@ var parseCSV = function(_file, template) {
         noOfRecords: 0,
         createdAt: new Date(),
         updateAt: new Date(),
-        deleteAt: new Date()
+        deleteAt: new Date(),
+        owner: Meteor.userId(),
+        username: Meteor.user().username
     };
 
-    Meteor.call('products.insertCSVDetails', file, function(e, res) {
+    Csvfiles.insert(file, function(e, res) {
         let fileID = res; // new file id
+        console.log('fileID', fileID);
         let chunks = 1;
         Papa.parse(_file, {
             header: true,
@@ -79,13 +83,17 @@ var parseCSV = function(_file, template) {
                 // insert chunk data in mongo db
                 streamer.pause();
                 Meteor.call('products.insertCSVData', fileID, results.data, function() {
+                    //insertCSVData(fileID, results.data, function(err, res) {
                     // update file progress
-                    Meteor.call('products.updateCSVDetails', fileID, { progress, noOfRecords }, function(e, res) {
-                        if (progress < 100)
-                            streamer.resume();
-                        else
-                            streamer.abort()
-                    });
+                    Csvfiles.update(fileID, {
+                            $set: { progress, noOfRecords }
+                        },
+                        function(e, res) {
+                            if (progress < 100)
+                                streamer.resume();
+                            else
+                                streamer.abort()
+                        });
                 });
                 //console.log("Chunk data:", results.data.length, results);
 
@@ -120,3 +128,16 @@ Template.readCSV.helpers({
         return Template.instance().files.get();
     }
 });
+
+// var insertCSVData = function(fileID, datas, cb) {
+//     let _data = [];
+//     datas.forEach(function(d) {
+//         _data.push({
+//             fileID: fileID,
+//             data: d,
+//             owner: Meteor.userId(),
+//             username: Meteor.user().username,
+//         });
+//     });
+//     Products.batchInsert(_data, function(err, res) { cb(err, res); });
+// }
