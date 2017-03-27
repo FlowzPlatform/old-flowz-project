@@ -21,18 +21,20 @@ Template.registerHelper('formatDate', function(date) {
 });
 
 Template.readCSV.events({
-    "click .btnReadCsv": function(event, template) {
+    "change #csv-file": function(event, template) {
 
         let _files = [];
 
         for (var i = 0; i < template.find('#csv-file').files.length; i++) {
+            var regex = new RegExp("(.*?)\.(csv)$");
+            if ((regex.test(template.find('#csv-file').files[i].name))) {
+                // view file progress
+                let existFiles = template.files.get();
+                existFiles.splice(0, 0, { name: template.find('#csv-file').files[i].name, progress: 0 });
+                template.files.set(existFiles);
 
-            // view file progress
-            let existFiles = template.files.get();
-            existFiles.splice(0, 0, { name: template.find('#csv-file').files[i].name, progress: 0 });
-            template.files.set(existFiles);
-
-            _files.push(template.find('#csv-file').files[i]);
+                _files.push(template.find('#csv-file').files[i]);
+            }
         }
         Papa.LocalChunkSize = 1000000; // 1000kb
         for (var i = 0; i < _files.length; i++) {

@@ -1,49 +1,89 @@
 <body>
 </body>
 <template name="header">
-        <header>
-            <h1>CSV Upload</h1>
-            {{> loginButtons}}
-        </header>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">CSV Upload</a>
+                </div>
+                <ul class="nav navbar-nav pull-right">
+                    <li class="active"><a href="/">Home</a></li>
+                    <li><a href="/history">History</a></li>
+                    <li>{{> loginButtons}}</li>
+                </ul>
+            </div>
+        </nav>
 </template>
 
 <template name="readCSV">
+    {{> header}}
     <div class="container">
-        {{> header}}
         {{#if currentUser}}
-            <input type="file" id="csv-file" name="files" accept=".csv" multiple/>
-            <button type="submit" class="btn btn-primary btnReadCsv">Read</button>
-            {{#each files}}
-                <div>
-                    <span>{{name}} &nbsp;:&nbsp;</span>
-                    <span>{{progress}}%</span>
-                </div>
-            {{/each}}
+            <div id="upload-csv-zone">
+                <span class="dz-message">Drop files here or click to upload.<br/>
+                    <small>(only csv files are valid.)</small>
+                </span>
+                <input type="file" id="csv-file" name="files" accept=".csv" multiple/>
+            </div>
+            <!--<button type="submit" class="btn btn-primary btnReadCsv">Read</button>-->
+            {{#if files.length}}
+                <table  class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>
+                                File name
+                            </th>
+                            <th style="width: 150px;">
+                                Progress
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each files}}
+                            <tr>
+                                <td>
+                                    {{name}}
+                                </td>
+                                <td >
+                                    <div class="progress">
+                                        <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar"
+                                        aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{progress}}%">
+                                            {{progress}}%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            {{/if}}
         {{/if}}
      </div>
 </template>
 
 <template name="history">
+    {{> header}}        
     <div class="container">
-        {{> header}}
         {{#if currentUser}}
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Name</th>
-                        <th>File size</th>
-                        <th>Progress</th>
-                        <th>No of records</th>
-                        <th>Last modified</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each files}}
-                        {{> file}}
-                    {{/each}}
-                </tbody>
-            </table>
+            <div id="fileprogress">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>File size</th>
+                            <th>Progress</th>
+                            <th>No of records</th>
+                            <th>Last modified</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each files}}
+                            {{> file}}
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
         {{/if}}
     </div>
 </template>
@@ -53,7 +93,7 @@
         <td>{{_id}}</td>
         <td>{{name}}</td>
         <td>{{size}}</td>
-        <td>{{progress}}</td>
+        <td>{{progress}}%</td>
         <td>{{noOfRecords}}</td>
         <td title="{{createdAt}}">{{formatDate  createdAt}}</td>
     </tr>
