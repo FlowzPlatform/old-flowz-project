@@ -1,0 +1,37 @@
+<template name="history">
+    {{> header}}        
+    <div class="container">
+        {{#if currentUser}}
+            <div id="fileprogress">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>File size</th>
+                            <th>Progress</th>
+                            <th>No of records</th>
+                            <th>Last modified</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each files}}
+                            {{> file}}
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        {{/if}}
+    </div>
+</template>
+
+<template name="file">
+    <tr>
+        <td>{{_id}}</td>
+        <td>{{name}}</td>
+        <td>{{size}}</td>
+        <td>{{progress}}%</td>
+        <td>{{noOfRecords}}</td>
+        <td title="{{createdAt}}">{{formatDate  createdAt}}</td>
+    </tr>
+</template>

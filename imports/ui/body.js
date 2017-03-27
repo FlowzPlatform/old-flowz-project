@@ -114,11 +114,6 @@ var parseCSV = function(_file, template) {
     });
 }
 
-Template.history.helpers({
-    files() {
-        return Csvfiles.find({ owner: Meteor.userId() }, { sort: { createdAt: -1 } });
-    },
-});
 
 Template.readCSV.onCreated(function() {
     this.files = new ReactiveVar([]);
