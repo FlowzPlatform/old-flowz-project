@@ -32,6 +32,10 @@ keen ui
 Element ui
 josn editor
 
+https://vitalets.github.io/x-editable/
+
+https://tympanus.net/Development/ProgressButtonStyles/
+
 
 
 
