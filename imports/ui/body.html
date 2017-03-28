@@ -27,7 +27,77 @@
                 <input type="file" id="csv-file" name="files" accept=".csv" multiple/>
             </div>
             <!--<button type="submit" class="btn btn-primary btnReadCsv">Read</button>-->
+
+            
             {{#if files.length}}
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>System headers</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>CSV header</label>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Data type</label>
+                        </div>
+                    </div>
+                </div>
+                {{#each headers}}
+                    {{#let rowIndex=@index col=column}}
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <select class="form-control">
+                                        {{#each headers}}
+                                            {{#if $eq rowIndex @index}}
+                                                <option selected="selected">{{column}}</option>
+                                            {{else}}
+                                                <option>{{column}}</option>
+                                            {{/if}}
+                                        {{/each}}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <select class="form-control">
+                                        {{#each csvHeaders}}
+                                            {{#let self=this}}
+                                                {{#with csvHeaders=csvHeaders col=col}}
+                                                    {{#let dis=distance}}
+                                                        {{#if $eq self dis}}
+                                                            <option selected="selected">{{self}}</option>
+                                                        {{else}}
+                                                            <option>{{self}}</option>
+                                                        {{/if}}
+                                                    {{/let}}
+                                                {{/with}}
+                                            {{/let}}
+                                        {{/each}}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <select class="form-control">
+                                        {{#each headers}}
+                                            {{#if $eq rowIndex @index}}
+                                                <option selected="selected">{{type}}</option>
+                                            {{else}}
+                                                <option>{{type}}</option>
+                                            {{/if}}
+                                        {{/each}}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    {{/let}}
+                {{/each}}
                 <table  class="table table-bordered">
                     <thead>
                         <tr>
@@ -60,4 +130,8 @@
             {{/if}}
         {{/if}}
      </div>
+</template>
+
+<template name="mapping">
+    
 </template>

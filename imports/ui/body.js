@@ -2,6 +2,10 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveDict } from 'meteor/reactive-dict';
 
+import { ProductInformationHeaders } from '../../lib/headers/product_information.js'
+import { ProductInformationData } from '../../lib/headers/product_imprint_data.js'
+import { ProductPrice } from '../../lib/headers/product_price.js'
+
 import { Products } from '../api/collections.js';
 import { Csvfiles } from '../api/collections.js';
 
@@ -57,6 +61,15 @@ var parseCSV = function(_file, template) {
             dynamicTyping: true,
             encoding: "UTF-8",
             skipEmptyLines: true,
+            beforeFirstChunk: function(chunk) {
+                let rows = chunk.split(/\r\n|\r|\n/);
+                let headings = rows[0].split(',');
+                //console.log('headings', headings);
+                template.csvHeaders.set(headings);
+                // headings[0] = 'newHeading';
+                // rows[0] = headings.join();
+                // console.log(rows.join('\n'));
+            },
             complete: function(results) {
                 //console.log('results', results);
             },
@@ -64,6 +77,7 @@ var parseCSV = function(_file, template) {
                 console.log("ERROR:", error, f);
             },
             chunk: function(results, streamer) {
+                return;
                 if (!results)
                     return;
                 //console.log('finished', streamer.streamer._finished);
@@ -86,7 +100,7 @@ var parseCSV = function(_file, template) {
                             if (progress < 100)
                                 streamer.resume();
                             else
-                                streamer.abort()
+                                streamer.abort();
                         });
                 });
                 //console.log("Chunk data:", results.data.length, results);
@@ -109,14 +123,30 @@ var parseCSV = function(_file, template) {
 
 Template.readCSV.onCreated(function() {
     this.files = new ReactiveVar([]);
+    this.csvHeaders = new ReactiveVar([]);
 });
-
 
 Template.readCSV.helpers({
     files() {
         return Template.instance().files.get();
+    },
+    headers() {
+        return ProductInformationHeaders;
+    },
+    csvHeaders() {
+        return Template.instance().csvHeaders.get();
+    },
+    distance() {
+        let res = this.csvHeaders[0];
+        // console.log(this.csvHeaders);
+        let col = this.col;
+        this.csvHeaders.forEach(function(d) {
+            res = Levenshtein.get(col, d) < Levenshtein.get(col, res) ? d : res;
+        });
+        return res;
     }
 });
+
 
 // var insertCSVData = function(fileID, datas, cb) {
 //     let _data = [];
