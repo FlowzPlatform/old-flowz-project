@@ -112,16 +112,34 @@ let generateMapping = function(template) {
     return mapping;
 }
 
+let getExistCSVHeader = function(template) {
+    let ft = template.filetypes.get(); // all file type
+    let fileTypeID = _.find(ft, function(d) { return d.isActive }).id;
+    var isExist = Csvfilemapping.findOne({ owner: Meteor.userId(), fileTypeID: fileTypeID });
+    if (isExist != undefined) {
+        return isExist.mapping;
+    } else {
+        return [];
+    }
+}
+
 let generateXEditor = function(template, cb) {
     let activefile = template.headers.get(); // get active file type data
     let _csvHeader = template.csvHeaders.get();
     let _dataTypes = template.dataTypes.get();
-
+    let _existCSVHeader = getExistCSVHeader(template);
     //console.log('dataTypes', _dataTypes);
     //console.log('csvHeader', _csvHeader);
     // create mapping
     activefile.forEach(function(result, index) {
-        let _val = getHeaderDistance(result.column, _csvHeader);
+        let _val
+
+        // if already mapping header then first getting in db
+        if (_existCSVHeader.length > 0) {
+            _val = _.find(_existCSVHeader, function(d) { return d.sysHeader == result.column }).csvHeader;
+        } else {
+            _val = getHeaderDistance(result.column, _csvHeader);
+        }
 
         $(template.find('#dpdcsvheader_' + index)).editable({
             value: _val,
