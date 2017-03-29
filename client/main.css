@@ -40,81 +40,6 @@
     margin-bottom: 20px;
 }
 
-.step-col {
-    background: #fff;
-    box-shadow: inset 0 -2px 0 0 #e6edf1;
-    padding: 20px 0;
-}
-
-.progress {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    /*display: table;*/
-    width: 100%;
-    color: #849397;
-    background: #fff;
-    box-shadow: none;
-}
-
-.progress>li {
-    position: relative;
-    display: table-cell;
-    text-align: center;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.progress>li:before {
-    content: attr(data-step);
-    display: block;
-    margin: 0 auto;
-    background: #DFE3E4;
-    width: 3em;
-    height: 3em;
-    text-align: center;
-    margin-bottom: 0.25em;
-    line-height: 3em;
-    border-radius: 100%;
-    position: relative;
-    z-index: 1000;
-}
-
-.progress>li:after {
-    content: '';
-    position: absolute;
-    display: block;
-    background: #DFE3E4;
-    width: 100%;
-    height: 0.5em;
-    top: 1.25em;
-    left: 50%;
-    margin-left: 1.5em\9;
-}
-
-.progress>li:last-child:after {
-    display: none;
-}
-
-.progress>li.is-complete {
-    color: #2ECC71;
-}
-
-.progress>li.is-complete:before,
-.progress>li.is-complete:after {
-    color: #FFF;
-    background: #2ECC71;
-}
-
-.progress>li.is-active {
-    color: #3498DB;
-}
-
-.progress>li.is-active:before {
-    color: #FFF;
-    background: #3498DB;
-}
-
 #preview table td,
 #preview table th {
     white-space: nowrap;
@@ -1006,7 +931,174 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 }
 
 #mapping .view-mapping {
-    height: 281px;
+    height: 275px;
     overflow-y: auto;
     width: 100%;
+}
+
+
+/*****************************   step css ****************************/
+
+.step-progress .progress {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: table;
+    width: 100%;
+    color: #849397;
+    background: #fff;
+    box-shadow: none;
+}
+
+.step-progress .progress>li {
+    position: relative;
+    display: table-cell;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.step-progress .progress>li:before {
+    content: attr(data-step);
+    display: block;
+    margin: 0 auto;
+    background: #DFE3E4;
+    width: 3em;
+    height: 3em;
+    text-align: center;
+    margin-bottom: 0.25em;
+    line-height: 3em;
+    border-radius: 100%;
+    position: relative;
+    z-index: 1000;
+}
+
+.step-progress .progress>li:after {
+    content: '';
+    position: absolute;
+    display: block;
+    background: #DFE3E4;
+    width: 100%;
+    height: 0.5em;
+    top: 1.25em;
+    left: 38%;
+    margin-left: 1.5em\9;
+}
+
+.step-progress .progress>li:first-child:after {
+    content: '';
+    position: absolute;
+    display: block;
+    background: #DFE3E4;
+    width: 100%;
+    height: 0.5em;
+    top: 1.25em;
+    left: 52%;
+    margin-left: 1.5em\9;
+}
+
+.step-progress .progress>li:last-child:after {
+    display: none;
+}
+
+.step-progress .progress>li.is-complete {
+    color: #1fb58f;
+}
+
+.step-progress .progress>li.is-complete:before,
+.step-progress .progress>li.is-complete:after {
+    color: #FFF;
+    background: #1fb58f;
+}
+
+.step-progress .progress>li.is-active {
+    color: #494e6b;
+}
+
+.step-progress .progress>li.is-active:before {
+    color: #FFF;
+    background: #494e6b;
+}
+
+.step-progress .product-tab-block {
+    position: relative;
+    margin: 30px 0;
+    overflow: auto;
+}
+
+.step-progress .product-tab-block .nav-tabs {
+    position: absolute;
+    top: 0;
+    left: 15px;
+    width: 220px;
+    border: 0;
+}
+
+.step-progress .product-tab-block .nav-tabs li {
+    float: none;
+    margin-bottom: 2px;
+}
+
+.step-progress .product-tab-block .nav-tabs li a {
+    border: 0;
+    background: #f9f9f9;
+    border-radius: 5px 0 0 5px;
+    font-size: 14px;
+    color: #888;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+    position: relative;
+    overflow: hidden;
+}
+
+.step-progress .product-tab-block .nav-tabs li.active a,
+.step-progress .product-tab-block .nav-tabs li a:hover {
+    border: 0;
+    background: #42a5f5;
+    color: #fff;
+}
+
+.step-progress .product-tab-block .nav-tabs li a:hover::before,
+.step-progress .product-tab-block .nav-tabs li.active a::before {
+    height: 2px;
+    background: #416486;
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.step-progress .product-tab-block .nav-tabs li.done a {
+    background: #1fb58f;
+    color: #fff;
+}
+
+.step-progress .product-tab-block .nav-tabs li.done a::before {
+    height: 2px;
+    background: #1fb58f;
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.step-progress .product-tab-block .tab-content {
+    width: 100%;
+    padding-left: 220px;
+}
+
+.step-progress .product-tab-block .tab-content .tab-pane {
+    background: #fff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+    padding: 30px;
+    min-height: 500px;
+    border-radius: 0 5px 5px 5px;
+}
+
+
+/***************************** end:  step css ******************************/
+
+#steps-block {
+    margin-bottom: 10px;
 }

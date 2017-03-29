@@ -20,13 +20,13 @@
     {{> header}}
     <div class="container">
         {{#if currentUser}}
-            <!--<div id="steps-block">
+            <div id="steps-block" class="step-progress">
                 <ol class="progress">
-                    <li class="is-complete" data-step="1"> Step 1 </li>
-                    <li class="is-active" data-step="2"> Step 2 </li>
-                    <li data-step="3" class="progress__last"> Step 3 </li>
+                    <li class="is-active" data-step="1"> Upload </li>
+                    <li data-step="2"> Validate </li>
+                    <li data-step="3" class="progress__last"> Import </li>
                 </ol>
-            </div>-->
+            </div>
             <div class="product-file-upload-tab-block">
                 <ul class="nav nav-tabs nav-tabs-vertical" role="tablist">
                     {{#each filetypes}}
