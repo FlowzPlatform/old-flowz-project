@@ -44,9 +44,20 @@
                         <!--<button type="submit" class="btn btn-primary btnReadCsv">Read</button>-->
 
                         
-                        {{#if files.length}}
-                            <div id="mapping">
-                                <h3>Headers mapping</h3>
+                        
+                            <div id="mapping" style="display: none;">
+                                <div class="pull-left">
+                                    <h3>Headers mapping</h3>
+                                </div>
+                                <div class="pull-left">
+                                    <div class="sk-wave spinner">
+                                        <div class="sk-rect sk-rect1"></div>
+                                        <div class="sk-rect sk-rect2"></div>
+                                        <div class="sk-rect sk-rect3"></div>
+                                        <div class="sk-rect sk-rect4"></div>
+                                        <div class="sk-rect sk-rect5"></div>
+                                    </div>
+                                </div>
                                 <table class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
@@ -67,6 +78,7 @@
                                                         {{/each}}
                                                     </td>
                                                     <td>
+                                                        <!--<a href="#" id="dpdcsvheader_{{rowIndex}}" data-type="select" data-inputclass="form-control">status1</a>-->
                                                         <select class="form-control" id="dpdcsvheader_{{rowIndex}}">
                                                             {{#each csvHeaders}}
                                                                 {{#let self=this}}
@@ -157,7 +169,7 @@
                                     {{/each}}
                                 </tbody>
                             </table>-->
-                        {{/if}}
+                        
                     </div>
                 </div>
             </div>

@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveDict } from 'meteor/reactive-dict';
 
+import { ProductAdditionalChargeHeaders } from '../../lib/headers/product_additional_charge.js'
 import { ProductInformationHeaders } from '../../lib/headers/product_information.js'
 import { ProductInformationData } from '../../lib/headers/product_imprint_data.js'
 import { ProductPrice } from '../../lib/headers/product_price.js'
@@ -19,7 +20,6 @@ Template.registerHelper('formatDate', function(date) {
 
 Template.readCSV.events({
     "change #csv-file": function(event, template) {
-
         let _files = [];
 
         for (var i = 0; i < template.find('#csv-file').files.length; i++) {
@@ -35,8 +35,12 @@ Template.readCSV.events({
         }
         Papa.LocalChunkSize = 1000000; // 1000kb
         for (var i = 0; i < _files.length; i++) {
+            //template.find("#mapping").style.display = 'block';
+            $(template.find("#mapping")).show().find('.spinner').show();
             getHeader(_files[i], template, function() {
-                template.find("#mapping").style.display = 'block';
+                setTimeout(function() {
+                    $(template.find("#mapping")).find('.spinner').hide();
+                }, 1000)
             });
             //parseCSV(_files[i], template); // parse csv to json using papa parse
         }
