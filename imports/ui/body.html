@@ -22,13 +22,16 @@
         {{#if currentUser}}
             <div class="product-file-upload-tab-block">
                 <ul class="nav nav-tabs nav-tabs-vertical" role="tablist">
-                    <li role="presentation" class="done"><a href="#Product-info"><i class="fa fa-check-circle-o"></i>Product Info</a></li>
-                    <li role="presentation" class="active"><a href="#Product-price">Product Pricing</a></li>
+                    {{#each filetypes}}
+                        <li role="presentation" class="{{#if isActive}}active{{/if}} {{#if isDone}}done{{/if}}"><a href="#"><i class="fa fa-check-circle-o"></i>{{name}}</a></li>
+                    {{/each}}
+                    
+                    <!--<li role="presentation" class="active"><a href="#Product-price">Product Pricing</a></li>
                     <li role="presentation"><a href="#Imprint-data">Imprint Data</a></li>
                     <li role="presentation"><a href="#Image">Image</a></li>
                     <li role="presentation"><a href="#Shipping">Shipping</a></li>
                     <li role="presentation"><a href="#Additional-charge">Additional Charges</a></li>
-                    <li role="presentation"><a href="#Variation-price">Variation Price</a></li>
+                    <li role="presentation"><a href="#Variation-price">Variation Price</a></li>-->
                 </ul>
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active">

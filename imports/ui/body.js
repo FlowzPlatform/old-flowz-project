@@ -35,14 +35,19 @@ Template.readCSV.events({
         }
         Papa.LocalChunkSize = 1000000; // 1000kb
         for (var i = 0; i < _files.length; i++) {
-            getHeader(_files[i], template);
+            getHeader(_files[i], template, function() {
+                template.find("#mapping").style.display = 'block';
+            });
             //parseCSV(_files[i], template); // parse csv to json using papa parse
         }
     },
     "click #btnPreview": function(event, template) {
         // get new mapping
         let mapping = [];
-        ProductInformationHeaders.forEach(function(result, index) {
+        let activefile = template.headers.get(); // get active file type data
+
+        // create mapping
+        activefile.forEach(function(result, index) {
             mapping.push({
                 sysHeader: template.find('#dpdsysheader_' + index).innerHTML,
                 csvHeader: template.find('#dpdcsvheader_' + index).value,
@@ -50,43 +55,60 @@ Template.readCSV.events({
             })
         });
 
-        insertCSVMapping(mapping, function(e, res) {
+        // insert csv maaping in db
+
+        let ft = template.filetypes.get(); // all file type
+        let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
+        insertCSVMapping(activeFiletypeId, mapping, function(e, res) {
 
             template.find('#btnPreview').children[1].children[0].style.width = '45%';
-
+            // generate Preview
             generatePreview(template.find('#csv-file').files[0], template, mapping, function() {
                 template.find('#btnPreview').children[1].children[0].style.width = '100%';
                 template.find("#mapping").style.display = 'none';
                 template.find("#preview").style.display = 'block';
             });
         });
-        console.log('mapping', mapping);
+        //console.log('mapping', mapping);
 
     },
     'click #btnNext': function(event, template) {
         parseCSV(template.find('#csv-file').files[0], template, function() {
+            let ft = template.filetypes.get(); // all file type
+            let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
+
+            ft[activeFiletypeId - 1].isActive = false;
+            ft[activeFiletypeId - 1].isDone = true;
+            ft[activeFiletypeId].isActive = true;
+
+            template.filetypes.set(ft)
+
             template.find('#csv-file').files.value = "";
             template.find("#mapping").style.display = 'none';
             template.find("#preview").style.display = 'none';
+            template.find('#btnPreview').children[1].children[0].style.width = '0%';
+            template.find('#btnNext').children[1].children[0].style.width = '0%';
         });
     }
 });
 
-var insertCSVMapping = function(data, cb) {
+var insertCSVMapping = function(fileTypeID, mapping, cb) {
     let _data = {
-        data: data,
+        mapping: mapping,
+        fileTypeID: fileTypeID,
         createdAt: new Date(),
         updateAt: new Date(),
-        deleteAt: '',
+        deleteAt: null,
         owner: Meteor.userId(),
         username: Meteor.user().username
-    }
+    };
+    console.log('mapping', _data);
     Csvfilemapping.insert(_data, function(e, res) {
         cb(e, res);
     });
 }
 
-var getHeader = function(_file, template) {
+var getHeader = function(_file, template, cb) {
     Papa.parse(_file, {
         header: true,
         dynamicTyping: true,
@@ -109,6 +131,7 @@ var getHeader = function(_file, template) {
         },
         chunk: function(results, streamer) {
             streamer.abort();
+            cb();
             return;
         }
     });
@@ -232,7 +255,19 @@ var parseCSV = function(_file, template, cb) {
 Template.readCSV.onCreated(function() {
     this.files = new ReactiveVar([]);
     this.csvHeaders = new ReactiveVar([]);
+    this.headers = new ReactiveVar([]);
     this.previewRec = new ReactiveVar([]);
+    this.filetypes = new ReactiveVar(
+        [
+            { id: 1, name: 'Product Info', isDone: false, isActive: true },
+            { id: 2, name: 'Product Pricing', isDone: false, isActive: false },
+            { id: 3, name: 'Imprint Data', isDone: false, isActive: false },
+            { id: 4, name: 'Image', isDone: false, isActive: false },
+            { id: 5, name: 'Shipping', isDone: false, isActive: false },
+            { id: 6, name: 'Additional Charges', isDone: false, isActive: false },
+            { id: 7, name: 'Variation Price', isDone: false, isActive: false }
+        ]
+    );
 });
 
 Template.readCSV.helpers({
@@ -240,7 +275,38 @@ Template.readCSV.helpers({
         return Template.instance().files.get();
     },
     headers() {
-        return ProductInformationHeaders;
+        let ft = Template.instance().filetypes.get(); // all file type
+        let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
+        //console.log('activeFiletype', activeFiletype);
+        let sysActiveHeader;
+        switch (activeFiletype.id) {
+            case 1:
+                sysActiveHeader = ProductInformationHeaders;
+                break;
+            case 2:
+                sysActiveHeader = ProductInformationHeaders;
+                break;
+            case 3:
+                sysActiveHeader = ProductInformationHeaders;
+                break;
+            case 4:
+                sysActiveHeader = ProductInformationHeaders;
+                break;
+            case 5:
+                sysActiveHeader = ProductInformationHeaders;
+                break;
+            case 6:
+                sysActiveHeader = ProductInformationHeaders;
+                break;
+            case 7:
+                sysActiveHeader = ProductInformationHeaders;
+                break;
+            default:
+                sysActiveHeader = [];
+                break;
+        }
+        Template.instance().headers.set(sysActiveHeader);
+        return Template.instance().headers.get();
     },
     csvHeaders() {
         return Template.instance().csvHeaders.get();
@@ -256,6 +322,9 @@ Template.readCSV.helpers({
     },
     previewRec() {
         return Template.instance().previewRec.get();
+    },
+    filetypes() {
+        return Template.instance().filetypes.get();
     }
 });
 

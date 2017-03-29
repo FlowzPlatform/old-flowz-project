@@ -146,7 +146,7 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
     border: none;
     background: #1fb58f;
     color: #fff;
-    text-transform: uppercase;
+    /*text-transform: uppercase;*/
     letter-spacing: 1px;
     font-size: 1em;
     line-height: 3;
