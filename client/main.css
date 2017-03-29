@@ -780,6 +780,10 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
     pointer-events: none;
 }
 
+.progress-button.progress-button-small {
+    line-height: 2.3;
+}
+
 
 /*****************end progress button ***********************/
 
@@ -983,7 +987,20 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
     color: #fff;
 }
 
+.table>thead>tr>th,
+.table>tbody>tr>th,
+.table>tfoot>tr>th,
+.table>thead>tr>td,
+.table>tbody>tr>td,
+.table>tfoot>tr>td {
+    line-height: 1;
+}
+
 #mapping .spinner {
     margin: 15px 0px 15px 15px;
     display: none;
+}
+
+#mapping .progress-button {
+    margin-top: 20px;
 }

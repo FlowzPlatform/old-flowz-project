@@ -37,10 +37,13 @@ Template.readCSV.events({
         for (var i = 0; i < _files.length; i++) {
             //template.find("#mapping").style.display = 'block';
             $(template.find("#mapping")).show().find('.spinner').show();
+
+
+
             getHeader(_files[i], template, function() {
-                setTimeout(function() {
+                generateXEditor(template, function() { // generate x-editor
                     $(template.find("#mapping")).find('.spinner').hide();
-                }, 1000)
+                });
             });
             //parseCSV(_files[i], template); // parse csv to json using papa parse
         }
@@ -54,8 +57,8 @@ Template.readCSV.events({
         activefile.forEach(function(result, index) {
             mapping.push({
                 sysHeader: template.find('#dpdsysheader_' + index).innerHTML,
-                csvHeader: template.find('#dpdcsvheader_' + index).value,
-                datatype: template.find('#dpddatatype_' + index).value,
+                csvHeader: template.find('#dpdcsvheader_' + index).innerHTML,
+                datatype: template.find('#dpddatatype_' + index).innerHTML,
             })
         });
 
@@ -98,6 +101,41 @@ Template.readCSV.events({
         });
     }
 });
+
+
+var generateXEditor = function(template, cb) {
+    let activefile = template.headers.get(); // get active file type data
+    let _csvHeader = template.csvHeaders.get();
+    let _dataTypes = template.dataTypes.get();
+
+    console.log('dataTypes', _dataTypes);
+    // create mapping
+    activefile.forEach(function(result, index) {
+        var _val = getHeaderDistance(result.column, _csvHeader);
+        $(template.find('#dpdcsvheader_' + index)).editable({
+            value: _val,
+            source: _csvHeader
+        });
+
+        $(template.find('#dpddatatype_' + index)).editable({
+            value: result.type,
+            source: _dataTypes
+        });
+
+    });
+    cb();
+}
+
+
+let getHeaderDistance = function(sysColumn, csvHeaders) {
+    let res = csvHeaders[0];
+    // console.log(this.csvHeaders);
+    let col = sysColumn;
+    csvHeaders.forEach(function(d) {
+        res = Levenshtein.get(col, d) < Levenshtein.get(col, res) ? d : res;
+    });
+    return res;
+}
 
 var insertCSVMapping = function(fileTypeID, mapping, cb) {
     let _data = {
@@ -275,6 +313,7 @@ Template.readCSV.onCreated(function() {
             { id: 7, name: 'Variation Price', isDone: false, isActive: false }
         ]
     );
+    this.dataTypes = new ReactiveVar(['text', 'integer', 'date']);
 });
 
 Template.readCSV.helpers({
@@ -318,15 +357,15 @@ Template.readCSV.helpers({
     csvHeaders() {
         return Template.instance().csvHeaders.get();
     },
-    distance() {
-        let res = this.csvHeaders[0];
-        // console.log(this.csvHeaders);
-        let col = this.col;
-        this.csvHeaders.forEach(function(d) {
-            res = Levenshtein.get(col, d) < Levenshtein.get(col, res) ? d : res;
-        });
-        return res;
-    },
+    // distance() {
+    //     let res = this.csvHeaders[0];
+    //     // console.log(this.csvHeaders);
+    //     let col = this.col;
+    //     this.csvHeaders.forEach(function(d) {
+    //         res = Levenshtein.get(col, d) < Levenshtein.get(col, res) ? d : res;
+    //     });
+    //     return res;
+    // },
     previewRec() {
         return Template.instance().previewRec.get();
     },
@@ -334,7 +373,7 @@ Template.readCSV.helpers({
         return Template.instance().filetypes.get();
     },
     dataTypes() {
-        return ['text', 'integer', 'date'];
+        return Template.instance().dataTypes.get();
     }
 });
 

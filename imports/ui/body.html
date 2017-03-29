@@ -58,6 +58,14 @@
                                         <div class="sk-rect sk-rect5"></div>
                                     </div>
                                 </div>
+                                <div class="pull-right">
+                                        <button class="progress-button progress-button-small pull-right" id="btnPreview" data-style="top-line" data-horizontal="">
+                                        <span class="content">Generate previews</span>
+                                        <span class="progress">
+                                            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                        </span>
+                                    </button>
+                                </div>
                                 <table class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
@@ -69,17 +77,18 @@
                                     <tbody>
                                         {{#each headers}}
                                             <tr>
-                                                {{#let rowIndex=@index col=column type=type}}
+                                                {{#let rowIndex=@index}}
                                                     <td>
-                                                        {{#each headers}}
+                                                        <span id="dpdsysheader_{{rowIndex}}"  selected="selected">{{column}}</span>
+                                                        <!--{{#each headers}}
                                                             {{#if $eq rowIndex @index}}
-                                                                <label id="dpdsysheader_{{rowIndex}}"  selected="selected">{{column}}</label>
+                                                                
                                                             {{/if}}
-                                                        {{/each}}
+                                                        {{/each}}-->
                                                     </td>
                                                     <td>
-                                                        <!--<a href="#" id="dpdcsvheader_{{rowIndex}}" data-type="select" data-inputclass="form-control">status1</a>-->
-                                                        <select class="form-control" id="dpdcsvheader_{{rowIndex}}">
+                                                        <a href="#" id="dpdcsvheader_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>
+                                                        <!--<select class="form-control" id="dpdcsvheader_{{rowIndex}}">
                                                             {{#each csvHeaders}}
                                                                 {{#let self=this}}
                                                                     {{#with csvHeaders=csvHeaders col=col}}
@@ -93,10 +102,11 @@
                                                                     {{/with}}
                                                                 {{/let}}
                                                             {{/each}}
-                                                        </select>
+                                                        </select>-->
                                                     </td>
                                                     <td>
-                                                        <select class="form-control" id="dpddatatype_{{rowIndex}}">
+                                                        <a href="#" id="dpddatatype_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>
+                                                        <!--<select class="form-control" id="dpddatatype_{{rowIndex}}">
                                                             {{#each dataTypes}}
                                                                 {{#if $eq type this}}
                                                                     <option value="{{this}}" selected="selected">{{this}}</option>
@@ -104,23 +114,13 @@
                                                                     <option value="{{this}}">{{this}}</option>
                                                                 {{/if}}
                                                             {{/each}}
-                                                        </select>
+                                                        </select>-->
                                                     </td>
                                                 {{/let}}
                                             </tr>
                                         {{/each}}
                                     </tbody>
                                 </table>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <button class="progress-button pull-right" id="btnPreview" data-style="top-line" data-horizontal="">
-                                        <span class="content">Generate previews</span>
-                                        <span class="progress">
-                                            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
-                                        </span>
-                                    </button>
-                                    </div>
-                                </div>
                             </div>
                             
                             <div id="preview" style="display: none;">
