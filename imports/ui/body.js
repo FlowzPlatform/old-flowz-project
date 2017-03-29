@@ -51,10 +51,14 @@ Template.readCSV.events({
         });
 
         insertCSVMapping(mapping, function(e, res) {
-            previewRecord(template.find('#csv-file').files[0], template, mapping);
-            template.find("#mapping").style.display = 'none';
-            template.find("#preview").style.display = 'block';
 
+            template.find('#btnPreview').children[1].children[0].style.width = '45%';
+
+            generatePreview(template.find('#csv-file').files[0], template, mapping, function() {
+                template.find('#btnPreview').children[1].children[0].style.width = '100%';
+                template.find("#mapping").style.display = 'none';
+                template.find("#preview").style.display = 'block';
+            });
         });
         console.log('mapping', mapping);
 
@@ -111,7 +115,7 @@ var getHeader = function(_file, template) {
 };
 
 
-var previewRecord = function(_file, template, mapping) {
+var generatePreview = function(_file, template, mapping, cb) {
     Papa.parse(_file, {
         header: true,
         dynamicTyping: true,
@@ -140,6 +144,7 @@ var previewRecord = function(_file, template, mapping) {
             console.log('results', results);
             template.previewRec.set(results.data.slice(0, 10));
             streamer.abort();
+            cb();
             return;
         }
     });

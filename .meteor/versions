@@ -33,6 +33,7 @@ email@1.1.18
 es5-shim@4.6.15
 evucale:fast-levenshtein@1.1.0
 fastclick@1.0.13
+fortawesome:fontawesome@4.7.0
 geojson-utils@1.0.10
 harrison:papa-parse@1.1.7
 hot-code-push@1.0.4

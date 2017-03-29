@@ -37,5 +37,13 @@ https://vitalets.github.io/x-editable/
 https://tympanus.net/Development/ProgressButtonStyles/
 
 
+https://designschool.canva.com/blog/website-color-schemes/   #46
+
+#494e68
+#98878f
+#985e6d
+#192231
+
+
 
 
