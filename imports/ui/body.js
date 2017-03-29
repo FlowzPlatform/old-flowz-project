@@ -184,19 +184,31 @@ let getHeaderDistance = function(sysColumn, csvHeaders) {
 }
 
 var insertCSVMapping = function(fileTypeID, mapping, cb) {
-    let _data = {
-        mapping: mapping,
-        fileTypeID: fileTypeID,
-        createdAt: new Date(),
-        updateAt: new Date(),
-        deleteAt: null,
-        owner: Meteor.userId(),
-        username: Meteor.user().username
-    };
-    console.log('mapping', _data);
-    Csvfilemapping.insert(_data, function(e, res) {
-        cb(e, res);
-    });
+
+
+    var isExist = Csvfilemapping.findOne({ owner: Meteor.userId(), fileTypeID: fileTypeID });
+    if (isExist == undefined) {
+        let _data = {
+            mapping: mapping,
+            fileTypeID: fileTypeID,
+            createdAt: new Date(),
+            updateAt: new Date(),
+            deleteAt: null,
+            owner: Meteor.userId(),
+            username: Meteor.user().username
+        };
+        Csvfilemapping.insert(_data, function(e, res) {
+            cb(e, res);
+        });
+    } else {
+        let _data = {
+            mapping: mapping,
+            updateAt: new Date()
+        };
+        Csvfilemapping.update(isExist._id, { $set: _data }, function(e, res) {
+            cb(e, res);
+        });
+    }
 }
 
 var getHeader = function(_file, template, cb) {
@@ -280,7 +292,7 @@ var parseCSV = function(_file, template, mapping, cb) {
 
     Csvfiles.insert(file, function(e, res) {
         let fileID = res; // new file id
-        console.log('fileID', fileID);
+        //console.log('fileID', fileID);
         let chunks = 1;
         Papa.parse(_file, {
             header: true,
