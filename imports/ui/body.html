@@ -58,7 +58,7 @@
                                     <tbody>
                                         {{#each headers}}
                                             <tr>
-                                                {{#let rowIndex=@index col=column}}
+                                                {{#let rowIndex=@index col=column type=type}}
                                                     <td>
                                                         {{#each headers}}
                                                             {{#if $eq rowIndex @index}}
@@ -85,11 +85,11 @@
                                                     </td>
                                                     <td>
                                                         <select class="form-control" id="dpddatatype_{{rowIndex}}">
-                                                            {{#each headers}}
-                                                                {{#if $eq rowIndex @index}}
-                                                                    <option value="{{type}}" selected="selected">{{type}}</option>
+                                                            {{#each dataTypes}}
+                                                                {{#if $eq type this}}
+                                                                    <option value="{{this}}" selected="selected">{{this}}</option>
                                                                 {{else}}
-                                                                    <option value="{{type}}">{{type}}</option>
+                                                                    <option value="{{this}}">{{this}}</option>
                                                                 {{/if}}
                                                             {{/each}}
                                                         </select>

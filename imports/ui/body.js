@@ -325,6 +325,9 @@ Template.readCSV.helpers({
     },
     filetypes() {
         return Template.instance().filetypes.get();
+    },
+    dataTypes() {
+        return ['text', 'integer', 'date'];
     }
 });
 
