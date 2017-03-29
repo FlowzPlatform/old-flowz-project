@@ -43,9 +43,17 @@
                         </div>
                         <!--<button type="submit" class="btn btn-primary btnReadCsv">Read</button>-->
 
-                        
-                        
-                            <div id="mapping" style="display: none;">
+                        <div id="preview"  class="row" style="display: none;">
+                            <div class="col-md-12">
+                                <div class="table-responsive" style="margin-bottom: 10px;border-right: 1px solid #ccc;">
+                                    {{> reactiveTable  class="table table-bordered table-hover" showNavigation='never' showFilter=false collection=previewRec }}
+                                </div>
+                                
+                            </div>
+                        </div>
+                            
+                        <div class="row">
+                            <div id="mapping" class="col-md-12" style="display: none;">
                                 <div class="pull-left">
                                     <h3>Headers mapping</h3>
                                 </div>
@@ -59,116 +67,107 @@
                                     </div>
                                 </div>
                                 <div class="pull-right">
-                                        <button class="progress-button progress-button-small pull-right" id="btnPreview" data-style="top-line" data-horizontal="">
+                                    <button id="btnNext" style="margin-left:5px;" class="progress-button progress-button-small pull-right" data-style="top-line" data-horizontal="">
+                                        <span class="content">Upload record</span>
+                                        <span class="progress">
+                                            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                        </span>
+                                    </button>
+                                    <button class="progress-button progress-button-small pull-right" id="btnPreview" data-style="top-line" data-horizontal="">
                                         <span class="content">Generate previews</span>
                                         <span class="progress">
                                             <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
                                         </span>
                                     </button>
                                 </div>
-                                <table class="table table-bordered table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>System headers</th>
-                                            <th>CSV header</th>
-                                            <th>Data type</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {{#each headers}}
+                                <div class="view-mapping">
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
                                             <tr>
-                                                {{#let rowIndex=@index}}
-                                                    <td>
-                                                        <span id="dpdsysheader_{{rowIndex}}"  selected="selected">{{column}}</span>
-                                                        <!--{{#each headers}}
-                                                            {{#if $eq rowIndex @index}}
-                                                                
-                                                            {{/if}}
-                                                        {{/each}}-->
-                                                    </td>
-                                                    <td>
-                                                        <a href="#" id="dpdcsvheader_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>
-                                                        <!--<select class="form-control" id="dpdcsvheader_{{rowIndex}}">
-                                                            {{#each csvHeaders}}
-                                                                {{#let self=this}}
-                                                                    {{#with csvHeaders=csvHeaders col=col}}
-                                                                        {{#let dis=distance}}
-                                                                            {{#if $eq self dis}}
-                                                                                <option value="{{self}}" selected="selected">{{self}}</option>
-                                                                            {{else}}
-                                                                                <option value="{{self}}">{{self}}</option>
-                                                                            {{/if}}
-                                                                        {{/let}}
-                                                                    {{/with}}
-                                                                {{/let}}
-                                                            {{/each}}
-                                                        </select>-->
-                                                    </td>
-                                                    <td>
-                                                        <a href="#" id="dpddatatype_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>
-                                                        <!--<select class="form-control" id="dpddatatype_{{rowIndex}}">
-                                                            {{#each dataTypes}}
-                                                                {{#if $eq type this}}
-                                                                    <option value="{{this}}" selected="selected">{{this}}</option>
-                                                                {{else}}
-                                                                    <option value="{{this}}">{{this}}</option>
-                                                                {{/if}}
-                                                            {{/each}}
-                                                        </select>-->
-                                                    </td>
-                                                {{/let}}
+                                                <th>System headers</th>
+                                                <th>CSV header</th>
+                                                <th>Data type</th>
                                             </tr>
-                                        {{/each}}
-                                    </tbody>
-                                </table>
-                            </div>
-                            
-                            <div id="preview" style="display: none;">
-                                <h3>Headers mapping</h3>
-                                <div class="row">
-                                    <div class="table-responsive col-md-12" style="margin-bottom: 10px;border-right: 1px solid #ccc;">
-                                        {{> reactiveTable  class="table table-bordered table-hover" showNavigation='never' showFilter=false collection=previewRec }}
-                                    </div>
-                                    <div>
-                                        <!--<button id="btnNext">Next</button>-->
-                                        <button id="btnNext" class="progress-button pull-right" data-style="top-line" data-horizontal="">
-                                            <span class="content">Upload record</span>
-                                            <span class="progress">
-                                                <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
-                                            </span>
-                                        </button>
-                                    </div>
+                                        </thead>
+                                        <tbody>
+                                            {{#each headers}}
+                                                <tr>
+                                                    {{#let rowIndex=@index}}
+                                                        <td>
+                                                            <span id="dpdsysheader_{{rowIndex}}"  selected="selected">{{column}}</span>
+                                                            <!--{{#each headers}}
+                                                                {{#if $eq rowIndex @index}}
+                                                                    
+                                                                {{/if}}
+                                                            {{/each}}-->
+                                                        </td>
+                                                        <td>
+                                                            <a href="#" id="dpdcsvheader_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>
+                                                            <!--<select class="form-control" id="dpdcsvheader_{{rowIndex}}">
+                                                                {{#each csvHeaders}}
+                                                                    {{#let self=this}}
+                                                                        {{#with csvHeaders=csvHeaders col=col}}
+                                                                            {{#let dis=distance}}
+                                                                                {{#if $eq self dis}}
+                                                                                    <option value="{{self}}" selected="selected">{{self}}</option>
+                                                                                {{else}}
+                                                                                    <option value="{{self}}">{{self}}</option>
+                                                                                {{/if}}
+                                                                            {{/let}}
+                                                                        {{/with}}
+                                                                    {{/let}}
+                                                                {{/each}}
+                                                            </select>-->
+                                                        </td>
+                                                        <td>
+                                                            <a href="#" id="dpddatatype_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>
+                                                            <!--<select class="form-control" id="dpddatatype_{{rowIndex}}">
+                                                                {{#each dataTypes}}
+                                                                    {{#if $eq type this}}
+                                                                        <option value="{{this}}" selected="selected">{{this}}</option>
+                                                                    {{else}}
+                                                                        <option value="{{this}}">{{this}}</option>
+                                                                    {{/if}}
+                                                                {{/each}}
+                                                            </select>-->
+                                                        </td>
+                                                    {{/let}}
+                                                </tr>
+                                            {{/each}}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
-                            <!--<table  class="table table-bordered">
-                                <thead>
+                        </div>
+                        <!--<table  class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        File name
+                                    </th>
+                                    <th style="width: 150px;">
+                                        Progress
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each files}}
                                     <tr>
-                                        <th>
-                                            File name
-                                        </th>
-                                        <th style="width: 150px;">
-                                            Progress
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {{#each files}}
-                                        <tr>
-                                            <td>
-                                                {{name}}
-                                            </td>
-                                            <td >
-                                                <div class="progress">
-                                                    <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar"
-                                                    aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{progress}}%">
-                                                        {{progress}}%
-                                                    </div>
+                                        <td>
+                                            {{name}}
+                                        </td>
+                                        <td >
+                                            <div class="progress">
+                                                <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar"
+                                                aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{progress}}%">
+                                                    {{progress}}%
                                                 </div>
-                                            </td>
-                                        </tr>
-                                    {{/each}}
-                                </tbody>
-                            </table>-->
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>-->
                         
                     </div>
                 </div>

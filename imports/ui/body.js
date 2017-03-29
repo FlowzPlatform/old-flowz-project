@@ -2,10 +2,16 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveDict } from 'meteor/reactive-dict';
 
-import { ProductAdditionalChargeHeaders } from '../../lib/headers/product_additional_charge.js'
+
 import { ProductInformationHeaders } from '../../lib/headers/product_information.js'
-import { ProductInformationData } from '../../lib/headers/product_imprint_data.js'
-import { ProductPrice } from '../../lib/headers/product_price.js'
+import { ProductPriceHeaders } from '../../lib/headers/product_price.js'
+import { ProductImprintDataHeaders } from '../../lib/headers/product_imprint_data.js'
+import { ProductImageHeaders } from '../../lib/headers/product_images.js'
+import { ProductShippingHeaders } from '../../lib/headers/product_shipping.js'
+import { ProductAdditionalChargeHeaders } from '../../lib/headers/product_additional_charge.js'
+import { ProductVariationPricingHeaders } from '../../lib/headers/product_variation_pricing.js'
+
+
 
 import { Products } from '../api/collections.js';
 import { Csvfiles } from '../api/collections.js';
@@ -49,33 +55,25 @@ Template.readCSV.events({
         }
     },
     "click #btnPreview": function(event, template) {
-        // get new mapping
-        let mapping = [];
-        let activefile = template.headers.get(); // get active file type data
 
-        // create mapping
-        activefile.forEach(function(result, index) {
-            mapping.push({
-                sysHeader: template.find('#dpdsysheader_' + index).innerHTML,
-                csvHeader: template.find('#dpdcsvheader_' + index).innerHTML,
-                datatype: template.find('#dpddatatype_' + index).innerHTML,
-            })
+        let mapping = generateMapping(template); // generate new Mapping
+
+        $(template.find('#btnPreview')).find('.progress-inner').css({ width: '45%' });
+        // generate Preview
+        generatePreview(template.find('#csv-file').files[0], template, mapping, function() {
+            template.find('#btnPreview').children[1].children[0].style.width = '100%';
+            //template.find("#mapping").style.display = 'none';
+            $(template.find("#preview")).show();
+            $(template.find("#upload-csv-zone")).hide();
+            $(template.find('#btnPreview')).find('.progress-inner').css({ width: '0%' });
         });
 
         // insert csv maaping in db
 
-        let ft = template.filetypes.get(); // all file type
-        let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
-        insertCSVMapping(activeFiletypeId, mapping, function(e, res) {
+        // // let ft = template.filetypes.get(); // all file type
+        // // let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
+        // // insertCSVMapping(activeFiletypeId, mapping, function(e, res) {});
 
-            template.find('#btnPreview').children[1].children[0].style.width = '45%';
-            // generate Preview
-            generatePreview(template.find('#csv-file').files[0], template, mapping, function() {
-                template.find('#btnPreview').children[1].children[0].style.width = '100%';
-                template.find("#mapping").style.display = 'none';
-                template.find("#preview").style.display = 'block';
-            });
-        });
         //console.log('mapping', mapping);
 
     },
@@ -83,47 +81,95 @@ Template.readCSV.events({
 
         $(template.find('#btnNext')).addClass('inProgress');
 
-        parseCSV(template.find('#csv-file').files[0], template, function() {
-            let ft = template.filetypes.get(); // all file type
-            let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
+        let mapping = generateMapping(template); // generate new Mapping
 
-            ft[activeFiletypeId - 1].isActive = false;
-            ft[activeFiletypeId - 1].isDone = true;
-            ft[activeFiletypeId].isActive = true;
+        // insert csv maaping in db
 
-            template.filetypes.set(ft)
-            template.find('#csv-file').files.value = "";
-            template.find("#mapping").style.display = 'none';
-            template.find("#preview").style.display = 'none';
-            template.find('#btnPreview').children[1].children[0].style.width = '0%';
-            template.find('#btnNext').children[1].children[0].style.width = '0%';
-            $(template.find('#btnNext')).removeClass('inProgress');
+        let ft = template.filetypes.get(); // all file type
+        let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
+        insertCSVMapping(activeFiletypeId, mapping, function(e, res) {
+            // upload csv file in db
+            parseCSV(template.find('#csv-file').files[0], template, mapping, function() {
+                resetAll(template);
+            });
         });
     }
 });
 
+let generateMapping = function(template) {
+    // get new mapping
+    let mapping = [];
+    let activefile = template.headers.get(); // get active file type data
 
-var generateXEditor = function(template, cb) {
+    // create mapping
+    activefile.forEach(function(result, index) {
+        mapping.push({
+            sysHeader: template.find('#dpdsysheader_' + index).innerHTML,
+            csvHeader: template.find('#dpdcsvheader_' + index).innerHTML,
+            datatype: template.find('#dpddatatype_' + index).innerHTML,
+        })
+    });
+    return mapping;
+}
+
+let generateXEditor = function(template, cb) {
     let activefile = template.headers.get(); // get active file type data
     let _csvHeader = template.csvHeaders.get();
     let _dataTypes = template.dataTypes.get();
 
-    console.log('dataTypes', _dataTypes);
+    //console.log('dataTypes', _dataTypes);
+    //console.log('csvHeader', _csvHeader);
     // create mapping
     activefile.forEach(function(result, index) {
-        var _val = getHeaderDistance(result.column, _csvHeader);
+        let _val = getHeaderDistance(result.column, _csvHeader);
+
         $(template.find('#dpdcsvheader_' + index)).editable({
             value: _val,
             source: _csvHeader
         });
-
+        $(template.find('#dpdcsvheader_' + index)).editable('setValue', _val)
         $(template.find('#dpddatatype_' + index)).editable({
             value: result.type,
             source: _dataTypes
         });
-
+        $(template.find('#dpddatatype_' + index)).editable('setValue', result.type)
     });
     cb();
+}
+
+let resetAll = function(template) {
+
+    let ft = template.filetypes.get(); // all file type
+    let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
+
+    ft[activeFiletypeId - 1].isActive = false;
+    ft[activeFiletypeId - 1].isDone = true;
+    ft[activeFiletypeId].isActive = true;
+
+    template.filetypes.set(ft)
+    $(template.find('#csv-file')).val('');
+    template.find("#mapping").style.display = 'none';
+    template.find("#preview").style.display = 'none';
+    template.find('#btnPreview').children[1].children[0].style.width = '0%';
+    template.find('#btnNext').children[1].children[0].style.width = '0%';
+    $(template.find('#btnNext')).removeClass('inProgress');
+    $(template.find("#upload-csv-zone")).show();
+    template.find('#btnNext').children[0].innerHTML = 'Upload record';
+
+    // destroyXEditor
+
+    let activefile = template.headers.get(); // get active file type data
+    let _csvHeader = template.csvHeaders.get();
+    let _dataTypes = template.dataTypes.get();
+
+    //console.log('dataTypes', _dataTypes);
+    //console.log('csvHeader', _csvHeader);
+    // create mapping
+    activefile.forEach(function(result, index) {
+        let _val = getHeaderDistance(result.column, _csvHeader);
+        $(template.find('#dpdcsvheader_' + index)).editable("destroy");
+        $(template.find('#dpddatatype_' + index)).editable("destroy");
+    });
 }
 
 
@@ -210,7 +256,7 @@ var generatePreview = function(_file, template, mapping, cb) {
         },
         chunk: function(results, streamer) {
             console.log('results', results);
-            template.previewRec.set(results.data.slice(0, 10));
+            template.previewRec.set(results.data.slice(0, 5));
             streamer.abort();
             cb();
             return;
@@ -219,7 +265,7 @@ var generatePreview = function(_file, template, mapping, cb) {
 };
 
 
-var parseCSV = function(_file, template, cb) {
+var parseCSV = function(_file, template, mapping, cb) {
     let file = {
         name: _file.name,
         size: _file.size,
@@ -241,6 +287,19 @@ var parseCSV = function(_file, template, cb) {
             dynamicTyping: true,
             encoding: "UTF-8",
             skipEmptyLines: true,
+            beforeFirstChunk: function(chunk) {
+                let rows = chunk.split(/\r\n|\r|\n/);
+                let headings = rows[0].split(',');
+                headings.forEach(function(result, index) {
+                    mapping.forEach(function(d) {
+                        if (d.csvHeader.trim() == result.trim()) {
+                            headings[index] = d.sysHeader.trim()
+                        }
+                    });
+                });
+                rows[0] = headings.join();
+                return rows.join('\n');
+            },
             complete: function(results) {
                 //console.log('results', results);
             },
@@ -253,7 +312,7 @@ var parseCSV = function(_file, template, cb) {
                     return;
 
                 //console.log('finished', streamer.streamer._finished);
-                console.log('streamer', streamer.streamer);
+                //console.log('streamer', streamer.streamer);
 
                 // calculate progress
                 let progress = Math.round((streamer.streamer._config.chunkSize * chunks) / streamer.streamer._input.size * 100);
@@ -290,7 +349,7 @@ var parseCSV = function(_file, template, cb) {
 
                 template.find('#btnNext').children[0].innerHTML = progress + '% completed';
                 template.find('#btnNext').children[1].children[0].style.width = progress + '%';
-                console.log('progress', progress);
+                //console.log('progress', progress);
                 chunks++;
             }
         });
@@ -325,27 +384,28 @@ Template.readCSV.helpers({
         let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
         //console.log('activeFiletype', activeFiletype);
         let sysActiveHeader;
+
         switch (activeFiletype.id) {
-            case 1:
+            case 1: // product information
                 sysActiveHeader = ProductInformationHeaders;
                 break;
-            case 2:
-                sysActiveHeader = ProductInformationHeaders;
+            case 2: // product Price
+                sysActiveHeader = ProductPriceHeaders;
                 break;
-            case 3:
-                sysActiveHeader = ProductInformationHeaders;
+            case 3: // Product Imprint Data
+                sysActiveHeader = ProductImprintDataHeaders;
                 break;
             case 4:
-                sysActiveHeader = ProductInformationHeaders;
+                sysActiveHeader = ProductImageHeaders;
                 break;
             case 5:
-                sysActiveHeader = ProductInformationHeaders;
+                sysActiveHeader = ProductShippingHeaders;
                 break;
             case 6:
-                sysActiveHeader = ProductInformationHeaders;
+                sysActiveHeader = ProductAdditionalChargeHeaders;
                 break;
             case 7:
-                sysActiveHeader = ProductInformationHeaders;
+                sysActiveHeader = ProductVariationPricingHeaders;
                 break;
             default:
                 sysActiveHeader = [];

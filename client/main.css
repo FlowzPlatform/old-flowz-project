@@ -1004,3 +1004,9 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 #mapping .progress-button {
     margin-top: 20px;
 }
+
+#mapping .view-mapping {
+    height: 281px;
+    overflow-y: auto;
+    width: 100%;
+}
