@@ -776,6 +776,10 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
     margin-left: 25px;
 }
 
+.progress-button.inProgress {
+    pointer-events: none;
+}
+
 
 /*****************end progress button ***********************/
 

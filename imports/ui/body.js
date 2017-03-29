@@ -73,6 +73,9 @@ Template.readCSV.events({
 
     },
     'click #btnNext': function(event, template) {
+
+        $(template.find('#btnNext')).addClass('inProgress');
+
         parseCSV(template.find('#csv-file').files[0], template, function() {
             let ft = template.filetypes.get(); // all file type
             let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
@@ -82,12 +85,12 @@ Template.readCSV.events({
             ft[activeFiletypeId].isActive = true;
 
             template.filetypes.set(ft)
-
             template.find('#csv-file').files.value = "";
             template.find("#mapping").style.display = 'none';
             template.find("#preview").style.display = 'none';
             template.find('#btnPreview').children[1].children[0].style.width = '0%';
             template.find('#btnNext').children[1].children[0].style.width = '0%';
+            $(template.find('#btnNext')).removeClass('inProgress');
         });
     }
 });
