@@ -28,8 +28,8 @@ Template.readCSV.events({
     "change #csv-file": function(event, template) {
         let _files = [];
 
-        for (var i = 0; i < template.find('#csv-file').files.length; i++) {
-            var regex = new RegExp("(.*?)\.(csv)$");
+        for (let i = 0; i < template.find('#csv-file').files.length; i++) {
+            let regex = new RegExp("(.*?)\.(csv)$");
             if ((regex.test(template.find('#csv-file').files[i].name))) {
                 // view file progress
                 let existFiles = template.files.get();
@@ -40,7 +40,7 @@ Template.readCSV.events({
             }
         }
         Papa.LocalChunkSize = 1000000; // 1000kb
-        for (var i = 0; i < _files.length; i++) {
+        for (let i = 0; i < _files.length; i++) {
             //template.find("#mapping").style.display = 'block';
             $(template.find("#mapping")).show().find('.spinner').show();
 
@@ -113,7 +113,7 @@ let generateMapping = function(template) {
 let getExistCSVHeader = function(template) {
     let ft = template.filetypes.get(); // all file type
     let fileTypeID = _.find(ft, function(d) { return d.isActive }).id;
-    var isExist = Csvfilemapping.findOne({ owner: Meteor.userId(), fileTypeID: fileTypeID });
+    let isExist = Csvfilemapping.findOne({ owner: Meteor.userId(), fileTypeID: fileTypeID });
     if (isExist != undefined) {
         return isExist.mapping;
     } else {
@@ -131,11 +131,13 @@ let generateXEditor = function(template, cb) {
     //console.log('csvHeader', _csvHeader);
     // create mapping
     activefile.forEach(function(result, index) {
-        let _val
+        let _val;
+        let _datatype = result.type;
 
         // if already mapping header then first getting in db
         if (_existCSVHeader.length > 0) {
             _val = _.find(_existCSVHeader, function(d) { return d.sysHeader == result.column }).csvHeader;
+            _datatype = _.find(_existCSVHeader, function(d) { return d.sysHeader == result.column }).datatype;
         } else {
             if (_hasHeader) {
                 _val = getHeaderDistance(result.column, _csvHeader);
@@ -150,10 +152,10 @@ let generateXEditor = function(template, cb) {
         });
         $(template.find('#dpdcsvheader_' + index)).editable('setValue', _val)
         $(template.find('#dpddatatype_' + index)).editable({
-            value: result.type,
+            value: _datatype,
             source: _dataTypes
         });
-        $(template.find('#dpddatatype_' + index)).editable('setValue', result.type)
+        $(template.find('#dpddatatype_' + index)).editable('setValue', _datatype)
     });
     cb();
 }
@@ -207,7 +209,7 @@ let getHeaderDistance = function(sysColumn, csvHeaders) {
 let insertCSVMapping = function(fileTypeID, mapping, cb) {
 
 
-    var isExist = Csvfilemapping.findOne({ owner: Meteor.userId(), fileTypeID: fileTypeID });
+    let isExist = Csvfilemapping.findOne({ owner: Meteor.userId(), fileTypeID: fileTypeID });
     if (isExist == undefined) {
         let _data = {
             mapping: mapping,
@@ -352,8 +354,7 @@ let generatePreview = function(_file, template, mapping, cb) {
     });
 };
 
-
-var parseCSV = function(_file, template, mapping, cb) {
+let parseCSV = function(_file, template, mapping, cb) {
     let _hasHeader = $(template.find('#hasheader')).prop('checked');
     let file = {
         name: _file.name,
@@ -445,7 +446,7 @@ var parseCSV = function(_file, template, mapping, cb) {
                 // update progress
 
                 let existFiles = template.files.get();
-                for (var i = 0; i < existFiles.length; i++) {
+                for (let i = 0; i < existFiles.length; i++) {
                     if (existFiles[i].name == streamer.streamer._input.name)
                         existFiles[i].progress = progress;
                 }
@@ -542,7 +543,7 @@ Template.readCSV.helpers({
 });
 
 
-// var insertCSVData = function(fileID, datas, cb) {
+// let insertCSVData = function(fileID, datas, cb) {
 //     let _data = [];
 //     datas.forEach(function(d) {
 //         _data.push({
