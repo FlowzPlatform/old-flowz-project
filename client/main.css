@@ -1102,3 +1102,15 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 #steps-block {
     margin-bottom: 10px;
 }
+
+#handson-Zone-during-upload {
+    display: none;
+}
+
+#handson-Zone-during-upload>.handson-table {
+    width: 100%;
+    overflow-y: auto;
+    height: 200px;
+    margin-bottom: 5px;
+    overflow-x: hidden;
+}

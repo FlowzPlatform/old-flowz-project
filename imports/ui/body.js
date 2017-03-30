@@ -148,15 +148,15 @@ let generateXEditor = function(template, cb) {
         }
 
         $(template.find('#dpdcsvheader_' + index)).editable({
-            value: _val,
+            value: _val.toLowerCase(),
             source: _csvHeader
         });
-        $(template.find('#dpdcsvheader_' + index)).editable('setValue', _val)
+        $(template.find('#dpdcsvheader_' + index)).editable('setValue', _val.toLowerCase())
         $(template.find('#dpddatatype_' + index)).editable({
-            value: _datatype,
+            value: _datatype.toLowerCase(),
             source: _dataTypes
         });
-        $(template.find('#dpddatatype_' + index)).editable('setValue', _datatype)
+        $(template.find('#dpddatatype_' + index)).editable('setValue', _datatype.toLowerCase())
     });
     cb();
 }
@@ -175,11 +175,13 @@ let resetAll = function(template) {
     $(template.find('#csv-file')).val('');
     template.find("#mapping").style.display = 'none';
     template.find("#preview").style.display = 'none';
+    $(template.find('#btnPreview')).show();
     template.find('#btnPreview').children[1].children[0].style.width = '0%';
     template.find('#btnNext').children[1].children[0].style.width = '0%';
     $(template.find('#btnNext')).removeClass('inProgress');
     $(template.find("#upload-csv-zone")).show();
     template.find('#btnNext').children[0].innerHTML = 'Upload record';
+    $(template.find("#handson-Zone-during-upload")).hide();
 
     // destroyXEditor
 
@@ -280,7 +282,7 @@ let getHeader = function(_file, template, cb) {
         skipEmptyLines: true,
         beforeFirstChunk: function(chunk) {
             let rows = CSVtoArray(chunk);
-            let headings = rows[0];
+            let headings = rows[0].map(v => v.toLowerCase());
             if (!_hasHeader) {
                 let newHeaders = [];
                 headings.forEach(function(result, index) {
@@ -300,11 +302,38 @@ let getHeader = function(_file, template, cb) {
         chunk: function(results, streamer) {
             streamer.abort();
             cb();
-            return;
         }
     });
 };
 
+let generateDatawithNewHeader = function(chunk, _hasHeader, mapping) {
+    let rows = CSVtoArray(chunk);
+    //let headings = rows[0].map(v => v.toLowerCase());
+    let headings = rows[0];
+    if (_hasHeader) {
+        headings.forEach(function(result, index) {
+            mapping.forEach(function(d) {
+                if (d.csvHeader.trim() == result.trim()) {
+                    headings[index] = d.sysHeader.trim()
+                }
+            });
+        });
+        return arrayToCSV(rows);
+    } else {
+        let newHeaders = [];
+        headings.forEach(function(result, index) {
+            newHeaders.push('header' + (index + 1));
+        });
+        newHeaders.forEach(function(result, index) {
+            mapping.forEach(function(d) {
+                if (d.csvHeader.trim() == result.trim()) {
+                    newHeaders[index] = d.sysHeader.trim()
+                }
+            });
+        });
+        return newHeaders.join(',') + '\n' + arrayToCSV(rows);
+    }
+}
 
 let generatePreview = function(_file, template, mapping, cb) {
     let _hasHeader = $(template.find('#hasheader')).prop('checked');
@@ -314,31 +343,7 @@ let generatePreview = function(_file, template, mapping, cb) {
         encoding: "UTF-8",
         skipEmptyLines: true,
         beforeFirstChunk: function(chunk) {
-            let rows = CSVtoArray(chunk);
-            let headings = rows[0];
-            if (_hasHeader) {
-                headings.forEach(function(result, index) {
-                    mapping.forEach(function(d) {
-                        if (d.csvHeader.trim() == result.trim()) {
-                            headings[index] = d.sysHeader.trim()
-                        }
-                    });
-                });
-                return arrayToCSV(rows);
-            } else {
-                let newHeaders = [];
-                headings.forEach(function(result, index) {
-                    newHeaders.push('header' + (index + 1));
-                });
-                newHeaders.forEach(function(result, index) {
-                    mapping.forEach(function(d) {
-                        if (d.csvHeader.trim() == result.trim()) {
-                            newHeaders[index] = d.sysHeader.trim()
-                        }
-                    });
-                });
-                return newHeaders.join(',') + '\n' + arrayToCSV(rows);
-            }
+            return generateDatawithNewHeader(chunk, _hasHeader, mapping);
         },
         complete: function(results) {
             //console.log('results', results);
@@ -357,6 +362,7 @@ let generatePreview = function(_file, template, mapping, cb) {
 };
 
 let parseCSV = function(_file, template, mapping, cb) {
+    $("#btnPreview").hide();
     let _hasHeader = $(template.find('#hasheader')).prop('checked');
     $(template.find('#btnNext')).find('.progress-inner').css({ 'width': '0%' });
     $(template.find('#btnNext')).find('.content').text('Start uploding...');
@@ -381,85 +387,71 @@ let parseCSV = function(_file, template, mapping, cb) {
             dynamicTyping: true,
             encoding: "UTF-8",
             skipEmptyLines: true,
-            beforeFirstChunk: function(chunk) {
-                let rows = CSVtoArray(chunk);
-                let headings = rows[0];
-                if (_hasHeader) {
-                    headings.forEach(function(result, index) {
-                        mapping.forEach(function(d) {
-                            if (d.csvHeader.trim() == result.trim()) {
-                                headings[index] = d.sysHeader.trim()
-                            }
-                        });
-                    });
-                    return arrayToCSV(rows);
-                } else {
-                    let newHeaders = [];
-                    headings.forEach(function(result, index) {
-                        newHeaders.push('header' + (index + 1));
-                    });
-
-                    newHeaders.forEach(function(result, index) {
-                        mapping.forEach(function(d) {
-                            if (d.csvHeader.trim() == result.trim()) {
-                                newHeaders[index] = d.sysHeader.trim()
-                            }
-                        });
-                    });
-                    return newHeaders.join(',') + '\n' + arrayToCSV(rows);
-                }
-            },
             complete: function(results) {
-                //console.log('results', results);
+                console.log('complate results', results);
+                cb();
             },
             error: function(error, f) {
                 console.log("ERROR:", error, f);
             },
-            chunk: function(results, streamer) {
-
-                if (!results)
-                    return;
-
-                //console.log('finished', streamer.streamer._finished);
-                //console.log('streamer', streamer.streamer);
-
-                // calculate progress
-                let progress = Math.round((streamer.streamer._config.chunkSize * chunks) / streamer.streamer._input.size * 100);
-                progress = progress > 100 ? 100 : progress;
-                let noOfRecords = streamer.streamer._rowCount;
-
-                // insert chunk data in mongo db
-                streamer.pause();
-                //Meteor.call('products.insertCSVData', fileID, results.data, function() {
-                insertCSVData(fileID, results.data, template, progress, function() {
-                    // update file progress
-                    Csvfiles.update(fileID, {
-                            $set: { progress, noOfRecords }
-                        },
-                        function(e, res) {
-                            if (progress < 100) {
-                                streamer.resume();
-                            } else {
-                                streamer.abort();
-                                cb(); // callback 'parseCSV' method
-                            }
-                        });
+            step: function(results, parser) {
+                //console.log("Row:", results.data[0]);
+                parser.pause();
+                let ft = template.filetypes.get(); // all file type
+                let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
+                insertCSVData(results.data[0], fileID, activeFiletype.collection, function() {
+                    $('#buttonProceedNext').hide();
+                    parser.resume();
                 });
-                //console.log("Chunk data:", results.data.length, results);
+            },
+            beforeFirstChunk: function(chunk) {
+                return generateDatawithNewHeader(chunk, _hasHeader, mapping);
+            },
+            // chunk: function(results, streamer) {
 
-                // update progress
+            //     if (!results)
+            //         return;
 
-                // let existFiles = template.files.get();
-                // for (let i = 0; i < existFiles.length; i++) {
-                //     if (existFiles[i].name == streamer.streamer._input.name)
-                //         existFiles[i].progress = progress;
-                // }
-                // template.files.set(existFiles);
-                //$(template.find('#btnNext')).find('.progress-inner').css({ 'width': progress + '%' })
-                //$(template.find('#btnNext')).find('.content').text(progress + '% completed');
-                //console.log('progress', progress);
-                chunks++;
-            }
+            //     //console.log('finished', streamer.streamer._finished);
+            //     //console.log('streamer', streamer.streamer);
+
+            //     // calculate progress
+            //     let progress = Math.round((streamer.streamer._config.chunkSize * chunks) / streamer.streamer._input.size * 100);
+            //     progress = progress > 100 ? 100 : progress;
+            //     let noOfRecords = streamer.streamer._rowCount;
+
+            //     // insert chunk data in mongo db
+            //     streamer.pause();
+            //     //Meteor.call('products.insertCSVData', fileID, results.data, function() {
+            //     insertCSVData(fileID, results.data, template, progress, streamer, function() {
+            //         // update file progress
+            //         Csvfiles.update(fileID, {
+            //                 $set: { progress, noOfRecords }
+            //             },
+            //             function(e, res) {
+            //                 if (progress < 100) {
+            //                     //streamer.resume();
+            //                 } else {
+            //                     streamer.abort();
+            //                     cb(); // callback 'parseCSV' method
+            //                 }
+            //             });
+            //     });
+            //     //console.log("Chunk data:", results.data.length, results);
+
+            //     // update progress
+
+            //     // let existFiles = template.files.get();
+            //     // for (let i = 0; i < existFiles.length; i++) {
+            //     //     if (existFiles[i].name == streamer.streamer._input.name)
+            //     //         existFiles[i].progress = progress;
+            //     // }
+            //     // template.files.set(existFiles);
+            //     //$(template.find('#btnNext')).find('.progress-inner').css({ 'width': progress + '%' })
+            //     //$(template.find('#btnNext')).find('.content').text(progress + '% completed');
+            //     //console.log('progress', progress);
+            //     chunks++;
+            // }
         });
     });
 }
@@ -517,21 +509,48 @@ Template.readCSV.helpers({
     }
 });
 
-let insertCSVData = function(fileID, datas, template, maxProgress, cb) {
-    let ft = template.filetypes.get(); // all file type
-    let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
-
-    maxProgress = maxProgress > 100 ? 100 : maxProgress;
-    datas.forEach(function(d, inx) {
-        d['fileID'] = fileID;
-        d['owner'] = Meteor.userId();
-        d['username'] = Meteor.user().username;
-        activeFiletype.collection.insert(d, function(err, res) {
-            var newProgress = Math.round(((inx + 1) * maxProgress) / datas.length);
-            $(template.find('#btnNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
-            $(template.find('#btnNext')).find('.content').text(newProgress + '% completed');
-        });
+let insertCSVData = function(data, fileID, collection, cb) {
+    let copedata = $.extend({}, data);
+    data['fileID'] = fileID;
+    data['owner'] = Meteor.userId();
+    data['username'] = Meteor.user().username;
+    collection.insert(data, function(err, res) {
+        if (err) {
+            console.log('errmessage', err.message);
+            console.log('err', err.invalidKeys);
+            console.log('data', data);
+            $("#upload-csv-zone,#preview").hide();
+            $("#handson-Zone-during-upload").show();
+            $('#buttonProceedNext').show();
+            renderHandsonTable(copedata, Object.keys(copedata), 'hotErrorDataDuringUpload', err, fileID, collection, cb);
+        } else {
+            cb(); // callback
+        }
     });
-    cb(); // callback //insetcsvData
-    //Products.batchInsert(_data, function(err, res) { cb(err, res); });
+}
+
+let renderHandsonTable = function(dataObject, headers, eleName, error, fileID, collection, cb) {
+    //Csvfiles.update(fileID, {$set: { 'errorString' :  error }});
+    //  console.log(headers);
+    let hotSettings = {
+        data: dataObject,
+        columns: "",
+        stretchH: 'all',
+        autoWrapRow: true,
+        //height: 441,
+        //maxRows: 22,
+        rowHeaders: true,
+        //colHeaders: getHeadersValues(headers),
+        colHeaders: headers,
+        afterChange: function(changes, source) {
+            //updateErrorData(changes, source, dataObject, fileID);
+            $("#buttonProceedNext").unbind('click').click(function() {
+                console.log('afterchange', dataObject);
+                insertCSVData(dataObject, fileID, collection, cb);
+            });
+        }
+    };
+    hotElement = document.querySelector('#' + eleName);
+
+    objHandsontable = new Handsontable(hotElement, hotSettings);
 }
