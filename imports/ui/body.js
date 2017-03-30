@@ -389,7 +389,10 @@ let parseCSV = function(_file, template, mapping, cb) {
             skipEmptyLines: true,
             complete: function(results) {
                 console.log('complate results', results);
-                cb();
+                Csvfiles.update(fileID, { $set: { progress: 100 } }, function(e, res) {
+                    cb();
+                });
+
             },
             error: function(error, f) {
                 console.log("ERROR:", error, f);
@@ -401,6 +404,7 @@ let parseCSV = function(_file, template, mapping, cb) {
                 let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
                 insertCSVData(results.data[0], fileID, activeFiletype.collection, function() {
                     $('#buttonProceedNext').hide();
+                    $("#errMessageFromSchema").text('');
                     parser.resume();
                 });
             },
@@ -522,6 +526,7 @@ let insertCSVData = function(data, fileID, collection, cb) {
             $("#upload-csv-zone,#preview").hide();
             $("#handson-Zone-during-upload").show();
             $('#buttonProceedNext').show();
+            $("#errMessageFromSchema").text(err.message);
             renderHandsonTable(copedata, Object.keys(copedata), 'hotErrorDataDuringUpload', err, fileID, collection, cb);
         } else {
             cb(); // callback
