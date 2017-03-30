@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveDict } from 'meteor/reactive-dict';
 
-
+// import  Headers
 import { ProductInformationHeaders } from '../../lib/headers/product_information.js'
 import { ProductPriceHeaders } from '../../lib/headers/product_price.js'
 import { ProductImprintDataHeaders } from '../../lib/headers/product_imprint_data.js'
@@ -12,8 +12,9 @@ import { ProductAdditionalChargeHeaders } from '../../lib/headers/product_additi
 import { ProductVariationPricingHeaders } from '../../lib/headers/product_variation_pricing.js'
 
 
+// import  collections
 
-import { Products } from '../api/collections.js';
+import { CollProductInformation, CollProductPricing, CollProductImprintData, CollProductImage, CollProductShipping, CollProductAdditionalCharges, CollProductVariationPrice } from '../api/collections.js';
 import { Csvfiles } from '../api/collections.js';
 import { Csvfilemapping } from '../api/collections.js';
 
@@ -163,11 +164,12 @@ let generateXEditor = function(template, cb) {
 let resetAll = function(template) {
 
     let ft = template.filetypes.get(); // all file type
-    let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
 
-    ft[activeFiletypeId - 1].isActive = false;
-    ft[activeFiletypeId - 1].isDone = true;
-    ft[activeFiletypeId].isActive = true;
+    let activeFiletypeId = _.indexOf(ft, _.find(ft, function(d) { return d.isActive }));
+
+    ft[activeFiletypeId].isActive = false;
+    ft[activeFiletypeId].isDone = true;
+    ft[activeFiletypeId + 1].isActive = true;
 
     template.filetypes.set(ft)
     $(template.find('#csv-file')).val('');
@@ -356,6 +358,8 @@ let generatePreview = function(_file, template, mapping, cb) {
 
 let parseCSV = function(_file, template, mapping, cb) {
     let _hasHeader = $(template.find('#hasheader')).prop('checked');
+    $(template.find('#btnNext')).find('.progress-inner').css({ 'width': '0%' });
+    $(template.find('#btnNext')).find('.content').text('Start uploding...');
     let file = {
         name: _file.name,
         size: _file.size,
@@ -426,8 +430,8 @@ let parseCSV = function(_file, template, mapping, cb) {
 
                 // insert chunk data in mongo db
                 streamer.pause();
-                Meteor.call('products.insertCSVData', fileID, results.data, function() {
-                    //insertCSVData(fileID, results.data, function(err, res) {
+                //Meteor.call('products.insertCSVData', fileID, results.data, function() {
+                insertCSVData(fileID, results.data, template, progress, function() {
                     // update file progress
                     Csvfiles.update(fileID, {
                             $set: { progress, noOfRecords }
@@ -437,7 +441,7 @@ let parseCSV = function(_file, template, mapping, cb) {
                                 streamer.resume();
                             } else {
                                 streamer.abort();
-                                cb();
+                                cb(); // callback 'parseCSV' method
                             }
                         });
                 });
@@ -445,15 +449,14 @@ let parseCSV = function(_file, template, mapping, cb) {
 
                 // update progress
 
-                let existFiles = template.files.get();
-                for (let i = 0; i < existFiles.length; i++) {
-                    if (existFiles[i].name == streamer.streamer._input.name)
-                        existFiles[i].progress = progress;
-                }
-                template.files.set(existFiles);
-
-                template.find('#btnNext').children[0].innerHTML = progress + '% completed';
-                template.find('#btnNext').children[1].children[0].style.width = progress + '%';
+                // let existFiles = template.files.get();
+                // for (let i = 0; i < existFiles.length; i++) {
+                //     if (existFiles[i].name == streamer.streamer._input.name)
+                //         existFiles[i].progress = progress;
+                // }
+                // template.files.set(existFiles);
+                //$(template.find('#btnNext')).find('.progress-inner').css({ 'width': progress + '%' })
+                //$(template.find('#btnNext')).find('.content').text(progress + '% completed');
                 //console.log('progress', progress);
                 chunks++;
             }
@@ -468,13 +471,13 @@ Template.readCSV.onCreated(function() {
     this.previewRec = new ReactiveVar([]);
     this.filetypes = new ReactiveVar(
         [
-            { id: 1, name: 'Product Info', isDone: false, isActive: true },
-            { id: 2, name: 'Product Pricing', isDone: false, isActive: false },
-            { id: 3, name: 'Imprint Data', isDone: false, isActive: false },
-            { id: 4, name: 'Image', isDone: false, isActive: false },
-            { id: 5, name: 'Shipping', isDone: false, isActive: false },
-            { id: 6, name: 'Additional Charges', isDone: false, isActive: false },
-            { id: 7, name: 'Variation Price', isDone: false, isActive: false }
+            { id: 'ProductInformation', name: 'Product Information', isDone: false, isActive: true, header: ProductInformationHeaders, collection: CollProductInformation },
+            { id: 'ProductPricing', name: 'Product Pricing', isDone: false, isActive: false, header: ProductPriceHeaders, collection: CollProductPricing },
+            { id: 'ProductImprintData', name: 'Imprint Data', isDone: false, isActive: false, header: ProductImprintDataHeaders, collection: CollProductImprintData },
+            { id: 'ProductImage', name: 'Image', isDone: false, isActive: false, header: ProductImageHeaders, collection: CollProductImage },
+            { id: 'ProductShipping', name: 'Shipping', isDone: false, isActive: false, header: ProductShippingHeaders, collection: CollProductShipping },
+            { id: 'ProductAdditionalCharges', name: 'Additional Charges', isDone: false, isActive: false, header: ProductAdditionalChargeHeaders, collection: CollProductAdditionalCharges },
+            { id: 'ProductVariationPrice', name: 'Variation Price', isDone: false, isActive: false, header: ProductVariationPricingHeaders, collection: CollProductVariationPrice }
         ]
     );
     this.dataTypes = new ReactiveVar(['text', 'integer', 'date']);
@@ -488,35 +491,7 @@ Template.readCSV.helpers({
         let ft = Template.instance().filetypes.get(); // all file type
         let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
         //console.log('activeFiletype', activeFiletype);
-        let sysActiveHeader;
-
-        switch (activeFiletype.id) {
-            case 1: // product information
-                sysActiveHeader = ProductInformationHeaders;
-                break;
-            case 2: // product Price
-                sysActiveHeader = ProductPriceHeaders;
-                break;
-            case 3: // Product Imprint Data
-                sysActiveHeader = ProductImprintDataHeaders;
-                break;
-            case 4:
-                sysActiveHeader = ProductImageHeaders;
-                break;
-            case 5:
-                sysActiveHeader = ProductShippingHeaders;
-                break;
-            case 6:
-                sysActiveHeader = ProductAdditionalChargeHeaders;
-                break;
-            case 7:
-                sysActiveHeader = ProductVariationPricingHeaders;
-                break;
-            default:
-                sysActiveHeader = [];
-                break;
-        }
-        Template.instance().headers.set(sysActiveHeader);
+        Template.instance().headers.set(activeFiletype.header);
         return Template.instance().headers.get();
     },
     csvHeaders() {
@@ -542,16 +517,21 @@ Template.readCSV.helpers({
     }
 });
 
+let insertCSVData = function(fileID, datas, template, maxProgress, cb) {
+    let ft = template.filetypes.get(); // all file type
+    let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
 
-// let insertCSVData = function(fileID, datas, cb) {
-//     let _data = [];
-//     datas.forEach(function(d) {
-//         _data.push({
-//             fileID: fileID,
-//             data: d,
-//             owner: Meteor.userId(),
-//             username: Meteor.user().username,
-//         });
-//     });
-//     Products.batchInsert(_data, function(err, res) { cb(err, res); });
-// }
+    maxProgress = maxProgress > 100 ? 100 : maxProgress;
+    datas.forEach(function(d, inx) {
+        d['fileID'] = fileID;
+        d['owner'] = Meteor.userId();
+        d['username'] = Meteor.user().username;
+        activeFiletype.collection.insert(d, function(err, res) {
+            var newProgress = Math.round(((inx + 1) * maxProgress) / datas.length);
+            $(template.find('#btnNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
+            $(template.find('#btnNext')).find('.content').text(newProgress + '% completed');
+        });
+    });
+    cb(); // callback //insetcsvData
+    //Products.batchInsert(_data, function(err, res) { cb(err, res); });
+}

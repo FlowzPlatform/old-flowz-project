@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import { Products } from '../imports/api/collections.js';
+import { CollProductInformation } from '../imports/api/collections.js';
 import { Csvfiles } from '../imports/api/collections.js';
 
 Meteor.methods({
@@ -11,6 +11,6 @@ Meteor.methods({
             d['username'] = Meteor.user().username;
             _data.push(d);
         });
-        return Products.batchInsert(_data);
+        return CollProductInformation.batchInsert(_data);
     }
 });
