@@ -1,12 +1,12 @@
 /* CSS declarations go here */
 
-#upload-csv-zone {
+#upload-csv-zone>.file-zone {
     border: 2px dashed #494e6b;
     position: relative;
     margin-bottom: 15px;
 }
 
-#upload-csv-zone>input[type="file"] {
+#upload-csv-zone>.file-zone>input[type="file"] {
     width: 100%;
     height: 200px;
     opacity: 0;

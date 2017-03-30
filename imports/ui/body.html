@@ -43,11 +43,19 @@
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active">
                         <div id="upload-csv-zone">
-                            <span class="dz-message">Drop files here or click to upload.<br/>
-                                <small>(only csv files are valid.)</small>
-                            </span>
-                            <input type="file" id="csv-file" name="files" accept=".csv"/>
+                            <div class="file-zone">
+                                <span class="dz-message">Drop files here or click to upload.<br/>
+                                    <small>(only csv files are valid.)</small>
+                                </span>
+                                <input type="file" id="csv-file" name="files" accept=".csv"/>
+                            </div>
+                            <div class="clearfix">
+                                <label>
+                                    <input type="checkbox" id="hasheader" checked="checked"/> Has header
+                                </label>
+                            </div>
                         </div>
+                        
                         <!--<button type="submit" class="btn btn-primary btnReadCsv">Read</button>-->
 
                         <div id="preview"  class="row" style="display: none;">

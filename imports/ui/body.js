@@ -44,8 +44,6 @@ Template.readCSV.events({
             //template.find("#mapping").style.display = 'block';
             $(template.find("#mapping")).show().find('.spinner').show();
 
-
-
             getHeader(_files[i], template, function() {
                 generateXEditor(template, function() { // generate x-editor
                     $(template.find("#mapping")).find('.spinner').hide();
@@ -128,6 +126,7 @@ let generateXEditor = function(template, cb) {
     let _csvHeader = template.csvHeaders.get();
     let _dataTypes = template.dataTypes.get();
     let _existCSVHeader = getExistCSVHeader(template);
+    let _hasHeader = $(template.find('#hasheader')).prop('checked');
     //console.log('dataTypes', _dataTypes);
     //console.log('csvHeader', _csvHeader);
     // create mapping
@@ -138,7 +137,11 @@ let generateXEditor = function(template, cb) {
         if (_existCSVHeader.length > 0) {
             _val = _.find(_existCSVHeader, function(d) { return d.sysHeader == result.column }).csvHeader;
         } else {
-            _val = getHeaderDistance(result.column, _csvHeader);
+            if (_hasHeader) {
+                _val = getHeaderDistance(result.column, _csvHeader);
+            } else {
+                _val = _csvHeader[index]
+            }
         }
 
         $(template.find('#dpdcsvheader_' + index)).editable({
@@ -201,7 +204,7 @@ let getHeaderDistance = function(sysColumn, csvHeaders) {
     return res;
 }
 
-var insertCSVMapping = function(fileTypeID, mapping, cb) {
+let insertCSVMapping = function(fileTypeID, mapping, cb) {
 
 
     var isExist = Csvfilemapping.findOne({ owner: Meteor.userId(), fileTypeID: fileTypeID });
@@ -229,20 +232,60 @@ var insertCSVMapping = function(fileTypeID, mapping, cb) {
     }
 }
 
-var getHeader = function(_file, template, cb) {
+// Return array of string values, or NULL if CSV string not well formed.
+let CSVtoArray = function(text) {
+    let p = '',
+        row = [''],
+        ret = [row],
+        i = 0,
+        r = 0,
+        s = !0,
+        l;
+    for (l in text) {
+        l = text[l];
+        if ('"' === l) {
+            if (s && l === p) row[i] += l;
+            s = !s;
+        } else if (',' === l && s) l = row[++i] = '';
+        else if ('\n' === l && s) {
+            if ('\r' === p) row[i] = row[i].slice(0, -1);
+            row = ret[++r] = [l = ''];
+            i = 0;
+        } else row[i] += l;
+        p = l;
+    }
+    return ret;
+};
+
+let arrayToCSV = function(row) {
+    for (let i in row) {
+        for (let j in row[i]) {
+            row[i][j] = "\"" + row[i][j] + "\"";
+        }
+        row[i] = row[i].join(',');
+    }
+    return row.join('\n');
+}
+
+let getHeader = function(_file, template, cb) {
+    let _hasHeader = $(template.find('#hasheader')).prop('checked');
     Papa.parse(_file, {
-        header: true,
+        header: _hasHeader,
         dynamicTyping: true,
         encoding: "UTF-8",
         skipEmptyLines: true,
         beforeFirstChunk: function(chunk) {
-            let rows = chunk.split(/\r\n|\r|\n/);
-            let headings = rows[0].split(',');
-            //console.log('headings', headings);
-            template.csvHeaders.set(headings);
-            // headings[0] = 'newHeading';
-            // rows[0] = headings.join();
-            // console.log(rows.join('\n'));
+            let rows = CSVtoArray(chunk);
+            let headings = rows[0];
+            if (!_hasHeader) {
+                let newHeaders = [];
+                headings.forEach(function(result, index) {
+                    newHeaders.push('header' + (index + 1));
+                });
+                template.csvHeaders.set(newHeaders);
+            } else {
+                template.csvHeaders.set(headings);
+            }
         },
         complete: function(results) {
             //console.log('results', results);
@@ -259,24 +302,39 @@ var getHeader = function(_file, template, cb) {
 };
 
 
-var generatePreview = function(_file, template, mapping, cb) {
+let generatePreview = function(_file, template, mapping, cb) {
+    let _hasHeader = $(template.find('#hasheader')).prop('checked');
     Papa.parse(_file, {
         header: true,
         dynamicTyping: true,
         encoding: "UTF-8",
         skipEmptyLines: true,
         beforeFirstChunk: function(chunk) {
-            let rows = chunk.split(/\r\n|\r|\n/);
-            let headings = rows[0].split(',');
-            headings.forEach(function(result, index) {
-                mapping.forEach(function(d) {
-                    if (d.csvHeader.trim() == result.trim()) {
-                        headings[index] = d.sysHeader.trim()
-                    }
+            let rows = CSVtoArray(chunk);
+            let headings = rows[0];
+            if (_hasHeader) {
+                headings.forEach(function(result, index) {
+                    mapping.forEach(function(d) {
+                        if (d.csvHeader.trim() == result.trim()) {
+                            headings[index] = d.sysHeader.trim()
+                        }
+                    });
                 });
-            });
-            rows[0] = headings.join();
-            return rows.join('\n');
+                return arrayToCSV(rows);
+            } else {
+                let newHeaders = [];
+                headings.forEach(function(result, index) {
+                    newHeaders.push('header' + (index + 1));
+                });
+                newHeaders.forEach(function(result, index) {
+                    mapping.forEach(function(d) {
+                        if (d.csvHeader.trim() == result.trim()) {
+                            newHeaders[index] = d.sysHeader.trim()
+                        }
+                    });
+                });
+                return newHeaders.join(',') + '\n' + arrayToCSV(rows);
+            }
         },
         complete: function(results) {
             //console.log('results', results);
@@ -296,6 +354,7 @@ var generatePreview = function(_file, template, mapping, cb) {
 
 
 var parseCSV = function(_file, template, mapping, cb) {
+    let _hasHeader = $(template.find('#hasheader')).prop('checked');
     let file = {
         name: _file.name,
         size: _file.size,
@@ -318,17 +377,32 @@ var parseCSV = function(_file, template, mapping, cb) {
             encoding: "UTF-8",
             skipEmptyLines: true,
             beforeFirstChunk: function(chunk) {
-                let rows = chunk.split(/\r\n|\r|\n/);
-                let headings = rows[0].split(',');
-                headings.forEach(function(result, index) {
-                    mapping.forEach(function(d) {
-                        if (d.csvHeader.trim() == result.trim()) {
-                            headings[index] = d.sysHeader.trim()
-                        }
+                let rows = CSVtoArray(chunk);
+                let headings = rows[0];
+                if (_hasHeader) {
+                    headings.forEach(function(result, index) {
+                        mapping.forEach(function(d) {
+                            if (d.csvHeader.trim() == result.trim()) {
+                                headings[index] = d.sysHeader.trim()
+                            }
+                        });
                     });
-                });
-                rows[0] = headings.join();
-                return rows.join('\n');
+                    return arrayToCSV(rows);
+                } else {
+                    let newHeaders = [];
+                    headings.forEach(function(result, index) {
+                        newHeaders.push('header' + (index + 1));
+                    });
+
+                    newHeaders.forEach(function(result, index) {
+                        mapping.forEach(function(d) {
+                            if (d.csvHeader.trim() == result.trim()) {
+                                newHeaders[index] = d.sysHeader.trim()
+                            }
+                        });
+                    });
+                    return newHeaders.join(',') + '\n' + arrayToCSV(rows);
+                }
             },
             complete: function(results) {
                 //console.log('results', results);
