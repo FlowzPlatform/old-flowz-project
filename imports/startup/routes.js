@@ -1,9 +1,16 @@
 // Import needed templates
 import '../ui/body.js';
 import '../ui/history/history.js';
+import '../ui/landing/landing.js';
+
+
 
 
 Router.route('/', function() {
+    this.render('landing');
+});
+
+Router.route('/upload', function() {
     this.render('readCSV');
 });
 

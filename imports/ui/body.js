@@ -411,8 +411,8 @@ let parseCSV = function(_file, template, mapping, cb) {
 
                     // calculate progress
                     ++uploadedRecords;
-                    //console.log('sku', results.data[0].sku);
-                    //console.log('uploadedRecords', uploadedRecords);
+                    console.log('sku', results.data[0].sku);
+                    console.log('uploadedRecords', uploadedRecords);
                     let newProgress = Math.round((uploadedRecords * 100) / totalRecords);
                     if (progress == newProgress) { parser.resume(); } else {
                         $(template.find('#btnNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
