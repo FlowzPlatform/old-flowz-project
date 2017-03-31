@@ -370,7 +370,8 @@ let parseCSV = function(_file, template, mapping, cb) {
         name: _file.name,
         size: _file.size,
         progress: 0,
-        noOfRecords: 0,
+        totalNoOfRecords: 0,
+        uploadedRecords: 0,
         createdAt: new Date(),
         updateAt: new Date(),
         deleteAt: '',
@@ -382,6 +383,10 @@ let parseCSV = function(_file, template, mapping, cb) {
         let fileID = res; // new file id
         //console.log('fileID', fileID);
         let chunks = 1;
+        console.log('size', _file.size)
+        let totalRecords = 0;
+        let uploadedRecords = 0;
+        let progress = 0;
         Papa.parse(_file, {
             header: true,
             dynamicTyping: true,
@@ -389,26 +394,39 @@ let parseCSV = function(_file, template, mapping, cb) {
             skipEmptyLines: true,
             complete: function(results) {
                 console.log('complate results', results);
-                Csvfiles.update(fileID, { $set: { progress: 100 } }, function(e, res) {
-                    cb();
-                });
-
+                // Csvfiles.update(fileID, { $set: { progress: 100, uploadedRecords: uploadedRecords } }, function(e, res) { });
+                cb();
             },
             error: function(error, f) {
                 console.log("ERROR:", error, f);
             },
             step: function(results, parser) {
-                //console.log("Row:", results.data[0]);
+                //console.log("Row:", results);
                 parser.pause();
                 let ft = template.filetypes.get(); // all file type
                 let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
                 insertCSVData(results.data[0], fileID, activeFiletype.collection, function() {
                     $('#buttonProceedNext').hide();
                     $("#errMessageFromSchema").text('');
-                    parser.resume();
+
+                    // calculate progress
+                    ++uploadedRecords;
+                    //console.log('sku', results.data[0].sku);
+                    //console.log('uploadedRecords', uploadedRecords);
+                    let newProgress = Math.round((uploadedRecords * 100) / totalRecords);
+                    if (progress == newProgress) { parser.resume(); } else {
+                        $(template.find('#btnNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
+                        $(template.find('#btnNext')).find('.content').text(newProgress + '% completed');
+                        Csvfiles.update(fileID, { $set: { progress: newProgress, uploadedRecords: uploadedRecords } }, function(e, res) {
+                            parser.resume();
+                        });
+                    }
                 });
             },
             beforeFirstChunk: function(chunk) {
+                let rows = CSVtoArray(chunk);
+                totalRecords = (_hasHeader) ? rows.length - 2 : rows - 1; // last row getting empty
+                Csvfiles.update(fileID, { $set: { totalNoOfRecords: totalRecords } }, function(e, res) {});
                 return generateDatawithNewHeader(chunk, _hasHeader, mapping);
             },
             // chunk: function(results, streamer) {
