@@ -545,19 +545,40 @@ let insertCSVData = function(data, fileID, collection, cb) {
             $("#handson-Zone-during-upload").show();
             $('#buttonProceedNext').show();
             $("#errMessageFromSchema").text(err.message);
+
             renderHandsonTable(copedata, Object.keys(copedata), 'hotErrorDataDuringUpload', err, fileID, collection, cb);
         } else {
             cb(); // callback
         }
     });
 }
+let errorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
+    td.style.backgroundColor = 'red';
+};
+
+let getHandsonHeader = function(headers, invalidKeys) {
+    let newHeaders = [];
+    _.each(headers, function(val, inx) {
+        if (_.find(invalidKeys, function(d) { return d.name == val; }) != undefined) {
+            newHeaders.push({ colHeader: val, renderer: errorRenderer, data: val })
+        } else {
+            newHeaders.push({ colHeader: val, data: val })
+        }
+    });
+    return newHeaders;
+}
 
 let renderHandsonTable = function(dataObject, headers, eleName, error, fileID, collection, cb) {
     //Csvfiles.update(fileID, {$set: { 'errorString' :  error }});
     //  console.log(headers);
+    console.log('error', error.invalidKeys);
+    console.log('headers', headers);
+    let newHeaders = getHandsonHeader(headers, error.invalidKeys);
+    console.log('newHeaders', newHeaders);
     let hotSettings = {
         data: dataObject,
-        columns: "",
+        columns: newHeaders,
         stretchH: 'all',
         autoWrapRow: true,
         //height: 441,
