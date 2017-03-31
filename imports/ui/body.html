@@ -9,6 +9,7 @@
                 </div>
                 <ul class="nav navbar-nav pull-right">
                     <li class="active"><a href="/">Home</a></li>
+                    <li class=""><a href="/upload">Upload</a></li>
                     <li><a href="/history">History</a></li>
                     <li>{{> loginButtons}}</li>
                 </ul>
@@ -32,7 +33,7 @@
                     {{#each filetypes}}
                         <li role="presentation" class="{{#if isActive}}active{{/if}} {{#if isDone}}done{{/if}}"><a href="#"><i class="fa fa-check-circle-o"></i>{{name}}</a></li>
                     {{/each}}
-                    
+
                     <!--<li role="presentation" class="active"><a href="#Product-price">Product Pricing</a></li>
                     <li role="presentation"><a href="#Imprint-data">Imprint Data</a></li>
                     <li role="presentation"><a href="#Image">Image</a></li>
@@ -62,7 +63,7 @@
                                 <div class="table-responsive" style="margin-bottom: 10px;border-right: 1px solid #ccc;">
                                     {{> reactiveTable  class="table table-bordered table-hover" showNavigation='never' showFilter=false collection=previewRec }}
                                 </div>
-                                
+
                             </div>
                         </div>
                         <div class="clearfix"></div>
@@ -124,7 +125,7 @@
                                                             <span id="dpdsysheader_{{rowIndex}}"  selected="selected">{{column}}</span>
                                                             <!--{{#each headers}}
                                                                 {{#if $eq rowIndex @index}}
-                                                                    
+
                                                                 {{/if}}
                                                             {{/each}}-->
                                                         </td>
@@ -195,7 +196,7 @@
                                 {{/each}}
                             </tbody>
                         </table>-->
-                        
+
                     </div>
                 </div>
             </div>

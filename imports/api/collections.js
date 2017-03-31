@@ -1,6 +1,6 @@
 import { Mongo } from 'meteor/mongo';
 
-// import schema 
+// import schema
 import { ProductInformationSchema } from '../../lib/schema/product_information.js';
 import { ProductAdditionalChargeSchemas } from '../../lib/schema/product_additional_charge.js';
 import { ProductImagesSchemas } from '../../lib/schema/product_images.js';
@@ -16,6 +16,8 @@ export const CollProductImage = new Mongo.Collection('collproductimage');
 export const CollProductShipping = new Mongo.Collection('collproductshipping');
 export const CollProductAdditionalCharges = new Mongo.Collection('collProductadditionalcharges');
 export const CollProductVariationPrice = new Mongo.Collection('collproductvariationprice');
+
+export const CollUploadJobMaster = new Mongo.Collection('CollUploadJobMaster');
 
 export const Csvfiles = new Mongo.Collection('csvfiles');
 export const Csvfilemapping = new Mongo.Collection('csvfilemapping');

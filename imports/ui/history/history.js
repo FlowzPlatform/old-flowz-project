@@ -1,7 +1,7 @@
-import { Meteor } from 'meteor/meteor';
-import { Template } from 'meteor/templating';
+  import { Meteor } from 'meteor/meteor';
+  import { Template } from 'meteor/templating';
 
-import './history.html';
+ import './history.html';
 
 import { Csvfiles } from '../../api/collections.js';
 
