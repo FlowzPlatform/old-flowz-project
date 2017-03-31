@@ -1,0 +1,60 @@
+<template name="validation">
+  {{> header}}
+    <div class="container">
+        {{#if currentUser}}
+            <div id="steps-block" class="step-progress">
+                <ol class="progress">
+                    <li data-step="1"> Upload </li>
+                    <li class="is-active" data-step="2"> Validate </li>
+                    <li data-step="3" class="progress__last"> Import </li>
+                </ol>
+            </div>
+            <div class="product-file-upload-tab-block">
+                <ul class="nav nav-tabs nav-tabs-vertical" role="tablist">
+                    {{#each filetypes}}
+                        <li role="presentation" class="{{#if isActive}}active{{/if}} {{#if isDone}}done{{/if}}"><a href="#"><i class="fa fa-check-circle-o"></i>{{name}}</a></li>
+                    {{/each}}
+                </ul>
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button class="progress-button progress-button-small pull-left" id="validation_start" data-style="top-line" data-horizontal="">
+                                    <span class="content">Start Validaton</span>
+                                    <span class="progress">
+                                        <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                    </span>
+                                </button>
+                                <div id="myProgress" class="pull-right text-success" style="display:none;margin-top: 8px;">
+                                    <span id="myBar">0%</span><span>&nbsp;completed</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="mydiv" class="clearfix">
+                            <div style="width: 100%;overflow: auto;margin: 5px 0px;">
+                                <div id="productData" ></div>
+                            </div>
+                            <div id="errorDiv" class="pull-left" style="display:none">
+                                    <span class="text-danger" id="errorStr">Error string will be here</span>
+                                </div>
+                            <div id='buttonDivProceed' style="display:none">
+                                <button class="progress-button progress-button-small pull-right" id="proceed_to_next" data-style="top-line" data-horizontal="">
+                                    <span class="content">Proceed To Next</span>
+                                    <span class="progress">
+                                        <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="validation_successful" style="display:none" class="success_div text-success">
+                            <span><i class="fa fa-check-circle-o"></i></span>
+                            <span>
+                                The file has been succefully validated withou any error . Now you can proceed to upload it on PDM .
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{/if}}
+    </div>
+</template>

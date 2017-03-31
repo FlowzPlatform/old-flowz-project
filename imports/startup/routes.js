@@ -10,3 +10,7 @@ Router.route('/', function() {
 Router.route('/history', function() {
     this.render('history');
 });
+
+Router.route('/validation', function() {
+    this.render('validation');
+});
