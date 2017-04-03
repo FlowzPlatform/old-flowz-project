@@ -58,7 +58,27 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="table-responsive" style="margin-bottom: 10px;border-right: 1px solid #ccc;">
-                                    {{> reactiveTable  class="table table-bordered table-hover" multiColumnSort='false' showNavigation='never' showFilter=false collection=previewRec }}
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                {{#each getJsonKeys previewRec.[0]}}
+                                                    <th>
+                                                        {{this}}
+                                                    </th>
+                                                {{/each}}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {{#each previewRec}}
+                                                <tr>
+                                                    {{#each  getJsonValues this}}
+                                                        <td>{{this}}</td>
+                                                    {{/each}}
+                                                </tr>
+                                            {{/each}}
+                                        </tbody>
+                                    </table>
+                                    <!--{{> reactiveTable  class="table table-bordered table-hover" multiColumnSort='false' showNavigation='never' showFilter=false collection=previewRec }}-->
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -176,6 +196,7 @@
         {{/if}}
      </div>
 </template>
+
 
 <template name="spinner">
     <div class="sk-wave spinner">

@@ -625,6 +625,12 @@ Template.readCSV.helpers({
     },
     dataTypes() {
         return Template.instance().dataTypes.get();
+    },
+    getJsonValues(obj) {
+        return Object.values(obj);
+    },
+    getJsonKeys(obj) {
+        return Object.keys(obj);
     }
 });
 
