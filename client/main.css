@@ -60,9 +60,12 @@
     margin-bottom: 20px;
 }
 
-#preview table td,
+#preview table td>div,
 #preview table th {
     white-space: nowrap;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 

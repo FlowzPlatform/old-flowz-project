@@ -58,26 +58,28 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="table-responsive" style="margin-bottom: 10px;border-right: 1px solid #ccc;">
-                                    <table class="table table-bordered table-hover">
-                                        <thead>
-                                            <tr>
-                                                {{#each getJsonKeys previewRec.[0]}}
-                                                    <th>
-                                                        {{this}}
-                                                    </th>
-                                                {{/each}}
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {{#each previewRec}}
+                                    {{#if previewRec.length}}
+                                        <table class="table table-bordered table-hover">
+                                            <thead>
                                                 <tr>
-                                                    {{#each  getJsonValues this}}
-                                                        <td>{{this}}</td>
+                                                    {{#each getJsonKeys previewRec.[0]}}
+                                                        <th>
+                                                            {{this}}
+                                                        </th>
                                                     {{/each}}
                                                 </tr>
-                                            {{/each}}
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                {{#each previewRec}}
+                                                    <tr>
+                                                        {{#each  getJsonValues this}}
+                                                            <td title="{{this}}"><div> {{this}} </div></td>
+                                                        {{/each}}
+                                                    </tr>
+                                                {{/each}}
+                                            </tbody>
+                                        </table>
+                                    {{/if}}
                                     <!--{{> reactiveTable  class="table table-bordered table-hover" multiColumnSort='false' showNavigation='never' showFilter=false collection=previewRec }}-->
                                 </div>
                             </div>
