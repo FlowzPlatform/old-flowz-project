@@ -363,19 +363,18 @@ let getHeader = function(_file, template, cb) {
     });
 };
 
-let getTransformVal = function(headings, row, transformStr, oldValue) {
+let getTransformVal = function(headings, row, transformStr, oldValue, index) {
     try {
         let code = transformStr;
-        let newRow = {};
         _.each(headings, function(d, index) {
-            newRow[d] = row[index];
+            row[d] = row[index];
         });
-        let result = new Function("row", code).call(this, newRow);
+        row['_id'] = index;
+        let result = new Function("row", code).call(this, row);
         return result;
     } catch (e) {
         return oldValue;
     }
-
 }
 
 let generateDatawithNewHeader = function(chunk, _hasHeader, mapping, template) {
@@ -395,7 +394,7 @@ let generateDatawithNewHeader = function(chunk, _hasHeader, mapping, template) {
         for (let i = _hasHeader ? 1 : 0; i < oldRows.length; i++) {
             if (map != undefined) {
                 if (map.transform.trim() != '') {
-                    rows[i][inx] = getTransformVal(headings, oldRows[i], map.transform.trim(), oldRows[i][oldHeading_index]);
+                    rows[i][inx] = getTransformVal(headings, oldRows[i], map.transform.trim(), oldRows[i][oldHeading_index], i);
                 } else {
                     rows[i][inx] = oldRows[i][oldHeading_index];
                 }
