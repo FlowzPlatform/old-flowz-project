@@ -34,7 +34,7 @@ Template.readCSV.events({
         let selectedheader = $selectedDom.attr('data-header');
         $selectedDom.attr('data-code', code).removeClass('open');
         if (code.trim() != '') {
-            $selectedDom.text('Edit').attr('title', code);
+            $selectedDom.attr('title', code).text(code);
         }
         $('#javascripEditorModal').modal('hide');
 
@@ -581,6 +581,7 @@ let parseCSV = function(_file, template, mapping, cb) {
 }
 
 Template.readCSV.onCreated(function() {
+    //console.log(Router.current().params.id);
     toastr.options = {
         "closeButton": true,
         "showMethod": "show",

@@ -14,6 +14,10 @@ Router.route('/upload', function() {
     this.render('readCSV');
 });
 
+Router.route('/upload/:id', function() {
+    this.render('readCSV');
+});
+
 Router.route('/history', function() {
     this.render('history');
 });
