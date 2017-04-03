@@ -34,6 +34,17 @@ Template.readCSV.events({
         let selectedheader = $selectedDom.attr('data-header');
         $selectedDom.attr('data-code', code);
         $('#javascripEditorModal').modal('hide');
+
+        $(template.find('#preview')).find('.spinner').show();
+        let mapping = generateMapping(template); // generate new Mapping
+        // generate Preview
+        generatePreview(template.find('#csv-file').files[0], template, mapping, function() {
+            let ft = template.filetypes.get(); // all file type
+            let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
+            insertCSVMapping(activeFiletypeId, mapping, function(e, res) {
+                $(template.find('#preview')).find('.spinner').hide();
+            });
+        });
     },
     "click a[data-target='#javascripEditorModal']": function(event, template) {
         var currentEl = event.currentTarget;
@@ -158,7 +169,7 @@ let generateMapping = function(template) {
         mapping.push({
             sysHeader: $(template.find('#dpdsysheader_' + index)).attr('data-column'),
             csvHeader: template.find('#dpdcsvheader_' + index).innerHTML,
-            transform: $(template.find('#dpddatatype_' + index)).attr('data-code'),
+            transform: $(template.find('#txtCustomJavascript_' + index)).attr('data-code'),
             //datatype: template.find('#dpddatatype_' + index).innerHTML,
         })
     });
@@ -174,7 +185,9 @@ let generateXEditor = function(template, cb) {
     //console.log('csvHeader', _csvHeader);
     // create mapping
 
-
+    let ft = template.filetypes.get(); // all file type
+    let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
+    let existMapping = Csvfilemapping.findOne({ owner: Meteor.userId(), fileTypeID: activeFiletype.id });
     activefile.forEach(function(result, index) {
         let _val;
         let _datatype = result.type;
@@ -200,6 +213,10 @@ let generateXEditor = function(template, cb) {
             }
         });
         $(template.find('#dpdcsvheader_' + index)).editable('setValue', _val.toLowerCase());
+
+        if (existMapping != undefined) {
+            $(template.find('#txtCustomJavascript_' + index)).attr('data-code', existMapping.mapping[index].transform);
+        }
         // $(template.find('#dpddatatype_' + index)).editable({
         //     value: _datatype.toLowerCase(),
         //     source: _dataTypes
@@ -346,6 +363,16 @@ let getHeader = function(_file, template, cb) {
     });
 };
 
+let getTransformVal = function(headings, row, transformStr) {
+    let code = transformStr;
+    let newRow = {};
+    _.each(headings, function(d, index) {
+        newRow[d] = row[index];
+    });
+    let result = new Function("row", code).call(this, newRow);
+    return result;
+}
+
 let generateDatawithNewHeader = function(chunk, _hasHeader, mapping, template) {
     let rows = CSVtoArray(chunk);
     let headings = template.csvHeaders.get(); //  _.extend([], rows[0]);
@@ -361,7 +388,15 @@ let generateDatawithNewHeader = function(chunk, _hasHeader, mapping, template) {
             oldHeading_index = _.indexOf(headings, d.trim());
         }
         for (let i = _hasHeader ? 1 : 0; i < oldRows.length; i++) {
-            rows[i][inx] = oldRows[i][oldHeading_index];
+            if (map != undefined) {
+                if (map.transform.trim() != '') {
+                    rows[i][inx] = getTransformVal(headings, oldRows[i], map.transform.trim());
+                } else {
+                    rows[i][inx] = oldRows[i][oldHeading_index];
+                }
+            } else {
+                rows[i][inx] = oldRows[i][oldHeading_index];
+            }
         }
         if (_hasHeader)
             rows[0][inx] = d.trim();
@@ -595,9 +630,9 @@ Template.readCSV.helpers({
 
 let insertCSVData = function(data, fileID, collection, cb) {
     let copedata = $.extend({}, data);
-    data['fileID'] = fileID;
-    data['owner'] = Meteor.userId();
-    data['username'] = Meteor.user().username;
+    copedata['fileID'] = fileID;
+    copedata['owner'] = Meteor.userId();
+    copedata['username'] = Meteor.user().username;
     collection.insert(data, function(err, res) {
         if (err) {
             //console.log('errmessage', err.message);
