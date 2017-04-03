@@ -149,14 +149,17 @@
                                                         </td>
                                                         <td style="width: 40%">
                                                             <!-- Trigger the modal with a button -->
-                                                            <span class="cm-s-default"><span class="cm-keyword">function</span>(<span class="cm-def">row</span>){</span>
-                                                            <a href="#" id="txtCustomJavascript_{{rowIndex}}" data-toggle="modal" data-target="#javascripEditorModal" data-header="{{column}}" data-code="" title="Click here to change code."> ... </a>
-                                                            <span class="after">};</span>
+                                                            <a href="#" id="txtCustomJavascript_{{rowIndex}}" data-toggle="modal" data-target="#javascripEditorModal" data-header="{{column}}" data-code="" title="Click here to add code."> Add </a>
                                                             <!--<a href="#" id="dpddatatype_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
                                                         </td>
                                                     {{/let}}
                                                 </tr>
                                             {{/each}}
+                                            <tr>
+                                                <td colspan="3" style="text-align: center;">
+                                                    <a href="#" id="addNewHeader">Add new</a>
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -222,7 +225,7 @@
 
 
 <template name="buttonAbort">
-    <button style="display: none;" class="progress-button progress-button-small pull-right" id="btnAbort" data-style="top-line" data-horizontal="">
+    <button style="display: none;" class="progress-button progress-button-small progress-button-danger pull-right" id="btnAbort" data-style="top-line" data-horizontal="">
         <span class="content">Abort</span>
         <span class="progress">
             <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>

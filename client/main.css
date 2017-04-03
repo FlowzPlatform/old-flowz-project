@@ -732,6 +732,10 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
     line-height: 2.3;
 }
 
+.progress-button-danger {
+    background: #a94442;
+}
+
 
 /*****************end progress button ***********************/
 

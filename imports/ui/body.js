@@ -32,7 +32,10 @@ Template.readCSV.events({
         var code = editor.getValue();
         let $selectedDom = $(template.find("a[data-target='#javascripEditorModal'].open"));
         let selectedheader = $selectedDom.attr('data-header');
-        $selectedDom.attr('data-code', code);
+        $selectedDom.attr('data-code', code).removeClass('open');
+        if (code.trim() != '') {
+            $selectedDom.text('Edit').attr('title', code);
+        }
         $('#javascripEditorModal').modal('hide');
 
         $(template.find('#preview')).find('.spinner').show();
@@ -154,8 +157,13 @@ Template.readCSV.events({
         });
     },
     'click #btnAbort': function(event, template) {
-        abortChecked = true;
-        resetAll(template);
+        if (confirm('Are you sure you want to abort?')) {
+            abortChecked = true;
+            resetAll(template);
+        }
+    },
+    'click #addNewHeader': function(event, template) {
+
     }
 });
 
@@ -214,8 +222,8 @@ let generateXEditor = function(template, cb) {
         });
         $(template.find('#dpdcsvheader_' + index)).editable('setValue', _val.toLowerCase());
 
-        if (existMapping != undefined) {
-            $(template.find('#txtCustomJavascript_' + index)).attr('data-code', existMapping.mapping[index].transform);
+        if (existMapping != undefined && existMapping.mapping[index].transform.trim() != '') {
+            $(template.find('#txtCustomJavascript_' + index)).attr('data-code', existMapping.mapping[index].transform).attr('title', existMapping.mapping[index].transform).text('Edit');
         }
         // $(template.find('#dpddatatype_' + index)).editable({
         //     value: _datatype.toLowerCase(),
