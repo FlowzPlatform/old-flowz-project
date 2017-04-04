@@ -39,6 +39,8 @@ https://tympanus.net/Development/ProgressButtonStyles/
 
 https://designschool.canva.com/blog/website-color-schemes/   #46
 
+https://tympanus.net/Development/AnimatedCheckboxes/
+
 #494e68
 #98878f
 #985e6d

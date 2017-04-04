@@ -36,8 +36,12 @@ natestrauser:x-editable-bootstrap
 aldeed:collection2-core
 awsp:handsontable
 
+
 dbarrett:dropzonejs
 session
 twbs:bootstrap
 cneuro:jquery-bootstrap-dropdown-on-hover
 zimme:bootstrap-hover-dropdown
+
+chrismbeckett:toastr
+perak:codemirror
