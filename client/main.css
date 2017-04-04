@@ -12,7 +12,22 @@
     opacity: 0;
 }
 
-.dz-message {
+#upload-csv-zone .dz-spinner {
+    display: none;
+}
+
+#upload-csv-zone.onprogress .dz-spinner {
+    position: absolute;
+    font-weight: 500;
+    font-size: 25px;
+    top: 23%;
+    text-align: center;
+    width: 100%;
+    color: #98878f;
+    display: block;
+}
+
+#upload-csv-zone .dz-message {
     position: absolute;
     font-weight: 500;
     font-size: 25px;
@@ -20,11 +35,16 @@
     text-align: center;
     width: 100%;
     color: #98878f;
+    display: block;
 }
 
-.dz-message>small {
+#upload-csv-zone .dz-message>small {
     font-size: 60%;
     color: #bbb;
+}
+
+#upload-csv-zone.onprogress .dz-message {
+    display: none;
 }
 
 .progress {
@@ -40,9 +60,12 @@
     margin-bottom: 20px;
 }
 
-#preview table td,
+#preview table td>div,
 #preview table th {
     white-space: nowrap;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 
@@ -709,6 +732,10 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
     line-height: 2.3;
 }
 
+.progress-button-danger {
+    background: #a94442;
+}
+
 
 /*****************end progress button ***********************/
 
@@ -722,6 +749,7 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 
 .product-file-upload-tab-block>.tab-content {
     margin-left: 250px;
+    margin-right: 25px;
 }
 
 .nav-tabs-vertical>li {
@@ -810,6 +838,10 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 
 .navbar {
     background: #192231;
+    border: none;
+    -moz-box-shadow: inset 0 -10px 10px -10px #fff;
+    -webkit-box-shadow: inset 0 -10px 10px -10px #fff;
+    box-shadow: inset 0 -10px 10px -10px #fff;
 }
 
 .navbar-default .navbar-brand,
@@ -922,7 +954,7 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 }
 
 #mapping .spinner {
-    margin: 15px 0px 15px 15px;
+    margin: 15px 0px 0px 15px;
     display: none;
 }
 
@@ -934,6 +966,11 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
     height: 275px;
     overflow-y: auto;
     width: 100%;
+}
+
+#preview .spinner {
+    margin: -5px 0px 0px 15px;
+    display: none;
 }
 
 
@@ -1113,4 +1150,11 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
     height: 200px;
     margin-bottom: 5px;
     overflow-x: hidden;
+}
+
+.navbar-default .navbar-brand:hover,
+.navbar-default .navbar-brand:focus,
+.navbar-default .navbar-nav>li>a:hover,
+.navbar-default .navbar-nav>li>a:focus {
+    color: #fff;
 }

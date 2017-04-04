@@ -17,7 +17,7 @@ export const CollProductShipping = new Mongo.Collection('collproductshipping');
 export const CollProductAdditionalCharges = new Mongo.Collection('collProductadditionalcharges');
 export const CollProductVariationPrice = new Mongo.Collection('collproductvariationprice');
 
-export const CollUploadJobMaster = new Mongo.Collection('CollUploadJobMaster');
+export const CollUploadJobMaster = new Mongo.Collection('uploadJobMaster');
 
 export const Csvfiles = new Mongo.Collection('csvfiles');
 export const Csvfilemapping = new Mongo.Collection('csvfilemapping');

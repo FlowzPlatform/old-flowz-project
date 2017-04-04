@@ -19,27 +19,17 @@
 
 <template name="readCSV">
     {{> header}}
-    <div class="container">
+    <div class="">
         {{#if currentUser}}
-            <div id="steps-block" class="step-progress">
-                <ol class="progress">
-                    <li class="is-active" data-step="1"> Upload </li>
-                    <li data-step="2"> Validate </li>
-                    <li data-step="3" class="progress__last"> Import </li>
-                </ol>
+            <div class="container">
+                {{> uploadStep}}
             </div>
+            {{> EditorPage}}
             <div class="product-file-upload-tab-block">
                 <ul class="nav nav-tabs nav-tabs-vertical" role="tablist">
                     {{#each filetypes}}
                         <li role="presentation" class="{{#if isActive}}active{{/if}} {{#if isDone}}done{{/if}}"><a href="#"><i class="fa fa-check-circle-o"></i>{{name}}</a></li>
                     {{/each}}
-
-                    <!--<li role="presentation" class="active"><a href="#Product-price">Product Pricing</a></li>
-                    <li role="presentation"><a href="#Imprint-data">Imprint Data</a></li>
-                    <li role="presentation"><a href="#Image">Image</a></li>
-                    <li role="presentation"><a href="#Shipping">Shipping</a></li>
-                    <li role="presentation"><a href="#Additional-charge">Additional Charges</a></li>
-                    <li role="presentation"><a href="#Variation-price">Variation Price</a></li>-->
                 </ul>
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active">
@@ -48,22 +38,62 @@
                                 <span class="dz-message">Drop files here or click to upload.<br/>
                                     <small>(only csv files are valid.)</small>
                                 </span>
+                                <div class="dz-spinner">
+                                    {{> spinner}}
+                                </div>
                                 <input type="file" id="csv-file" name="files" accept=".csv"/>
                             </div>
-                            <div class="clearfix">
-                                <label>
-                                    <input type="checkbox" id="hasheader" checked="checked"/> Has header
-                                </label>
-                            </div>
+                            
                         </div>
                         <div class="clearfix"></div>
                         <!--<button type="submit" class="btn btn-primary btnReadCsv">Read</button>-->
                         <div id="preview"  class="row" style="display: none;">
                             <div class="col-md-12">
-                                <div class="table-responsive" style="margin-bottom: 10px;border-right: 1px solid #ccc;">
-                                    {{> reactiveTable  class="table table-bordered table-hover" showNavigation='never' showFilter=false collection=previewRec }}
+                                <div class="pull-left">
+                                    <h3 style="margin-top: 0px;">Preview</h3>
                                 </div>
-
+                                <div class="pull-left">
+                                    {{> spinner}}
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="table-responsive" style="margin-bottom: 10px;border-right: 1px solid #ccc;">
+                                    {{#if previewRec.length}}
+                                        <table class="table table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    {{#each getJsonKeys previewRec.[0]}}
+                                                        <th>
+                                                            {{this}}
+                                                        </th>
+                                                    {{/each}}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {{#each previewRec}}
+                                                    <tr>
+                                                        {{#each  getJsonValues this}}
+                                                            <td title="{{this}}"><div> {{this}} </div></td>
+                                                        {{/each}}
+                                                    </tr>
+                                                {{/each}}
+                                            </tbody>
+                                        </table>
+                                    {{/if}}
+                                    <!--{{> reactiveTable  class="table table-bordered table-hover" multiColumnSort='false' showNavigation='never' showFilter=false collection=previewRec }}-->
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label>
+                                    <input type="checkbox" id="hasheader" checked="checked" /> Has header
+                                </label>
+                                <button id="btnNext" style="margin-left:5px;" class="progress-button progress-button-small pull-right" data-style="top-line" data-horizontal="">
+                                    <span class="content">Proceed</span>
+                                    <span class="progress">
+                                        <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                    </span>
+                                </button>
+                                {{> buttonAbort}}
                             </div>
                         </div>
                         <div class="clearfix"></div>
@@ -72,12 +102,13 @@
                                 <div id="hotErrorDataDuringUpload"></div>
                             </div>
                             <span id="errMessageFromSchema" class="pull-left text-danger"></span>
-                            <button class="progress-button progress-button-small pull-right" id="buttonProceedNext" data-style="top-line" data-horizontal="">
+                            <button style="margin-left:5px;" class="progress-button progress-button-small pull-right" id="buttonProceedNext" data-style="top-line" data-horizontal="">
                                 <span class="content">Proceed To Next</span>
                                 <span class="progress">
                                     <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
                                 </span>
                             </button>
+                            {{> buttonAbort}}
                         </div>
                         <div class="clearfix"></div>
                         <div class="row">
@@ -86,22 +117,11 @@
                                     <h3>Headers mapping</h3>
                                 </div>
                                 <div class="pull-left">
-                                    <div class="sk-wave spinner">
-                                        <div class="sk-rect sk-rect1"></div>
-                                        <div class="sk-rect sk-rect2"></div>
-                                        <div class="sk-rect sk-rect3"></div>
-                                        <div class="sk-rect sk-rect4"></div>
-                                        <div class="sk-rect sk-rect5"></div>
-                                    </div>
+                                    {{> spinner}}
                                 </div>
                                 <div class="pull-right">
-                                    <button id="btnNext" style="margin-left:5px;" class="progress-button progress-button-small pull-right" data-style="top-line" data-horizontal="">
-                                        <span class="content">Upload record</span>
-                                        <span class="progress">
-                                            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
-                                        </span>
-                                    </button>
-                                    <button class="progress-button progress-button-small pull-right" id="btnPreview" data-style="top-line" data-horizontal="">
+                                    
+                                    <button class="progress-button progress-button-small pull-right" style="display: none" id="btnPreview" data-style="top-line" data-horizontal="">
                                         <span class="content">Generate previews</span>
                                         <span class="progress">
                                             <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
@@ -114,54 +134,32 @@
                                             <tr>
                                                 <th>System headers</th>
                                                 <th>CSV header</th>
-                                                <th>Data type</th>
+                                                <th>Transform</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {{#each headers}}
                                                 <tr>
                                                     {{#let rowIndex=@index}}
-                                                        <td>
-                                                            <span id="dpdsysheader_{{rowIndex}}"  selected="selected">{{column}}</span>
-                                                            <!--{{#each headers}}
-                                                                {{#if $eq rowIndex @index}}
-
-                                                                {{/if}}
-                                                            {{/each}}-->
+                                                        <td style="width: 30%">
+                                                            <span id="dpdsysheader_{{rowIndex}}"  selected="selected" data-column="{{column}}" style="text-transform:capitalize">{{text}}</span>
                                                         </td>
-                                                        <td>
+                                                        <td style="width: 30%">
                                                             <a href="#" id="dpdcsvheader_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>
-                                                            <!--<select class="form-control" id="dpdcsvheader_{{rowIndex}}">
-                                                                {{#each csvHeaders}}
-                                                                    {{#let self=this}}
-                                                                        {{#with csvHeaders=csvHeaders col=col}}
-                                                                            {{#let dis=distance}}
-                                                                                {{#if $eq self dis}}
-                                                                                    <option value="{{self}}" selected="selected">{{self}}</option>
-                                                                                {{else}}
-                                                                                    <option value="{{self}}">{{self}}</option>
-                                                                                {{/if}}
-                                                                            {{/let}}
-                                                                        {{/with}}
-                                                                    {{/let}}
-                                                                {{/each}}
-                                                            </select>-->
                                                         </td>
-                                                        <td>
-                                                            <a href="#" id="dpddatatype_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>
-                                                            <!--<select class="form-control" id="dpddatatype_{{rowIndex}}">
-                                                                {{#each dataTypes}}
-                                                                    {{#if $eq type this}}
-                                                                        <option value="{{this}}" selected="selected">{{this}}</option>
-                                                                    {{else}}
-                                                                        <option value="{{this}}">{{this}}</option>
-                                                                    {{/if}}
-                                                                {{/each}}
-                                                            </select>-->
+                                                        <td style="width: 40%">
+                                                            <!-- Trigger the modal with a button -->
+                                                            <a href="#" id="txtCustomJavascript_{{rowIndex}}" data-toggle="modal" data-target="#javascripEditorModal" data-header="{{column}}" data-code="" title="Click here to add code."><i class="fa fa-pencil-square-o"></i></a>
+                                                            <!--<a href="#" id="dpddatatype_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
                                                         </td>
                                                     {{/let}}
                                                 </tr>
                                             {{/each}}
+                                            <tr>
+                                                <td colspan="3" style="text-align: center;">
+                                                    <a href="#" id="addNewHeader">Add new</a>
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -202,4 +200,58 @@
             </div>
         {{/if}}
      </div>
+</template>
+
+
+<template name="spinner">
+    <div class="sk-wave spinner">
+        <div class="sk-rect sk-rect1"></div>
+        <div class="sk-rect sk-rect2"></div>
+        <div class="sk-rect sk-rect3"></div>
+        <div class="sk-rect sk-rect4"></div>
+        <div class="sk-rect sk-rect5"></div>
+    </div>
+</template>
+
+<template name="uploadStep">
+    <div id="steps-block" class="step-progress">
+        <ol class="progress">
+            <li class="is-active" data-step="1"> Upload </li>
+            <li data-step="2"> Validate </li>
+            <li data-step="3" class="progress__last"> Import </li>
+        </ol>
+    </div>
+</template>
+
+
+<template name="buttonAbort">
+    <button style="display: none;" class="progress-button progress-button-small progress-button-danger pull-right" id="btnAbort" data-style="top-line" data-horizontal="">
+        <span class="content">Abort</span>
+        <span class="progress">
+            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+        </span>
+    </button>
+</template>
+
+<template name="EditorPage">
+    <!-- Modal -->
+    <div id="javascripEditorModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Write your custom javascript</h4>
+            </div>
+            <div class="modal-body">
+                <textarea id="customJavascript" name="customJavascript"></textarea>
+                <!--{{> CodeMirror id="customJavascript" name="customJavascript" options=editorOptions code=editorCode}}-->
+            </div>
+            <div class="modal-footer">
+                <button id="btnSaveCustomjavascript" type="button" class="progress-button progress-button-small">Save</button>
+            </div>
+            </div>
+        </div>
+    </div>
 </template>
