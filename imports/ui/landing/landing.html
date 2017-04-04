@@ -1,7 +1,54 @@
 <template name="landing">
     {{> header}}
-    <div class="container">
-        <p>Landing Page</p>
-        <button type="button" id="selectUploadType">Click Me!</button>
+    <div class="landing_container">
+      {{#if currentUser}}
+
+
+      <div class="right">
+        <h3>Choose a method for upload the data</h3>
+        <form id="myform">
+        <ul class="mySection">
+            <li class="btn" data-something="replace">
+                <input type="radio" class="show_infoDiv" id="r1" name="myOptions"  value="replace"  />
+                <img src="tick.png" class="selected_tick1" alt="">
+                <label  class="dropbtn" for="r1">
+
+                    REPLACE
+                  </label>
+            </li>
+            <li class="btn" data-something="append">
+                <input type="radio" class="show_infoDiv" id="r2" name="myOptions" value="append" />
+                <img src="tick.png" class="selected_tick2" alt="">
+                <label class="dropbtn" for="r2">
+
+                  APPEND
+                </label>
+            </li>
+            <li class="btn" data-something="upsert">
+                <input type="radio" class="show_infoDiv" id="r3" name="myOptions"  value="upsert" />
+                <img src="tick.png" class="selected_tick3" alt="">
+                <label class="dropbtn" for="r3">
+
+                  UPSERT
+                </label>
+            </li>
+            <li class="btn" data-something="update">
+                <input type="radio" class="show_infoDiv" id="r4" name="myOptions"  value="update" />
+                <img src="tick.png" class="selected_tick4" alt="">
+                <label class="dropbtn" for="r4">
+                  UPDATE
+                </label>
+            </li>
+        </ul>
+        <div id="dv" class="clearfix" style="display:none">
+          <button type="button" class="close" id ="close_info_div">×</button>
+            <img class="bulb" src="idea.png" />
+            <p id="get"></p>
+        </div>
+        <button class="progress-button" type="button" id="getOptions" data-style="top-line" data-horizontal="">Submit</button>
+        <div id="display-error">Please choose a method of your choice.</div>
+    </form>
+      </div>
+      {{/if}}
     </div>
 </template>
