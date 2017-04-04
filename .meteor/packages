@@ -26,7 +26,6 @@ iron:router
 harrison:papa-parse
 mikowals:batch-insert
 momentjs:moment
-twbs:bootstrap
 
 raix:handlebar-helpers
 evucale:fast-levenshtein
@@ -36,3 +35,9 @@ underscore
 natestrauser:x-editable-bootstrap
 aldeed:collection2-core
 awsp:handsontable
+
+dbarrett:dropzonejs
+session
+twbs:bootstrap
+cneuro:jquery-bootstrap-dropdown-on-hover
+zimme:bootstrap-hover-dropdown
