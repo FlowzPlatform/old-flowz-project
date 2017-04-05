@@ -63,45 +63,44 @@
                                                                 <span id="myBar1">{{this.validationProgress}}%</span><span>&nbsp;completed</span>
                                                           </td>
                                                       </tr>
-                                                      {{this.validationStatus}}
                                                       {{#if isJobQueueStatusRunning this.validationStatus }}
+                                                      <tr>
+                                                          <td colspan="5" width="100%" >
+                                                            <div class="row">
+                                                                <div class="col-md-12" >
+                                                                    <button style="display:none" class="progress-button progress-button-small pull-left" id="validation_start" data-style="top-line" data-horizontal="">
+                                                                        <span class="content">Start Validaton</span>
+                                                                        <span class="progress">
+                                                                            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                                                        </span>
+                                                                    </button>
+                                                                    <div id="myProgress" class="pull-right text-success" style="display:none;margin-top: 8px;">
+                                                                        <span id="myBar" style="display:none">0%</span><span style="display:none">&nbsp;completed</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div id="mydiv" class="clearfix">
+                                                              <div id="errorDiv" class="pull-left" style="display:none">
+                                                                      <span class="text-danger" id="errorStr">Error string will be here</span>
+                                                              </div>
+                                                                <div style="width: 98%;overflow: auto;margin: 5px 0px;">
+                                                                    <div id="productData" ></div>
+                                                                </div>
 
+                                                                <div id='buttonDivProceed' style="display:none">
+                                                                    <button class="progress-button progress-button-small pull-right" id="proceed_to_next" data-style="top-line" data-horizontal="">
+                                                                        <span class="content">Proceed To Next</span>
+                                                                        <span class="progress">
+                                                                            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                                                        </span>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                          </td>
+                                                      </tr>
                                                       {{/if}}
                                               {{/each}}
-                                              <tr>
-                                                  <td colspan="5" width="100%" >
-                                                    <div class="row">
-                                                        <div class="col-md-12" >
-                                                            <button style="display:none" class="progress-button progress-button-small pull-left" id="validation_start" data-style="top-line" data-horizontal="">
-                                                                <span class="content">Start Validaton</span>
-                                                                <span class="progress">
-                                                                    <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
-                                                                </span>
-                                                            </button>
-                                                            <div id="myProgress" class="pull-right text-success" style="display:none;margin-top: 8px;">
-                                                                <span id="myBar" style="display:none">0%</span><span style="display:none">&nbsp;completed</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div id="mydiv" class="clearfix">
-                                                      <div id="errorDiv" class="pull-left" style="display:none">
-                                                              <span class="text-danger" id="errorStr">Error string will be here</span>
-                                                      </div>
-                                                        <div style="width: 98%;overflow: auto;margin: 5px 0px;">
-                                                            <div id="productData" ></div>
-                                                        </div>
 
-                                                        <div id='buttonDivProceed' style="display:none">
-                                                            <button class="progress-button progress-button-small pull-right" id="proceed_to_next" data-style="top-line" data-horizontal="">
-                                                                <span class="content">Proceed To Next</span>
-                                                                <span class="progress">
-                                                                    <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
-                                                                </span>
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                  </td>
-                                              </tr>
                                       </tbody>
                                   </table>
                               </div>
