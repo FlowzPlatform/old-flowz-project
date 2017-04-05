@@ -963,9 +963,10 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 }
 
 #mapping .view-mapping {
-    height: 275px;
+    height: 465px;
     overflow-y: auto;
     width: 100%;
+    overflow-x: hidden;
 }
 
 #preview .spinner {
