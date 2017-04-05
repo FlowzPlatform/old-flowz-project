@@ -473,7 +473,7 @@ let parseCSV = function(_file, template, mapping, cb) {
         username: Meteor.user().username
     };
 
-    Csvfiles.insert(file, function(e, res) {
+    Csvfiles.insert(file , function(e, res) {
         $('#buttonProceedNext').hide();
         let fileID = res; // new file id
         //console.log('fileID', fileID);

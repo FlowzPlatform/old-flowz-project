@@ -121,3 +121,34 @@ a {color: white;}
       position: absolute;
       display: none;
 }
+
+
+  #landingPageStatusReport{
+    border: 3px solid #7c7e86;
+    color: black;
+    text-align: center;
+    padding-top: 4px;
+    margin: 50px;
+    padding-bottom: 26px;
+  }
+
+  .landingAbortBtn{
+    width: 160px ;
+    border: none ;
+    background: #b51f1f ;
+    color: #fff ;
+    letter-spacing: 1px ;
+    line-height: 3 ;
+  }
+  .landingContinuetBtn{
+    width: 160px ;
+    border: none ;
+    background: #1fb58f ;
+    color: #fff ;
+    letter-spacing: 1px ;
+    line-height: 3 ;
+  }
+
+  .landingBtnDiv{
+    padding: 15px;
+  }

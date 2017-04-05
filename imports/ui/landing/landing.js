@@ -6,9 +6,52 @@ import './landing.html';
 import { Csvfiles } from '../../api/collections.js';
 import { CollUploadJobMaster } from '../../api/collections.js';
 
+const reactiveArray = [
+    { id: 'ProductInformation', name: 'Product Information', isDone: false, isActive: true},
+    { id: 'ProductPrice', name: 'Product Pricing', isDone: false, isActive: false},
+    { id: 'ProductImprintData', name: 'Imprint Data', isDone: false, isActive: false},
+    { id: 'ProductImage', name: 'Image', isDone: false, isActive: false},
+    { id: 'ProductShipping', name: 'Shipping', isDone: false, isActive: false},
+    { id: 'ProductAdditionalCharges', name: 'Additional Charges', isDone: false, isActive: false},
+    { id: 'ProductVariationPrice', name: 'Variation Price', isDone: false, isActive: false}
+]
+
 Template.landing.onRendered(function() {
 
+})
 
+Template.landing.helpers({
+
+  // getStatusFromMasterStepStatus() {
+  //   console.log(CollUploadJobMaster.find().fetch()[0].stepStatus);
+  //     return CollUploadJobMaster.find().fetch()[0].stepStatus;
+  // },getStatusFromMasterCount
+  getStatusFromMasterCount() {
+    console.log(CollUploadJobMaster.find({ owner: Meteor.userId() , stepStatus : {$ne : 0} }).count());
+      return CollUploadJobMaster.find({ owner: Meteor.userId() , stepStatus : {$ne : 0} }).count();
+  },
+  getStatusFromMaster() {
+      return CollUploadJobMaster.find({ owner: Meteor.userId() , stepStatus : {$ne : 0}});
+  },
+  hasStatus(){
+      all = CollUploadJobMaster.find({ owner: Meteor.userId() , stepStatus : {$ne : 0} }).fetch();
+      showStatusOnLanding = [];
+      for(var i =0; i<reactiveArray.length; i++ ){
+        let findExistingId = reactiveArray[i].id;
+        console.log(all[0][findExistingId]);
+        if (all[0][findExistingId] == undefined) {
+          break;
+        }else{
+          all[0][findExistingId]["sheetName"] = reactiveArray[i].id;
+          showStatusOnLanding.push(all[0][findExistingId]);
+        }
+      }
+      if (showStatusOnLanding.length == 0 ) {
+        return false;
+      }else{
+        return showStatusOnLanding;
+      }
+  }
 
 })
 
@@ -37,7 +80,6 @@ Template.landing.events({
         $(".selected_tick3").css("display" , "none");
         $(".selected_tick4").css("display" , "block");
       }
-      
     },
 
 
@@ -73,7 +115,32 @@ Template.landing.events({
       document.getElementById("dv").style.display="none"
     } ,
 
+    'click #landingAbortBtnId' (event){
+      swal({
+            title: "Are you sure?",
+            text: "All your existing uploaded file will be deleted and you have to upload the files again",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Abort it!",
+            closeOnConfirm: false
+          },
+          function(){
+            let _id = CollUploadJobMaster.findOne({ owner: Meteor.userId() , stepStatus : {$ne : 0}})._id;
+            console.log(_id);
+            Meteor.call("abortInLanding" , Meteor.userId(),_id,function (err , success) {
+              if (err) {
+                console.log("Something bad happend");
+              }else
+              {
+                swal("Aborted!", "Your files has been deleted.", "success");
+              }
+            });
+            //CollUploadJobMaster.remove({_id: CollUploadJobMaster.findOne()._id});
 
+
+          });
+    },
     'click #getOptions' (event) {
       var elems = document.getElementById('myform').elements;
       var selected_option = elems['myOptions'].value;
@@ -81,15 +148,34 @@ Template.landing.events({
         $('#display-error').fadeIn().delay(4000).fadeOut();
       }else{
 
-        CollUploadJobMaster.upsert(Meteor.userId(), {
+        // CollUploadJobMaster.upsert(Meteor.userId(), {
+        //     // Modifier
+        //     $set: {
+        //
+        //         createdAt: new Date(),
+        //         deleteAt: '',
+        //         owner: Meteor.userId(),
+        //         stepStatus: 1,
+        //         username: Meteor.user().username,
+        //         uploadType: selected_option.toLowerCase(),
+        //     }
+        // }, function(e, res) {
+        //   if (e) {
+        //     log(e);
+        //   }
+        //   console.log("inserted into master collection" ,Meteor.userId());
+        //   Router.go("upload")
+        // })
+        CollUploadJobMaster.insert({
             // Modifier
-            $set: {
-                uploadType: selected_option.toLowerCase(),
+
                 createdAt: new Date(),
                 deleteAt: '',
                 owner: Meteor.userId(),
-                username: Meteor.user().username
-            }
+                stepStatus: 1,
+                username: Meteor.user().username,
+                uploadType: selected_option.toLowerCase(),
+
         }, function(e, res) {
           if (e) {
             log(e);
