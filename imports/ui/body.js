@@ -222,9 +222,10 @@ let generateXEditor = function(template, cb) {
         });
         $(template.find('#dpdcsvheader_' + index)).editable('setValue', _val.toLowerCase());
 
-        if (existMapping != undefined && existMapping.mapping[index].transform.trim() != '') {
-            $(template.find('#txtCustomJavascript_' + index)).attr('data-code', existMapping.mapping[index].transform).attr('title', existMapping.mapping[index].transform).text('Edit');
-        }
+        //if (existMapping != undefined && existMapping.mapping[index].transform.trim() != '') {
+        //    $(template.find('#txtCustomJavascript_' + index)).attr('data-code', existMapping.mapping[index].transform).attr('title', existMapping.mapping[index].transform).text('Edit');
+        //}
+
         // $(template.find('#dpddatatype_' + index)).editable({
         //     value: _datatype.toLowerCase(),
         //     source: _dataTypes
@@ -595,8 +596,8 @@ Template.readCSV.onCreated(function() {
     this.previewRec = new ReactiveVar([]);
     this.filetypes = new ReactiveVar(
         [
-            { id: 'ProductInformation', name: 'Product Information', isDone: false, isActive: true, header: ProductInformationHeaders, collection: CollProductInformation },
-            { id: 'ProductPricing', name: 'Product Pricing', isDone: false, isActive: false, header: ProductPriceHeaders, collection: CollProductPricing },
+            { id: 'ProductInformation', name: 'Product Information', isDone: false, isActive: false, header: ProductInformationHeaders, collection: CollProductInformation },
+            { id: 'ProductPrice', name: 'Product Pricing', isDone: false, isActive: true, header: ProductPriceHeaders, collection: CollProductPricing },
             { id: 'ProductImprintData', name: 'Imprint Data', isDone: false, isActive: false, header: ProductImprintDataHeaders, collection: CollProductImprintData },
             { id: 'ProductImage', name: 'Image', isDone: false, isActive: false, header: ProductImageHeaders, collection: CollProductImage },
             { id: 'ProductShipping', name: 'Shipping', isDone: false, isActive: false, header: ProductShippingHeaders, collection: CollProductShipping },
