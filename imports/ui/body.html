@@ -33,15 +33,15 @@
                 </ul>
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active">
-
-                        <!--<div>
-                            <table>
+                        <!--<div> {{previewCollection.length}} </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
                                 <tbody>
-                                    {{#each Previewcollection}}
+                                    {{#each previewCollection}}
                                         <tr>
-                                            <td>
-                                                {{sr_no}}
-                                            </td>
+                                            {{#each  getJsonValues this}}
+                                                <td title="{{this}}"><div> {{this}} </div></td>
+                                            {{/each}}
                                         </tr>
                                     {{/each}}     
                                 </tbody>

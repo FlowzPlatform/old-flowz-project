@@ -597,6 +597,7 @@ let parseCSV = function(_file, template, cb) {
                         $(template.find('#buttonProceedNext')).find('.content').text(newProgress + '% completed');
                         Csvfiles.update(fileID, { $set: { progress: newProgress, uploadedRecords: uploadedRecords } }, function(e, res) {
                             console.log('csvupload');
+                            parser.resume();
                         });
                     }
                     progress = newProgress;
@@ -737,9 +738,10 @@ Template.readCSV.helpers({
         return Object.values(obj);
     },
     getJsonKeys(obj) {
+        console.log('obj', obj);
         return Object.keys(obj);
     },
-    Previewcollection() {
+    previewCollection() {
         let ft = Template.instance().filetypes.get(); // all file type
         let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
         let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), deleteAt: '' });
