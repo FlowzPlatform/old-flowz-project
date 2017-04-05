@@ -10,7 +10,7 @@ import { ProductShippingSchemas } from '../../lib/schema/product_shipping.js';
 import { ProductVariationPricingSchemas } from '../../lib/schema/product_variation_pricing.js';
 
 export const CollProductInformation = new Mongo.Collection('collproductinformation');
-export const CollProductPrice = new Mongo.Collection('collproductpricing');
+export const CollProductPrice = new Mongo.Collection('collproductprice');
 export const CollProductImprintData = new Mongo.Collection('collproductimprintdata');
 export const CollProductImage = new Mongo.Collection('collproductimage');
 export const CollProductShipping = new Mongo.Collection('collproductshipping');
