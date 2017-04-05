@@ -26,7 +26,22 @@ if (Meteor.isServer) {
     'abortInLanding': function(userId , documentId){
 
       if (CollUploadJobMaster.findOne().owner == this.userId) {
-        return  CollUploadJobMaster.remove({_id: documentId});
+        //return  CollUploadJobMaster.remove({_id: documentId});
+
+        CollUploadJobMaster.update({ _id: documentId },
+          {
+            $set: {
+
+                deleteAt: new Date()
+
+            }
+        }, function(e, res) {
+          if (e) {
+            log(e);
+          }
+          console.log("updated deleteAt into master collection" ,Meteor.userId());
+          //Router.go("upload")
+        })
       }
 
     }

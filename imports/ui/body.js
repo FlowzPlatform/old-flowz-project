@@ -28,6 +28,32 @@ Template.registerHelper('formatDate', function(date) {
 });
 
 Template.readCSV.events({
+    "click #btnAbortRecord": function(event, template) {
+        swal({
+                title: "Are you sure?",
+                text: "All your existing uploaded data will be deleted and you have to upload the files again",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Abort it!",
+                closeOnConfirm: false
+            },
+            function() {
+                swal("Aborted!", "Your data has been deleted.", "success");
+            });
+    },
+    "click .sheets": function(event, template) {
+        var currentEl = event.currentTarget;
+        var _href = $(currentEl).attr('href').split('#')[1];
+        let ft = template.filetypes.get(); // all file type
+
+        let activeFiletypeId = _.indexOf(ft, _.find(ft, function(d) { return d.isActive }));
+        let newFiletypeId = _.indexOf(ft, _.find(ft, function(d) { return d.id == _href }));
+
+        ft[activeFiletypeId].isDone = true;
+        ft[activeFiletypeId].isActive = false;
+        ft[newFiletypeId].isActive = true;
+    },
     "click #btnSaveCustomjavascript": function(event, template) {
         var code = editor.getValue();
         let $selectedDom = $(template.find("a[data-target='#javascripEditorModal'].open"));
@@ -746,7 +772,7 @@ Template.readCSV.helpers({
         let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
         let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), deleteAt: '' });
         if (obj != undefined) {
-            return activeFiletype.collection.find({ fileID: obj[activeFiletype.id].id });
+            return activeFiletype.collection.find({ fileID: obj[activeFiletype.id].id }).fetch();
         }
         return [];
     }

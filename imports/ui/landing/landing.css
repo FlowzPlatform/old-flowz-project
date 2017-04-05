@@ -101,16 +101,8 @@ button {
     padding: 10px;
     width: 8%;
 }
-
-input[type=text] {
-    text-align: center;
-}
-
-
-/*
-a {
-    color: white;
-}*/
+input[type=text] {text-align: center;}
+/*a {color: white;}*/
 
 #display-error {
     display: none;
