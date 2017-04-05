@@ -82,7 +82,7 @@ input#btn { margin: 8px 18px; padding: 8px; }
     width:8%;
 }
 input[type=text] {text-align: center;}
-a {color: white;}
+/*a {color: white;}*/
 
 #display-error {
     display:none;
