@@ -33,6 +33,21 @@
                 </ul>
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active">
+                        <!--<div> {{previewCollection.length}} </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <tbody>
+                                    {{#each previewCollection}}
+                                        <tr>
+                                            {{#each  getJsonValues this}}
+                                                <td title="{{this}}"><div> {{this}} </div></td>
+                                            {{/each}}
+                                        </tr>
+                                    {{/each}}     
+                                </tbody>
+                            </table>
+                        </div>-->
+
                         <div id="upload-csv-zone">
                             <div class="file-zone">
                                 <span class="dz-message">Drop files here or click to upload.<br/>
@@ -212,9 +227,9 @@
 <template name="uploadStep">
     <div id="steps-block" class="step-progress">
         <ol class="progress">
-            <li class="is-active" data-step="1"> Upload </li>
-            <li data-step="2"> Validate </li>
-            <li data-step="3" class="progress__last"> Import </li>
+            <li class="is-active" data-step="1"> <a href="/upload"> Upload </a> </li>
+            <li data-step="2"> <a href="/validation"> Validate </a> </li>
+            <li data-step="3" class="progress__last"> <a href="/import"> Import </a> </li>
         </ol>
     </div>
 </template>
