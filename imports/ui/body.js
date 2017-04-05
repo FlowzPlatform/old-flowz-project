@@ -14,10 +14,10 @@ import { ProductVariationPricingHeaders } from '../../lib/headers/product_variat
 
 // import  collections
 
-import { CollProductInformation, CollProductPricing, CollProductImprintData, CollProductImage, CollProductShipping, CollProductAdditionalCharges, CollProductVariationPrice } from '../api/collections.js';
+import { CollProductInformation, CollProductPrice, CollProductImprintData, CollProductImage, CollProductShipping, CollProductAdditionalCharges, CollProductVariationPrice } from '../api/collections.js';
 import { Csvfiles } from '../api/collections.js';
 import { Csvfilemapping } from '../api/collections.js';
-
+import { CollUploadJobMaster } from '../api/collections.js';
 
 import './body.html';
 
@@ -185,7 +185,7 @@ let generateMapping = function(template) {
             sysHeader: $(template.find('#dpdsysheader_' + index)).editable('getValue')['dpdsysheader_' + index],
             csvHeader: $(template.find('#dpdcsvheader_' + index)).text(),
             transform: $(template.find('#txtCustomJavascript_' + index)).attr('data-code'),
-            csvHeaderDetail: _.find(activefile, function(d) { return d.text == $(template.find('#dpdcsvheader_' + index)).text() })
+            csvSysHeaderDetail: _.find(activefile, function(d) { return d.text == $(template.find('#dpdsysheader_' + index)).text() })
         })
     });
     template.mapping.set(mapping);
@@ -469,7 +469,7 @@ let generateDatawithNewHeader = function(chunk, _hasHeader, mapping, isPreview, 
         let headerText = d.csvHeader.trim();
         if (!isPreview && d.sysHeader != undefined) {
             //let mapHeader = _.find(activeHeaders, function(v) { return v.text == d.sysHeader });
-            headerText = (d.csvHeaderDetail != undefined) ? d.csvHeaderDetail.column.trim() : d.csvHeader.trim();
+            headerText = (d.csvSysHeaderDetail != undefined) ? d.csvSysHeaderDetail.column.trim() : d.csvHeader.trim();
         } else {
             headerText = (d.sysHeader != undefined && d.sysHeader != '') ? d.sysHeader.trim() : d.csvHeader.trim();
         }
@@ -545,9 +545,11 @@ let parseCSV = function(_file, template, cb) {
         username: Meteor.user().username
     };
 
-    Csvfiles.insert(file , function(e, res) {
+    Csvfiles.insert(file, function(e, res) {
         $('#buttonProceedNext').hide();
         let fileID = res; // new file id
+        let ft = template.filetypes.get(); // all file type
+        let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
         //console.log('fileID', fileID);
         let chunks = 1;
         let totalRecords = 0;
@@ -559,11 +561,12 @@ let parseCSV = function(_file, template, cb) {
             encoding: "UTF-8",
             skipEmptyLines: true,
             complete: function(results) {
-                console.log('complate results', results);
-                if (!abortChecked) {
-                    setNextFile(template);
+                if (!abortChecked && progress == 100) {
+                    updateJobMaster(activeFiletype.id, fileID, function() {
+                        setNextFile(template);
+                        cb();
+                    });
                 }
-                cb();
             },
             error: function(error, f) {
                 console.log("ERROR:", error, f);
@@ -575,8 +578,6 @@ let parseCSV = function(_file, template, cb) {
                     return;
                 }
                 parser.pause();
-                let ft = template.filetypes.get(); // all file type
-                let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
 
                 insertCSVData(results.data[0], fileID, activeFiletype.collection, function() {
 
@@ -586,16 +587,19 @@ let parseCSV = function(_file, template, cb) {
                     // calculate progress
                     ++uploadedRecords;
                     let newProgress = Math.round((uploadedRecords * 100) / totalRecords);
-                    if (progress == newProgress) { parser.resume(); } else {
+                    if (progress == newProgress) {
+                        parser.resume();
+                    } else {
                         $(template.find('#btnNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
                         $(template.find('#btnNext')).find('.content').text(newProgress + '% completed');
 
                         $(template.find('#buttonProceedNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
                         $(template.find('#buttonProceedNext')).find('.content').text(newProgress + '% completed');
                         Csvfiles.update(fileID, { $set: { progress: newProgress, uploadedRecords: uploadedRecords } }, function(e, res) {
-                            parser.resume();
+                            console.log('csvupload');
                         });
                     }
+                    progress = newProgress;
                 });
             },
             beforeFirstChunk: function(chunk) {
@@ -676,7 +680,7 @@ Template.readCSV.onCreated(function() {
     this.filetypes = new ReactiveVar(
         [
             { id: 'ProductInformation', name: 'Product Information', isDone: false, isActive: true, header: ProductInformationHeaders, collection: CollProductInformation },
-            { id: 'ProductPricing', name: 'Product Pricing', isDone: false, isActive: false, header: ProductPriceHeaders, collection: CollProductPricing },
+            { id: 'ProductPrice', name: 'Product Pricing', isDone: false, isActive: false, header: ProductPriceHeaders, collection: CollProductPrice },
             { id: 'ProductImprintData', name: 'Imprint Data', isDone: false, isActive: false, header: ProductImprintDataHeaders, collection: CollProductImprintData },
             { id: 'ProductImage', name: 'Image', isDone: false, isActive: false, header: ProductImageHeaders, collection: CollProductImage },
             { id: 'ProductShipping', name: 'Shipping', isDone: false, isActive: false, header: ProductShippingHeaders, collection: CollProductShipping },
@@ -734,8 +738,27 @@ Template.readCSV.helpers({
     },
     getJsonKeys(obj) {
         return Object.keys(obj);
+    },
+    Previewcollection() {
+        let ft = Template.instance().filetypes.get(); // all file type
+        let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
+        let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), deleteAt: '' });
+        if (obj != undefined) {
+            return activeFiletype.collection.find({ fileID: obj[activeFiletype.id].id });
+        }
+        return [];
     }
 });
+
+let updateJobMaster = function(filename, fileID, cb) {
+    //return CollUploadJobMaster.findOne({ owner: Meteor.userId(),deleteAt:'',stepStatus:1 });
+    let data = {};
+    data[filename] = { id: fileID, validateStatus: 'pending', uploadStatus: 'completed', uplodedAt: new Date() };
+    let Obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), deleteAt: '', stepStatus: 1 });
+    CollUploadJobMaster.upsert(Obj._id, { $set: data }, function() {
+        cb();
+    });
+}
 
 let insertCSVData = function(data, fileID, collection, cb) {
     let copedata = $.extend({}, data);
@@ -744,7 +767,7 @@ let insertCSVData = function(data, fileID, collection, cb) {
     data['username'] = Meteor.user().username;
     // console.log('data', data);
     // return;
-    collection.insert(data, { validate: false }, function(err, res) {
+    collection.insert(data, function(err, res) {
         if (err) {
             //console.log('errmessage', err.message);
             //console.log('err', err.invalidKeys);
