@@ -10,48 +10,126 @@
                 </ol>
             </div>
             <div class="product-file-upload-tab-block">
-                <ul class="nav nav-tabs nav-tabs-vertical" role="tablist">
+                <!-- <ul class="nav nav-tabs nav-tabs-vertical" role="tablist">
                     {{#each filetypes}}
                         <li role="presentation" class="{{#if isActive}}active{{/if}} {{#if isDone}}done{{/if}}"><a href="#"><i class="fa fa-check-circle-o"></i>{{name}}</a></li>
                     {{/each}}
-                </ul>
-                <div class="tab-content">
+                </ul> -->
+                <div class="">
                     <div role="tabpanel" class="tab-pane active">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <button class="progress-button progress-button-small pull-left" id="validation_start" data-style="top-line" data-horizontal="">
-                                    <span class="content">Start Validaton</span>
-                                    <span class="progress">
-                                        <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
-                                    </span>
-                                </button>
-                                <div id="myProgress" class="pull-right text-success" style="display:none;margin-top: 8px;">
-                                    <span id="myBar">0%</span><span>&nbsp;completed</span>
+                      <div class="clearfix"></div>
+                      <div class="row">
+                          <div id="mapping" class="col-md-12" style="display: block;">
+                              {{#if isJobQueueStatusRunning jobQueue.status }}
+                              <div class="pull-left">
+                                  <h3>Validation Status</h3>
+                              </div>
+                              <div class="pull-left">
+                                  <div class="sk-wave spinner">
+                                      <div class="sk-rect sk-rect1"></div>
+                                      <div class="sk-rect sk-rect2"></div>
+                                      <div class="sk-rect sk-rect3"></div>
+                                      <div class="sk-rect sk-rect4"></div>
+                                      <div class="sk-rect sk-rect5"></div>
+                                  </div>
+                              </div>
+                              <div class="view-mapping">
+                                  <table class="table table-bordered table-striped">
+                                      <thead>
+                                          <tr>
+                                              <th>Validation File Type</th>
+                                              <th>Validation Start At</th>
+                                              <th>Validation Status</th>
+                                              <th>Number of Record</th>
+                                              <th>Validation Progress</th>
+                                          </tr>
+                                      </thead>
+                                       <tbody>
+                                              {{#each jobQueue.arrFileObj}}
+                                                      <tr>
+                                                          <td>
+                                                              <span id="dpdsysheader_{{rowIndex}}" >{{this.fileType}}</span>
+                                                          </td>
+                                                          <td>
+                                                              <span id="dpdsysheader_{{rowIndex}}"  selected="selected">{{jobQueue.startAt}}</span>
+                                                          </td>
+                                                          <td>
+                                                             <span id="dpdsysheader_{{rowIndex}}"  selected="selected">{{this.validationStatus}}</span>
+                                                          </td>
+                                                          <td>
+                                                              <span id="dpdsysheader_{{rowIndex}}"  selected="selected">{{this.totalNoOfRecords}}</span>
+                                                          </td>
+                                                          <td>
+                                                                <span id="myBar1">{{this.validationProgress}}%</span><span>&nbsp;completed</span>
+                                                          </td>
+                                                      </tr>
+                                                      {{#if isJobQueueStatusRunning this.validationStatus }}
+                                                      <tr>
+                                                          <td colspan="5" width="100%" >
+                                                            <div class="row">
+                                                                <div class="col-md-12" >
+                                                                    <button style="display:none" class="progress-button progress-button-small pull-left" id="validation_start" data-style="top-line" data-horizontal="">
+                                                                        <span class="content">Start Validaton</span>
+                                                                        <span class="progress">
+                                                                            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                                                        </span>
+                                                                    </button>
+                                                                    <div id="myProgress" class="pull-right text-success" style="display:none;margin-top: 8px;">
+                                                                        <span id="myBar" style="display:none">0%</span><span style="display:none">&nbsp;completed</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div id="mydiv" class="clearfix">
+
+                                                                <div style="width: 98%;overflow: auto;margin: 5px 0px;">
+                                                                    <div id="productData" ></div>
+                                                                </div>
+                                                                <div id="errorDiv" class="pull-left" style="display:none">
+                                                                        <span class="text-danger" id="errorStr">Error string will be here</span>
+                                                                </div>
+                                                                <div id='buttonDivProceed' style="display:none">
+                                                                    <button class="progress-button progress-button-small pull-right" id="proceed_to_next" data-style="top-line" data-horizontal="">
+                                                                        <span class="content">Proceed To Next</span>
+                                                                        <span class="progress">
+                                                                            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                                                        </span>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                          </td>
+                                                      </tr>
+                                                      {{/if}}
+                                              {{/each}}
+
+                                      </tbody>
+                                  </table>
+                              </div>
+                              {{else}}
+                              <div class="pull-left">
+                                  <h3>Validation Completed</h3>
+                              </div>
+                              <div class="pull-left">
+                                  <div class="sk-wave spinner">
+                                      <div class="sk-rect sk-rect1"></div>
+                                      <div class="sk-rect sk-rect2"></div>
+                                      <div class="sk-rect sk-rect3"></div>
+                                      <div class="sk-rect sk-rect4"></div>
+                                      <div class="sk-rect sk-rect5"></div>
+                                  </div>
+                              </div>
+                                <div class="view-mapping">
+                                  <div id="validation_successful" style="display:block" class="success_div text-success">
+                                      <span><i class="fa fa-check-circle-o"></i></span>
+                                      <span>
+                                          The file has been succefully validated withou any error . Now you can proceed to upload it on PDM .
+                                      </span>
+                                  </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div id="mydiv" class="clearfix">
-                            <div style="width: 100%;overflow: auto;margin: 5px 0px;">
-                                <div id="productData" ></div>
-                            </div>
-                            <div id="errorDiv" class="pull-left" style="display:none">
-                                    <span class="text-danger" id="errorStr">Error string will be here</span>
-                                </div>
-                            <div id='buttonDivProceed' style="display:none">
-                                <button class="progress-button progress-button-small pull-right" id="proceed_to_next" data-style="top-line" data-horizontal="">
-                                    <span class="content">Proceed To Next</span>
-                                    <span class="progress">
-                                        <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-                        <div id="validation_successful" style="display:none" class="success_div text-success">
-                            <span><i class="fa fa-check-circle-o"></i></span>
-                            <span>
-                                The file has been succefully validated withou any error . Now you can proceed to upload it on PDM .
-                            </span>
-                        </div>
+                              {{/if}}
+
+                          </div>
+                      </div>
+
                     </div>
                 </div>
             </div>

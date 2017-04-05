@@ -119,37 +119,33 @@
                                 <div class="pull-left">
                                     {{> spinner}}
                                 </div>
-                                <div class="pull-right">
-                                    
-                                    <button class="progress-button progress-button-small pull-right" style="display: none" id="btnPreview" data-style="top-line" data-horizontal="">
-                                        <span class="content">Generate previews</span>
-                                        <span class="progress">
-                                            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
-                                        </span>
-                                    </button>
-                                </div>
                                 <div class="view-mapping">
                                     <table class="table table-bordered table-striped">
                                         <thead>
                                             <tr>
-                                                <th>System headers</th>
+                                                <th>Column Index</th>
                                                 <th>CSV header</th>
+                                                <th>System headers</th>
                                                 <th>Transform</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {{#each headers}}
+                                            {{#each csvHeaders}}
                                                 <tr>
                                                     {{#let rowIndex=@index}}
+                                                        <td style="width: 12%" class="text-center">{{rowIndex}}</td>
                                                         <td style="width: 30%">
-                                                            <span id="dpdsysheader_{{rowIndex}}"  selected="selected" data-column="{{column}}" style="text-transform:capitalize">{{text}}</span>
+                                                            <span id="dpdcsvheader_{{rowIndex}}"  selected="selected" data-column="{{this}}" style="text-transform:capitalize">{{this}}</span>
+                                                            <!--<span id="dpdsysheader_{{rowIndex}}"  selected="selected" data-column="{{column}}" style="text-transform:capitalize">{{text}}</span>-->
                                                         </td>
                                                         <td style="width: 30%">
-                                                            <a href="#" id="dpdcsvheader_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>
+                                                            <a href="#" id="dpdsysheader_{{rowIndex}}" class="dpdsysheader" data-type="select" data-inputclass="form-control"></a>
+                                                            <!--<a href="#" id="dpdcsvheader_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
                                                         </td>
-                                                        <td style="width: 40%">
+                                                        <td style="width: 30%">
                                                             <!-- Trigger the modal with a button -->
-                                                            <a href="#" id="txtCustomJavascript_{{rowIndex}}" data-toggle="modal" data-target="#javascripEditorModal" data-header="{{column}}" data-code="" title="Click here to add code."><i class="fa fa-pencil-square-o"></i></a>
+                                                            <a href="#" id="txtCustomJavascript_{{rowIndex}}" data-toggle="modal" data-target="#javascripEditorModal" data-header="{{column}}" data-code="" title="Click here to add code." style="float: left;"><i class="fa fa-pencil-square-o"></i></a>
+                                                            <div class="transform-function"></div>
                                                             <!--<a href="#" id="dpddatatype_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
                                                         </td>
                                                     {{/let}}

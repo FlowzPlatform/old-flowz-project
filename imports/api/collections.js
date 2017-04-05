@@ -10,7 +10,7 @@ import { ProductShippingSchemas } from '../../lib/schema/product_shipping.js';
 import { ProductVariationPricingSchemas } from '../../lib/schema/product_variation_pricing.js';
 
 export const CollProductInformation = new Mongo.Collection('collproductinformation');
-export const CollProductPricing = new Mongo.Collection('collproductpricing');
+export const CollProductPrice = new Mongo.Collection('collproductpricing');
 export const CollProductImprintData = new Mongo.Collection('collproductimprintdata');
 export const CollProductImage = new Mongo.Collection('collproductimage');
 export const CollProductShipping = new Mongo.Collection('collproductshipping');
@@ -25,7 +25,7 @@ export const Csvfilemapping = new Mongo.Collection('csvfilemapping');
 
 // add schema
 CollProductInformation.attachSchema(ProductInformationSchema);
-CollProductPricing.attachSchema(ProductPriceSchemas);
+CollProductPrice.attachSchema(ProductPriceSchemas);
 CollProductImprintData.attachSchema(ProductImprintDataSchemas);
 CollProductImage.attachSchema(ProductImagesSchemas);
 CollProductShipping.attachSchema(ProductShippingSchemas);

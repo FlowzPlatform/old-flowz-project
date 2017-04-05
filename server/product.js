@@ -1,7 +1,11 @@
 import { Meteor } from 'meteor/meteor';
 import { CollProductInformation } from '../imports/api/collections.js';
 import { Csvfiles } from '../imports/api/collections.js';
+
 import { CollUploadJobMaster } from '../imports/api/collections.js';
+
+
+/*
 
 Meteor.methods({
     'products.insertCSVData': function(fileID, datas) {
@@ -16,6 +20,7 @@ Meteor.methods({
     }
 });
 
+*/
 if (Meteor.isServer) {
   Meteor.methods({
     'abortInLanding': function(userId , documentId){
