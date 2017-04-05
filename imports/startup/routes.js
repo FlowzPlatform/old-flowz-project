@@ -1,7 +1,7 @@
 // Import needed templates
-import '../ui/body.js';
-import '../ui/history/history.js';
-import '../ui/landing/landing.js';
+//import '../ui/body.js';
+//import '../ui/history/history.js';
+//import '../ui/landing/landing.js';
 
 
 
