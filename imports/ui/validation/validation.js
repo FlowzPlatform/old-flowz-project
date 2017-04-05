@@ -19,7 +19,7 @@ const divNameOfhandsontable = 'productData';
 // const esUrl='http:/localhost:9200/pdmrawdata/';
 const esUrl = 'http://localhost:9200/pdmrowdata/';
 let objHandsontable = null;
-let invalidColumnColor = 'red';
+let invalidColumnColor = '#a94442';
 
 import { ProductInformationRules } from '../../../lib/validatorRules/product_information.js';
 import { ProductPriceRules } from '../../../lib/validatorRules/product_price.js';
@@ -508,6 +508,10 @@ function findInValidData(sheetName, currentRuleIdx, arrRules,sheetHeaders, callb
         //document.getElementById("validation_successful").style.display = "block";
         // all rules are completed
         return false;
+    }
+    if(currentRuleIdx<=0)
+    {
+      setValidationProgress(sheetName,currentRuleIdx, arrRules.length);
     }
     delete(sheetHeaders[(currentRule + 1)].renderer);
     if (fromValidate == 'mongo') {
