@@ -30,8 +30,8 @@ Template.registerHelper('formatDate', function(date) {
 
 Template.readCSV.events({
     "click #btngostep2": function(event, template) {
-        let Id = CollUploadJobMaster.findOne({ owner: Meteor.userId(), deleteAt: '', stepStatus: 1 })._id;
-        CollUploadJobMaster.update(Id, { $set: { step2status: "running" } }, function() {
+        let Id = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running', stepStatus: 'upload_pending' })._id;
+        CollUploadJobMaster.update(Id, { $set: { stepStatus: 'validation_pending' } }, function() {
             Router.go('/validation');
         });
     },
@@ -92,6 +92,7 @@ Template.readCSV.events({
         setTimeout(function() {
             if (editor == undefined) {
                 editor = CodeMirror.fromTextArea(template.find("#customJavascript"), {
+                    placeholder: 'return row[' + $(currentEl).attr('data-header') + ']',
                     lineNumbers: true,
                     mode: "javascript" // set any of supported language modes here
                 });
@@ -266,7 +267,7 @@ let generateMapping = function(template) {
     csvHeaders.forEach(function(result, index) {
         mapping.push({
             sysHeader: $(template.find('#dpdsysheader_' + index)).editable('getValue')['dpdsysheader_' + index],
-            csvHeader: $(template.find('#dpdcsvheader_' + index)).text(),
+            csvHeader: $(template.find('#dpdcsvheader_' + index)).editable('getValue')['dpdcsvheader_' + index], //$(template.find('#dpdcsvheader_' + index)).text(),
             transform: $(template.find('#txtCustomJavascript_' + index)).attr('data-code'),
             csvSysHeaderDetail: _.find(activefile, function(d) { return d.text == $(template.find('#dpdsysheader_' + index)).text() })
         })
@@ -305,6 +306,14 @@ let generateXEditor = function(template, cb) {
             // } else {
             //     _val = activefile[index]
             // }
+            $(template.find('#dpdcsvheader_' + index)).editable("destroy");
+            $(template.find('#dpdcsvheader_' + index)).editable({
+                success: function(response, newValue) {
+                    generatePreview(template.find('#csv-file').files[0], template, function() {
+                        $(template.find('#preview')).find('.spinner').hide();
+                    });
+                }
+            });
 
             $(template.find('#dpdsysheader_' + index)).editable("destroy");
             $(template.find('#dpdsysheader_' + index)).editable({
@@ -852,7 +861,7 @@ Template.readCSV.helpers({
 
         let ft = Template.instance().filetypes.get(); // all file type
         let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
-        let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), deleteAt: '' });
+        let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running' });
         if (obj != undefined && activeFiletype != undefined) {
             if (obj.hasOwnProperty(activeFiletype.id)) {
                 return activeFiletype.collection.find({ fileID: obj[activeFiletype.id].id }, { fields: { 'everythingButThisField': 0 } }).fetch();
@@ -861,7 +870,7 @@ Template.readCSV.helpers({
         return [];
     },
     isActiveStep2() {
-        let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), deleteAt: '' });
+        let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running' });
         let ft = Template.instance().filetypes.get();
 
         return !_.chain(ft).filter(function(d) { return d.require }).map(function(d) { return d.id }).map(function(d) { return _.contains(_.keys(obj), d) }).contains(false).value();
@@ -872,7 +881,7 @@ let updateJobMaster = function(filename, fileID, cb) {
     //return CollUploadJobMaster.findOne({ owner: Meteor.userId(),deleteAt:'',stepStatus:1 });
     let data = {};
     data[filename] = { id: fileID, validateStatus: 'pending', uploadStatus: 'completed', uplodedAt: new Date() };
-    let Obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), deleteAt: '', stepStatus: 1 });
+    let Obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running', stepStatus: 'upload_pending' });
     CollUploadJobMaster.upsert(Obj._id, { $set: data }, function() {
         cb();
     });

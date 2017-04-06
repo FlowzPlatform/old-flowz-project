@@ -15,10 +15,10 @@ Router.route('/upload', {
     path: '/upload/:id?',
     template: 'readCSV',
     data: function() {
-        return CollUploadJobMaster.findOne({ owner: Meteor.userId(), deleteAt: '' })
+        return CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running' })
     },
     onBeforeAction: function() {
-        let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), deleteAt: '' })
+        let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running' })
 
         if (obj != undefined) {
             this.next();
