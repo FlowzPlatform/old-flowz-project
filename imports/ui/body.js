@@ -127,11 +127,11 @@ Template.readCSV.events({
                 showCancelButton: true,
                 confirmButtonColor: "#DD6B55",
                 confirmButtonText: "Yes, Abort it!",
-                closeOnConfirm: false
+                closeOnConfirm: true
             },
             function() {
                 template.abortData.set(false);
-                swal("Aborted!", "Your data has been deleted.", "success");
+                toastr.success("Your data has been successfully deleted.");
             });
     },
     "click .sheets": function(event, template) {
@@ -298,7 +298,7 @@ Template.readCSV.events({
         $(template.find('#btnNext')).addClass('inProgress');
 
         $(template.find('#mapping')).hide();
-        $(template.find('#btnAbort')).show();
+        //$(template.find('#btnAbort')).show();
         //let mapping = generateMapping(template); // generate new Mapping
 
         // insert csv maaping in db
@@ -313,10 +313,21 @@ Template.readCSV.events({
         });
     },
     'click #btnAbort': function(event, template) {
-        if (confirm('Are you sure you want to abort?')) {
-            abortChecked = true;
-            resetAll(template);
-        }
+        swal({
+                title: "Abort?",
+                text: "Are you sure you want to abort?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes",
+                closeOnConfirm: true
+            },
+            function(isConfirm) {
+                if (isConfirm) {
+                    abortChecked = true;
+                    resetAll(template);
+                }
+            });
     },
     'click #addNewHeader': function(event, template) {
 
@@ -385,18 +396,18 @@ let setMapping = function(template, cb) {
 
     let ft = Template.instance().filetypes.get(); // all file type
     let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
-    let csvmapping = Csvfilemapping.findOne({ owner: Meteor.userId(), fileTypeID: activeFiletype.id, hasHeader: _hasHeader });
-    if (csvmapping != undefined) {
-        if (_hasHeader) {
-            if (template.mappingWithHeader.get().length == 0) {
-                template.mappingWithHeader.set(csvmapping.mapping);
-            }
-        } else {
-            if (template.mappingWithOutHeader.get().length == 0) {
-                template.mappingWithOutHeader.set(csvmapping.mapping);
-            }
-        }
-    }
+    // let csvmapping = Csvfilemapping.findOne({ owner: Meteor.userId(), fileTypeID: activeFiletype.id, hasHeader: _hasHeader });
+    // if (csvmapping != undefined) {
+    //     if (_hasHeader) {
+    //         if (template.mappingWithHeader.get().length == 0) {
+    //             template.mappingWithHeader.set(csvmapping.mapping);
+    //         }
+    //     } else {
+    //         if (template.mappingWithOutHeader.get().length == 0) {
+    //             template.mappingWithOutHeader.set(csvmapping.mapping);
+    //         }
+    //     }
+    // }
     cb();
 }
 
@@ -552,7 +563,7 @@ let resetAll = function(template) {
     $(template.find("#upload-csv-zone")).show();
     $(template.find('#btnNext')).find('.content').text('Proceed');
     $(template.find('#btnNext')).show();
-    $(template.find('#btnAbort')).hide();
+    //$(template.find('#btnAbort')).hide();
     $(template.find("#handson-Zone-during-upload")).hide();
     $(template.find('#uploadCsv')).show();
     $(template.find('#uploadImage')).hide();
@@ -951,10 +962,10 @@ Template.readCSV.onCreated(function() {
     let a =
         toastr.options = {
             "closeButton": true,
-            "showMethod": "show",
-            "hideDuration": "1000",
-            "showDuration": "0",
-            "timeOut": "10000000"
+            // "showMethod": "show",
+            // "hideDuration": "1000",
+            // "showDuration": "0",
+            // "timeOut": "10000000"
         }
     this.files = new ReactiveVar([]);
     this.csvHeaders = new ReactiveVar([]);
@@ -1087,8 +1098,8 @@ let insertCSVData = function(data, fileID, collection, cb) {
 
             $('#buttonProceedNext').show().find('.content').text('Proceed To Next');
             $('#btnNext').hide();
-            toastr.error(err.message);
-            //$("#errMessageFromSchema").text(err.message);
+            //toastr.error(err.message);
+            $("#errMessageFromSchema").text(err.message);
 
             renderHandsonTable(copedata, Object.keys(copedata), 'hotErrorDataDuringUpload', err, fileID, collection, cb);
         } else {
@@ -1098,7 +1109,7 @@ let insertCSVData = function(data, fileID, collection, cb) {
 }
 let errorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
-    td.style.backgroundColor = '#a94442';
+    td.style.border = "2px solid #a94442";
 };
 
 let getHandsonHeader = function(headers, invalidKeys) {
