@@ -235,7 +235,7 @@ Meteor.validatorFunctions = {
           }
       };
       let updResult = CollUploadJobMaster.update({_id: guid}, query);
-      //Router.go("/import");
+      Router.go("/import");
     },
     onClickFindInValidData: function(sheetName) {
         if(sheetName=='')
