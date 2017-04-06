@@ -41,6 +41,21 @@ import { ProductVariationPricingHeaders } from '../../../lib/headers/product_var
 
 let arrHeader = [];
 
+// Step Status
+const ValidationRunning = 'validation_running';
+const ValidationCompleted = 'validation_completed';
+const ImportRunning = 'import_in_progress';
+const UploadPending = 'upload_pending';
+let fileTypes =
+[
+    { id: 'ProductInformation', name: 'Product Information', isDone: false, isActive: true, header: ProductInformationHeaders, collection: CollProductInformation },
+    { id: 'ProductPrice', name: 'Product Pricing', isDone: false, isActive: false, header: ProductPriceHeaders, collection: CollProductPrice },
+    { id: 'ProductImprintData', name: 'Imprint Data', isDone: false, isActive: false, header: ProductImprintDataHeaders, collection: CollProductImprintData },
+    { id: 'ProductImage', name: 'Image', isDone: false, isActive: false, header: ProductImageHeaders, collection: CollProductImage },
+    { id: 'ProductShipping', name: 'Shipping', isDone: false, isActive: false, header: ProductShippingHeaders, collection: CollProductShipping },
+    { id: 'ProductAdditionalCharges', name: 'Additional Charges', isDone: false, isActive: false, header: ProductAdditionalChargeHeaders, collection: CollProductAdditionalCharges },
+    { id: 'ProductVariationPrice', name: 'Variation Price', isDone: false, isActive: false, header: ProductVariationPricingHeaders, collection: CollProductVariationPrice }
+];
 Template.validation.events({
     'click #validation_start' (event) {
         Meteor.validatorFunctions.getCurrentRunningUploadJob();
@@ -51,18 +66,47 @@ Template.validation.events({
     'click #import_start' (event) {
         Meteor.validatorFunctions.importStart();
     },
-
+    'click #validationAbortBtnId' (event) {
+        swal({
+                title: "Are you sure?",
+                text: "All validation will be stopped and you have to start again",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Abort it!",
+                closeOnConfirm: true
+            },
+            function(isConfirm) {
+                if(isConfirm)
+                {
+                  let job = Meteor.validatorFunctions.getCurrentRunningUploadJob();
+                  let guid=job._id;
+                  var query = {
+                      "$set": {
+                          "stepStatus":UploadPending
+                          //step2status: "completed"
+                      }
+                  };
+                  job['arrFileObj']=[];
+                  $.each(fileTypes, function(index, value) {
+                      if(job[value.id])
+                      {
+                        query["$set"][value.id]=job[value.id];
+                        query["$set"][value.id]['validateStatus']='pending';
+                      }
+                  });
+                  //console.log(query);
+                  let updResult = CollUploadJobMaster.update({_id: guid}, query,function(err,result){
+                    if(!err)
+                    {
+                        Router.go("/");
+                    }
+                  });
+                }
+            });
+    }
 });
-let fileTypes =
-[
-    { id: 'ProductInformation', name: 'Product Information', isDone: false, isActive: true, header: ProductInformationHeaders, collection: CollProductInformation },
-    { id: 'ProductPrice', name: 'Product Pricing', isDone: false, isActive: false, header: ProductPriceHeaders, collection: CollProductPrice },
-    { id: 'ProductImprintData', name: 'Imprint Data', isDone: false, isActive: false, header: ProductImprintDataHeaders, collection: CollProductImprintData },
-    { id: 'ProductImage', name: 'Image', isDone: false, isActive: false, header: ProductImageHeaders, collection: CollProductImage },
-    { id: 'ProductShipping', name: 'Shipping', isDone: false, isActive: false, header: ProductShippingHeaders, collection: CollProductShipping },
-    { id: 'ProductAdditionalCharges', name: 'Additional Charges', isDone: false, isActive: false, header: ProductAdditionalChargeHeaders, collection: CollProductAdditionalCharges },
-    { id: 'ProductVariationPrice', name: 'Variation Price', isDone: false, isActive: false, header: ProductVariationPricingHeaders, collection: CollProductVariationPrice }
-]
+
 
 Template.validation.onRendered(function() {
   Meteor.call("test" , function(error,success){
@@ -214,10 +258,7 @@ Template.validation.helpers({
 Meteor.UploadJob = {
 
 }
-// Step Status
-const ValidationRunning = 'validation_running';
-const ValidationCompleted = 'validation_completed';
-const ImportRunning = 'import_in_progress';
+
 
 
 
