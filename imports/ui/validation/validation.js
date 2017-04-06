@@ -47,7 +47,11 @@ Template.validation.events({
     },
     'click #proceed_to_next' (event) {
         Meteor.validatorFunctions.proceedToNext();
-    }
+    },
+    'click #import_start' (event) {
+        Meteor.validatorFunctions.importStart();
+    },
+
 });
 let fileTypes =
 [
@@ -96,7 +100,7 @@ Template.validation.helpers({
         if(!job)
         {
           Meteor.validatorFunctions.startValidation();
-          return {};
+          job = Meteor.validatorFunctions.getCurrentRunningUploadJob();
         }
 
         else {
@@ -169,26 +173,29 @@ Template.validation.helpers({
     {
         let job = Template.instance().jobQueue.get();
         console.log("=======isJobHasAllPandingStatus========");
-        console.log(job);
+        console.log(currentjobQueue);
         let flag=0;
-        $.each(currentjobQueue.arrFileObj , function(index, value) {
-          //console.log(value.validateStatus);
-            if(value.validateStatus=="pending" )
-            {
-              ++flag;
-            }
-        });
-
-        console.log("=====flag=",flag,"==========");
-        // there is no running and pending status then job will be completed
-        if(currentjobQueue.arrFileObj.length==flag){
-          //Meteor.validatorFunctions.onClickFindInValidData(newSheetName);
-          Meteor.validatorFunctions.setJobQueusSheetStatus("ProductInformation",job,"running");
-          return true;
+        if(job && job.arrFileObj)
+        {
+          $.each(currentjobQueue.arrFileObj , function(index, value) {
+            //console.log(value.validateStatus);
+              if(value.validateStatus=="pending" )
+              {
+                ++flag;
+              }
+          });
+          console.log("=====flag=",flag,"==========");
+          // there is no running and pending status then job will be completed
+          if(currentjobQueue.arrFileObj && currentjobQueue.arrFileObj.length==flag){
+            //Meteor.validatorFunctions.onClickFindInValidData(newSheetName);
+            Meteor.validatorFunctions.setJobQueusSheetStatus("ProductInformation",job,"running");
+            return true;
+          }
+          else {
+            return false;
+          }
         }
-        else {
-          return false;
-        }
+        return false;
     }
 });
 
@@ -197,7 +204,21 @@ Meteor.UploadJob = {
 }
 
 Meteor.validatorFunctions = {
-
+    importStart:function()
+    {
+      let qry={owner:Meteor.userId(),"status":"running","stepStatus":2};
+      job = CollUploadJobMaster.find(qry).fetch();
+      console.log(job);
+      let guid=job._id;
+      var query = {
+          "$set": {
+              stepStatus: 3
+          }
+      };
+      console.log(query);
+      let updResult = CollUploadJobMaster.update({_id: guid}, query);
+      console.log(updResult);
+    },
     onClickFindInValidData: function(sheetName) {
         if(sheetName=='')
           return false;
@@ -378,8 +399,9 @@ function findjobQueueData() {
 // display error msg hide/show
 function displayErrorMsg(flag, msg) {
     //$("#divrunning").
-    //let row = $('#errorContainer').remove().clone();
-    //$('#divrunning').after(row);
+    console.log(currentValidationName);
+    let row = $('#errorContainer').remove().clone();
+    $('#div'+currentValidationName).after(row);
     var errorMsg = $("#errorDiv").find("#errorStr");
     if(errorMsg)
     {
