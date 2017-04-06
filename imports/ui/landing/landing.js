@@ -16,6 +16,10 @@ const reactiveArray = [
     { id: 'ProductVariationPrice', name: 'Variation Price', isDone: false, isActive: false }
 ]
 
+
+
+
+
 Template.landing.onRendered(function() {
 
 })
@@ -77,26 +81,28 @@ Template.landing.events({
 
 
     'mouseover .btn' (event) {
+      document.getElementById("dv").style.display="block";
+      var img = $('#dv_img');
+      var data = event.currentTarget.innerText;
+      if(data == "REPLACE") {
+          $("selected_tick").css("display" , "block");
+          $( "#get" ).html( "<p> By choosing <b>Replace</b> method you can remove all your old data and add the new one.Replace all the old products with new one.</p><p>Example :</p><p> Old records existed- A , B , C </p> <p>New records uploaded- <span style='color:blue;font-weight:bold'>C'</span>  ,D ,E</p><p>Final result will be - <span style='color:blue;font-weight:bold'>C'</span> ,D ,E</p>");
+      }
+      else if(data == "APPEND") {
 
-        document.getElementById("dv").style.display = "block";
-        var img = $('#dv_img');
-        var data = event.currentTarget.innerText;
-        if (data == "REPLACE") {
-            $("selected_tick").css("display", "block");
-            $("#get").html("<p> By choosing <b>Replace</b> method you can remove all your old data and add the new one.Replace all the old products with new one.</p><p>e.g. Old records existed- A , B , C / New records uploaded- C' ,D ,E</p><p>Final result will be - C' ,D ,E</p>");
-        } else if (data == "APPEND") {
+          $("selected_tick").css("display" , "block");
+          $( "#get" ).html( "<p> By choosing <b>Append</b> method you can Keep all the old products and add the new one . No old records will be updated .</p><p><p>Example :</p><p> Old records existed- A , B , C </p><p> New records uploaded- <span style='color:blue;font-weight:bold'>C'</span> , D ,E</p><p>Final result will be - A ,B ,C ,D ,E</p>" );
+      }
+      else if(data == "UPSERT") {
 
-            $("selected_tick").css("display", "block");
-            $("#get").html("<p> By choosing <b>Append</b> method you can Keep all the old products and add the new one . No old records will be updated .</p><p>e.g. Old records existed- A , B , C / New records uploaded- C' , D ,E</p><p>Final result will be - A ,B ,C ,D ,E</p>");
-        } else if (data == "UPSERT") {
+          $("selected_tick").css("display" , "block");
+          $( "#get" ).html( " <p> By choosing <b>Upsert</b> method you can Keep all the old products , update old records and add the new one .</p><p><p>Example :</p><p> Old records existed- A , B , C </p><p> New records uploaded- <span style='color:blue;font-weight:bold'>C'</span> , D ,E</p><p>Final result will be - A ,B ,<span style='color:blue;font-weight:bold'>C'</span> ,D , E</p>" );
+      }
+      else if(data == "UPDATE") {
 
-            $("selected_tick").css("display", "block");
-            $("#get").html(" <p> By choosing <b>Upsert</b> method you can Keep all the old products , update old records and add the new one .</p><p>e.g. Old records existed- A , B , C / New records uploaded- C' , D ,E</p><p>Final result will be - A ,B ,C' ,D , E</p>");
-        } else if (data == "UPDATE") {
-
-            $("selected_tick").css("display", "block");
-            $("#get").html("<p> By choosing <b>Update</b> method you can Keep all the old products and update old records . No new products can be added in this method</p><p>e.g. Old records existed- A , B , C / New records uploaded- C' , D ,E</p><p>Final result will be - A ,B ,C'</p>");
-        }
+          $("selected_tick").css("display" , "block");
+          $( "#get" ).html( "<p> By choosing <b>Update</b> method you can Keep all the old products and update old records . No new products can be added in this method</p><p><p>Example :</p><p> Old records existed- A , B , C </p><p>New records uploaded- <span style='color:blue;font-weight:bold'>C'</span> , D ,E</p><p>Final result will be - A ,B ,<span style='color:blue;font-weight:bold'>C'</span></p>" );
+      }
     },
 
 
@@ -118,29 +124,39 @@ Template.landing.events({
             Router.go("/");
         }
     },
-    'click #landingAbortBtnId' (event) {
-        swal({
-                title: "Are you sure?",
-                text: "All your existing uploaded file will be deleted and you have to upload the files again",
-                type: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#DD6B55",
-                confirmButtonText: "Yes, Abort it!",
-                closeOnConfirm: false
-            },
-            function() {
-                let _id = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: "running" })._id;
-                console.log(_id);
-                Meteor.call("abortInLanding", Meteor.userId(), _id, 'aborted', function(err, success) {
-                    if (err) {
-                        swal("Error!", "Something bad happend.Please try again later", "warning");
-                    } else {
-                        swal("Aborted!", "Your files has been deleted.", "success");
-                    }
-                });
-                //CollUploadJobMaster.remove({_id: CollUploadJobMaster.findOne()._id});
+    'click #landingAbortBtnId' (event){
+      toastr.options = {
+          "closeButton": true,
+          "showMethod": "show",
+          "hideDuration": "5000",
+          "showDuration": "0",
+          "timeOut": "5000"
+      }
 
+      swal({
+            title: "Are you sure?",
+            text: "All your existing uploaded file will be deleted and you have to upload the files again",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes, Abort it!",
+            closeOnConfirm: true
+          },
+          function(){
+            let _id = CollUploadJobMaster.findOne({ owner: Meteor.userId() , masterJobStatus : "running"})._id;
+            console.log(_id);
+            Meteor.call("abortInLanding" , Meteor.userId(),_id, 'aborted' ,function (err , success) {
+              if (err) {
+                //swal("Error!", "Something bad happend.Please try again later", "warning");
+                toastr.error('Something bad happend.Please try again later');
+              }else
+              {
+                //swal("Aborted!", "Your files has been deleted.", "success");
 
+                toastr.error('Your files has been deleted');
+              }
+            });
+            //CollUploadJobMaster.remove({_id: CollUploadJobMaster.findOne()._id});
             });
     },
     'click #getOptions' (event) {

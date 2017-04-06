@@ -31,11 +31,16 @@ Template.registerHelper('formatDate', function(date) {
 
 
 Template.imageUpload.onRendered(function() {
+  document.getElementById('btnUploadCsv').focus();
+  $('.imageOrFileButton').on('click', function(){
+    $('.imageOrFileButton').removeClass('active');
+    $(this).addClass('active');
+  });
     //this.csv_files = new ReactiveArray();
 
     // Meteor.Dropzone.options.maxFiles = 1;
     //  Meteor.Dropzone.options.previewTemplate = '<div id="preview-template" >';
-    Meteor.Dropzone.options.dictDefaultMessage = 'Drag and drop images here to upload ';
+    Meteor.Dropzone.options.dictDefaultMessage = '<p class="first">Drag and drop images here to upload</p>   <p class="second">(only .jpg , .png and .gif files are allowed)</p>';
     //Meteor.Dropzone.options.addRemoveLinks = true;
     //Meteor.Dropzone.options.dictRemoveFile = "Remove File"; // Remove button text
 
