@@ -154,7 +154,6 @@ input[type=text] {text-align: center;}
   }
 
 
-
   .dropzone {
       /* min-height: 150px; */
       border: 2px solid rgba(0, 0, 0, 0.3);
@@ -163,3 +162,7 @@ input[type=text] {text-align: center;}
       height: 198px !important;
       overflow-y: scroll !important;
   }
+.upload-type > span{
+  padding-right: 35px;
+    font-weight: 500;
+}

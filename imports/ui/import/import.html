@@ -1,0 +1,18 @@
+<template name="import">
+    {{> header}}
+    <div class="container">
+        {{#if currentUser}}
+
+
+      <div id="dv" class="clearfix" style="padding: 0px 24px;">
+        <h3>Data are being uploaded to PDM. Please have patience</h3>
+
+        <div id="myProgress">
+          <div id="myBar"></div>
+        </div>
+
+      </div>
+
+        {{/if}}
+    </div>
+</template>

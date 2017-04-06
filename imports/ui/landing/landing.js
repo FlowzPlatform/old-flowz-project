@@ -116,8 +116,8 @@ Template.landing.events({
       }else if (getStepStatus == "validation_running" || getStepStatus == "validation_compleated") {
         Router.go("validation")
       }else if (getStepStatus == "import_in_proress") {
-        console.log("go to pdm");
-      }else {
+        Router.go("import");
+      }else{
         Router.go("/");
       }
     },
@@ -134,7 +134,7 @@ Template.landing.events({
           function(){
             let _id = CollUploadJobMaster.findOne({ owner: Meteor.userId() , masterJobStatus : "running"})._id;
             console.log(_id);
-            Meteor.call("abortInLanding" , Meteor.userId(),_id,function (err , success) {
+            Meteor.call("abortInLanding" , Meteor.userId(),_id, 'aborted' ,function (err , success) {
               if (err) {
                 swal("Error!", "Something bad happend.Please try again later", "warning");
               }else
@@ -153,30 +153,11 @@ Template.landing.events({
       if (selected_option == "") {
         $('#display-error').fadeIn().delay(4000).fadeOut();
       }else{
-
-        // CollUploadJobMaster.upsert(Meteor.userId(), {
-        //     // Modifier
-        //     $set: {
-        //
-        //         createdAt: new Date(),
-        //         deleteAt: '',
-        //         owner: Meteor.userId(),
-        //         stepStatus: 1,
-        //         username: Meteor.user().username,
-        //         uploadType: selected_option.toLowerCase(),
-        //     }
-        // }, function(e, res) {
-        //   if (e) {
-        //     log(e);
-        //   }
-        //   console.log("inserted into master collection" ,Meteor.userId());
-        //   Router.go("upload")
-        // })
         CollUploadJobMaster.insert({
             // Modifier
 
                 createdAt: new Date(),
-                
+
                 owner: Meteor.userId(),
                 stepStatus: "upload_pending",
                 username: Meteor.user().username,

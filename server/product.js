@@ -23,26 +23,30 @@ Meteor.methods({
 */
 if (Meteor.isServer) {
     Meteor.methods({
-        'abortInLanding': function(userId, documentId) {
+       'abortInLanding': function(userId , documentId , action){
+      //action == abort / compleated
 
-            if (CollUploadJobMaster.findOne().owner == this.userId) {
-                //return  CollUploadJobMaster.remove({_id: documentId});
 
-                CollUploadJobMaster.update({ _id: documentId }, {
-                    $set: {
+      if (CollUploadJobMaster.findOne().owner == this.userId) {
+        //return  CollUploadJobMaster.remove({_id: documentId});
 
-                masterJobStatus: "aborted"
-
-                    }
-                }, function(e, res) {
-                    if (e) {
-                        log(e);
-                    }
-                    console.log("updated deleteAt into master collection", Meteor.userId());
-                    //Router.go("upload")
-                })
-            }
-
+        let updateData = {
+            masterJobStatus: action
+        }
+        if (action == "compleated") {
+          updateData['stepStatus'] = 'import_compleated'
+        }
+        CollUploadJobMaster.update({ _id: documentId },
+          {
+            $set: updateData
+        }, function(e, res) {
+          if (e) {
+            log(e);
+          }
+          console.log("updated deleteAt into master collection" ,Meteor.userId());
+          //Router.go("upload")
+        })
+      }
     }
 });
 
