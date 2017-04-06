@@ -31,7 +31,7 @@ Template.registerHelper('formatDate', function(date) {
 Template.readCSV.events({
     "click #btngostep2": function(event, template) {
         let Id = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running', stepStatus: 'upload_pending' })._id;
-        CollUploadJobMaster.update(Id, { $set: { stepStatus: 'validation_pending' } }, function() {
+        CollUploadJobMaster.update(Id, { $set: { stepStatus: 'validation_running' } }, function() {
             Router.go('/validation');
         });
     },
@@ -92,7 +92,7 @@ Template.readCSV.events({
         setTimeout(function() {
             if (editor == undefined) {
                 editor = CodeMirror.fromTextArea(template.find("#customJavascript"), {
-                    placeholder: 'return row[' + $(currentEl).attr('data-header') + ']',
+                    //placeholder: 'return row[' + $(currentEl).attr('data-header') + ']',
                     lineNumbers: true,
                     mode: "javascript" // set any of supported language modes here
                 });
@@ -187,6 +187,9 @@ Template.readCSV.events({
         }
     },
     'click #addNewHeader': function(event, template) {
+
+        //$(".view-mapping").scrollTop($(".view-mapping")[0].scrollHeight);
+
         $(template.find('#mapping')).find('.spinner').show();
         let oldHeaders = template.csvHeaders.get();
 
@@ -225,6 +228,7 @@ Template.readCSV.events({
 
         generateXEditor(template, function() {
             $(template.find('#mapping')).find('.spinner').hide();
+            $(".view-mapping").scrollTop($(".view-mapping")[0].scrollHeight);
             $(template.find('#preview')).find('.spinner').show();
             setTimeout(function() {
                 // generate Preview
@@ -438,8 +442,8 @@ let insertCSVMapping = function(fileTypeID, template, cb) {
             mapping: mapping,
             fileTypeID: fileTypeID,
             createdAt: new Date(),
-            updateAt: new Date(),
-            deleteAt: null,
+            updatedAt: new Date(),
+            deletedAt: null,
             hasHeader: _hasHeader,
             owner: Meteor.userId(),
             username: Meteor.user().username
@@ -632,8 +636,8 @@ let parseCSV = function(_file, template, cb) {
         totalNoOfRecords: 0,
         uploadedRecords: 0,
         createdAt: new Date(),
-        updateAt: new Date(),
-        deleteAt: '',
+        updatedAt: new Date(),
+        deletedAt: '',
         owner: Meteor.userId(),
         username: Meteor.user().username
     };
@@ -767,7 +771,7 @@ Template.readCSV.onCreated(function() {
     //console.log(Meteor.userId());
     //let masterJob = this.data;
 
-    let masterJob = CollUploadJobMaster.findOne({ owner: Meteor.userId(), deleteAt: '' });
+    let masterJob = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running' });
     let a =
         toastr.options = {
             "closeButton": true,

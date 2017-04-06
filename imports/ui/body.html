@@ -25,12 +25,17 @@
                 {{> uploadStep}}
             </div>
             {{> EditorPage}}
-            <div class="product-file-upload-tab-block">
+            <div class="product-file-upload-tab-block" style="position: relative;">
                 <ul class="nav nav-tabs nav-tabs-vertical" role="tablist">
                     {{#each filetypes}}
                         <li role="presentation" class="{{#if isActive}}active{{/if}} {{#if isDone}}done{{/if}}"><a href="#{{id}}" class="sheets" role="tab" data-toggle="tab"><i class="fa fa-check-circle-o"></i>{{name}}</a></li>
                     {{/each}}
                 </ul>
+                {{#if isActiveStep2}}
+                    <div style="margin-top: 20px;position: absolute;top: 300px;"> 
+                        {{> buttonGoStep2}}
+                    </div>
+                {{/if}}
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" style="margin-bottom:20px; ">
                         {{#if $and previewCollection.length abortData}}
@@ -186,13 +191,12 @@
                                                         {{/let}}
                                                     </tr>
                                                 {{/each}}
-                                                <tr>
-                                                    <td colspan="4" style="text-align: center;">
-                                                        <a href="#" id="addNewHeader" class="text-success text-bold" style="border-bottom: dashed 1px #3c763d;"><strong>Add new custom header</strong></a>
-                                                    </td>
-                                                </tr>
+                                                
                                             </tbody>
                                         </table>
+                                    </div>
+                                    <div style="text-align: center;border: 1px solid #ddd;background: #f9f9f9;padding: 5px 0px;">
+                                        <a href="#" id="addNewHeader" class="text-success text-bold" style="border-bottom: dashed 1px #3c763d;"><strong>Add new custom header</strong></a>
                                     </div>
                                 </div>
                             </div>
@@ -225,12 +229,6 @@
                                     {{/each}}
                                 </tbody>
                             </table>-->
-                        {{/if}}
-
-                        {{#if isActiveStep2}}
-                            <div class="clearfix" style="margin-top: 20px;">
-                                {{> buttonGoStep2}}
-                            </div>
                         {{/if}}
                     </div>
                 </div>
