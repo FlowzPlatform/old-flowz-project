@@ -146,7 +146,7 @@ Template.readCSV.events({
             if (_val != '') {
                 editor.setValue(_val);
             } else {
-                editor.setValue('return row[' + $(currentEl).attr('data-header') + '];');
+                editor.setValue('return row["' + $(currentEl).attr('data-header') + '"];');
             }
             editor.refresh();
         }, 200);
@@ -782,6 +782,7 @@ let parseCSV = function(_file, template, cb) {
             },
             beforeFirstChunk: function(chunk) {
                 let rows = CSVtoArray(chunk);
+                console.log('rows.length', rows.length);
                 totalRecords = (_hasHeader) ? rows.length - 1 : rows.length - 0; // last row getting empty
                 Csvfiles.update(fileID, { $set: { totalNoOfRecords: totalRecords } }, function(e, res) {});
                 return generateDatawithNewHeader(chunk, _hasHeader, mapping, false, template);
