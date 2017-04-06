@@ -802,7 +802,7 @@ let setNextFile = function(template, cb) {
     swal({
             title: "Upload successfully",
             text: "Are you ready to upload next file?",
-            type: "warning",
+            type: "success",
             showCancelButton: true,
             confirmButtonColor: "#DD6B55",
             confirmButtonText: "Yes",
@@ -1132,7 +1132,7 @@ let insertCSVData = function(data, fileID, collection, cb) {
 }
 let errorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
-    td.style.border = "2px solid #a94442";
+    td.style.border = "2px solid red";
 };
 
 let getHandsonHeader = function(headers, invalidKeys) {

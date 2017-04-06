@@ -19,7 +19,7 @@ const divNameOfhandsontable = 'productData';
 // const esUrl='http:/localhost:9200/pdmrawdata/';
 const esUrl = 'http://localhost:9200/pdmrowdata/';
 let objHandsontable = null;
-let invalidColumnColor = '#a94442';
+let invalidColumnColor = 'red';
 let currentjobQueue = null;
 import { ProductInformationRules } from '../../../lib/validatorRules/product_information.js';
 import { ProductPriceRules } from '../../../lib/validatorRules/product_price.js';
