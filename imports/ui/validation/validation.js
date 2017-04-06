@@ -102,6 +102,7 @@ Template.validation.onCreated(function() {
 
 });
 
+let runningStatusSet=0;
 
 Template.validation.helpers({
     filetypes() {
@@ -172,12 +173,15 @@ Template.validation.helpers({
     },
     isJobHasAllPandingStatus()
     {
+        if(runningStatusSet)
+          return false;
         let job = Template.instance().jobQueue.get();
         //console.log("=======isJobHasAllPandingStatus========");
         //console.log(currentjobQueue);
         let flag=0;
         if(job && job.arrFileObj)
         {
+          runningStatusSet=1;
           $.each(job.arrFileObj , function(index, value) {
               //console.log(value.validateStatus);
               if(value.validateStatus=="running" )
@@ -195,12 +199,14 @@ Template.validation.helpers({
           if(job.arrFileObj.length==flag){
             //Meteor.validatorFunctions.onClickFindInValidData(newSheetName);
             Meteor.validatorFunctions.setJobQueusSheetValidationStatus("ProductInformation",job,"running");
+
             return true;
           }
           else {
             return false;
           }
         }
+        runningStatusSet=1;
         return false;
     }
 });
@@ -218,9 +224,10 @@ const ImportRunning = 'import_in_progress';
 Meteor.validatorFunctions = {
     importStart:function()
     {
-      let qry={owner:Meteor.userId(),"masterJobStatus":"running","stepStatus":ValidationRunning};
+      let qry={owner:Meteor.userId(),"masterJobStatus":"running","stepStatus":ValidationCompleted};
       job = CollUploadJobMaster.find(qry).fetch();
       job = job[0];
+      console.log(job);
       let guid=job._id;
       var query = {
           "$set": {
@@ -246,9 +253,15 @@ Meteor.validatorFunctions = {
                 if (!err) {
                     let extraRules=eval(sheetName+"Rules");
                     //check column avaialble or not
-                    let columnName = extraRules[currentRule].validationGroup;
+                    let columnName = extraRules[currentRule].columnName;
                     // set column highLight column
-                    arrHeader[sheetName][(currentRule + 1)].renderer = errorRenderer;
+                    $.each(arrHeader[sheetName], function(index, value) {
+                        if(value.colHeaders==extraRules[(currentRule)].columnName)
+                        {
+                          arrHeader[sheetName][index].renderer = errorRenderer;
+                        }
+                    });
+                    //console.log(arrHeader[sheetName]);
                     renderHandsonTable(sheetName,productData, arrHeader[sheetName], divNameOfhandsontable);
                 }
             });
@@ -435,7 +448,7 @@ function renderHandsonTable(sheetName,dataObject, headers, eleName) {
     let hotSettings = {
         data: dataObject,
         columns: arrHeader[sheetName],
-      //  stretchH: 'all',
+        stretchH: 'all',
         //width: '100%',
         autoWrapRow: true,
         height: 200,
@@ -450,6 +463,8 @@ function renderHandsonTable(sheetName,dataObject, headers, eleName) {
     if(hotElement)
     {
       objHandsontable = new Handsontable(hotElement, hotSettings);
+      console.log("========objHandsontable=========",currentRule);
+      objHandsontable.selectCell(1,currentRule);
     }
 }
 
