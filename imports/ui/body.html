@@ -184,8 +184,9 @@
                                                             </td>
                                                             <td style="width: 30%">
                                                                 <!-- Trigger the modal with a button -->
-                                                                <a href="#" id="txtCustomJavascript_{{rowIndex}}" data-toggle="modal" data-target="#javascripEditorModal" data-header="{{column}}" data-code="" title="Click here to add code." style="float: left;"><i class="fa fa-pencil-square-o"></i></a>
+                                                                <a href="#" id="txtCustomJavascript_{{rowIndex}}" data-toggle="modal" data-target="#javascripEditorModal" data-header="{{this}}" data-code="" title="Add custom code." style="float: left;"><i class="fa fa-pencil-square-o"></i></a>
                                                                 <div class="transform-function"></div>
+                                                                <a href="#" class="text-danger remove-custom-javascript" title="Remove"><i class="fa fa-times-circle-o"></i></a>
                                                                 <!--<a href="#" id="dpddatatype_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
                                                             </td>
                                                         {{/let}}
@@ -240,7 +241,7 @@
 
 <template name="buttonGoStep2">
     <button class="progress-button progress-button-small pull-right" id="btngostep2" data-style="top-line" data-horizontal="">
-        <span class="content">Start validation</span>
+        <span class="content">Start validation&nbsp;<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i></span>
     </button>
 </template>
 
@@ -286,8 +287,10 @@
                 <h4 class="modal-title">Write your custom javascript</h4>
             </div>
             <div class="modal-body">
-                <textarea id="customJavascript" name="customJavascript"></textarea>
-                <!--{{> CodeMirror id="customJavascript" name="customJavascript" options=editorOptions code=editorCode}}-->
+                <div style="border: 1px solid #ddd">
+                    <textarea id="customJavascript" name="customJavascript"  placeholder="Code goes here..."></textarea>
+                    <!--{{> CodeMirror id="customJavascript" name="customJavascript" options=editorOptions code=editorCode}}-->
+                </div>
             </div>
             <div class="modal-footer">
                 <button id="btnSaveCustomjavascript" type="button" class="progress-button progress-button-small">Save</button>

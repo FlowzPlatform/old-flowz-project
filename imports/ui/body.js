@@ -66,13 +66,29 @@ Template.readCSV.events({
         return;
 
     },
+    "click .remove-custom-javascript": function(event, template) {
+        var currentEl = event.currentTarget;
+        $(currentEl).closest('td').removeClass('has-edit').find('[data-target="#javascripEditorModal"]').attr('data-code', '');
+        $(currentEl).closest('td').find('.transform-function').text('').attr('title', '');
+        $(template.find('#preview')).find('.spinner').show();
+        // generate Preview
+        generatePreview(template.find('#csv-file').files[0], template, function() {
+            let ft = template.filetypes.get(); // all file type
+            let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
+            insertCSVMapping(activeFiletypeId, template, function(e, res) {
+                $(template.find('#preview')).find('.spinner').hide();
+            });
+        });
+    },
     "click #btnSaveCustomjavascript": function(event, template) {
         var code = editor.getValue();
         let $selectedDom = $(template.find("a[data-target='#javascripEditorModal'].open"));
         let selectedheader = $selectedDom.attr('data-header');
         $selectedDom.attr('data-code', code).removeClass('open');
         if (code.trim() != '') {
-            $selectedDom.attr('title', 'Edit').parent('td').children('.transform-function').text(code).attr('title', code);
+            $selectedDom.attr('title', 'Edit').parent('td').addClass('has-edit').children('.transform-function').text(code).attr('title', code);
+        } else {
+            $selectedDom.attr('title', 'Edit').parent('td').removeClass('has-edit').children('.transform-function').text(code).attr('title', code);
         }
         $('#javascripEditorModal').modal('hide');
 
@@ -99,7 +115,11 @@ Template.readCSV.events({
             }
             //editor.setValue();
             let _val = $(currentEl).attr('data-code').toString();
-            editor.setValue(_val);
+            if (_val != '') {
+                editor.setValue(_val);
+            } else {
+                editor.setValue('return row[' + $(currentEl).attr('data-header') + '];');
+            }
             editor.refresh();
         }, 200);
     },
@@ -313,9 +333,13 @@ let generateXEditor = function(template, cb) {
             $(template.find('#dpdcsvheader_' + index)).editable("destroy");
             $(template.find('#dpdcsvheader_' + index)).editable({
                 success: function(response, newValue) {
-                    generatePreview(template.find('#csv-file').files[0], template, function() {
-                        $(template.find('#preview')).find('.spinner').hide();
-                    });
+                    $(template.find('#preview')).find('.spinner').show();
+                    setTimeout(function() {
+                        generatePreview(template.find('#csv-file').files[0], template, function() {
+                            $(template.find('#preview')).find('.spinner').hide();
+                        });
+                    }, 1000);
+
                 }
             });
 
@@ -341,7 +365,7 @@ let generateXEditor = function(template, cb) {
             if (existMapping.length > 0) {
                 if (existMapping[index].transform.trim() != '') {
                     let code = existMapping[index].transform;
-                    $(template.find('#txtCustomJavascript_' + index)).attr('data-code', code).attr('title', 'Edit').parent('td').children('.transform-function').text(code).attr('title', code);
+                    $(template.find('#txtCustomJavascript_' + index)).attr('data-code', code).attr('title', 'Edit').parent('td').addClass('has-edit').children('.transform-function').text(code).attr('title', code);
                 }
             }
         });
@@ -609,16 +633,35 @@ let generatePreview = function(_file, template, cb) {
     });
 };
 
-let setNextFile = function(template) {
+let setNextFile = function(template, cb) {
     let ft = template.filetypes.get(); // all file type
     let activeFiletypeId = _.indexOf(ft, _.find(ft, function(d) { return d.isActive }));
-    ft[activeFiletypeId].isActive = false;
-    ft[activeFiletypeId].isDone = true;
-    ft[activeFiletypeId + 1].isActive = true;
-    template.filetypes.set(ft);
-    template.abortData.set(true);
-
-    Router.go('/upload/' + ft[activeFiletypeId + 1].id);
+    swal({
+            title: "Upload successfully",
+            text: "Are you ready to upload next file?",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            closeOnConfirm: true
+        },
+        function(isConfirm) {
+            if (isConfirm) {
+                ft[activeFiletypeId].isActive = false;
+                ft[activeFiletypeId].isDone = true;
+                ft[activeFiletypeId + 1].isActive = true;
+                template.filetypes.set(ft);
+                template.abortData.set(true);
+                Router.go('/upload/' + ft[activeFiletypeId + 1].id);
+                cb();
+            } else {
+                ft[activeFiletypeId].isActive = true;
+                ft[activeFiletypeId].isDone = true;
+                template.filetypes.set(ft);
+                template.abortData.set(true);
+                cb();
+            }
+        });
 }
 
 let parseCSV = function(_file, template, cb) {
@@ -660,8 +703,9 @@ let parseCSV = function(_file, template, cb) {
             complete: function(results) {
                 if (!abortChecked && progress == 100) {
                     updateJobMaster(activeFiletype.id, fileID, function() {
-                        setNextFile(template);
-                        cb();
+                        setNextFile(template, function() {
+                            cb();
+                        });
                     });
                 }
             },
