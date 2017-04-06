@@ -259,7 +259,8 @@ Template.readCSV.events({
         }
         Papa.LocalChunkSize = 1000000; // 1000kb
         for (let i = 0; i < _files.length; i++) {
-
+            template.mappingWithHeader.set([]);
+            template.mappingWithOutHeader.set([]);
             $(template.find("#upload-csv-zone")).addClass('onprogress');
 
             //template.find("#mapping").style.display = 'block';
@@ -586,6 +587,8 @@ let resetAll = function(template) {
     $(template.find("#handson-Zone-during-upload")).hide();
     $(template.find('#uploadCsv')).show();
     $(template.find('#uploadImage')).hide();
+    template.mappingWithHeader.set([]);
+    template.mappingWithOutHeader.set([]);
     toastr.clear();
 
     // destroyXEditor
