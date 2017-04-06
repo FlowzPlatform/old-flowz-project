@@ -1189,3 +1189,16 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 .panel-heading .options>a>i {
     font-size: 30px;
 }
+
+.imageOrFileDiv {
+    display: flex;
+    width: 50%;
+    height: 41px;
+    margin: 10px;
+}
+
+.imageOrFileButton {
+    width: 30%;
+    background-color: #494e6b;
+    color: #fff;
+}
