@@ -98,7 +98,7 @@ Template.validation.onCreated(function() {
             Meteor.validatorFunctions.onClickFindInValidData(CurrentValidation);
           }
       });
-    },3000);
+    },2000);
 
 });
 
@@ -235,6 +235,7 @@ Meteor.validatorFunctions = {
           }
       };
       let updResult = CollUploadJobMaster.update({_id: guid}, query);
+      //Router.go("/import");
     },
     onClickFindInValidData: function(sheetName) {
         if(sheetName=='')
@@ -259,6 +260,9 @@ Meteor.validatorFunctions = {
                         if(value.colHeaders==extraRules[(currentRule)].columnName)
                         {
                           arrHeader[sheetName][index].renderer = errorRenderer;
+                        }
+                        else {
+                          delete(arrHeader[sheetName][index].renderer);
                         }
                     });
                     //console.log(arrHeader[sheetName]);
@@ -444,7 +448,7 @@ let errorRenderer = function(instance, td, row, col, prop, value, cellProperties
 };
 
 function renderHandsonTable(sheetName,dataObject, headers, eleName) {
-    //console.log(headers);
+    //console.log(arrHeader[sheetName]);
     let hotSettings = {
         data: dataObject,
         columns: arrHeader[sheetName],
