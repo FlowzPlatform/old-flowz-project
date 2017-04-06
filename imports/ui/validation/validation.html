@@ -21,7 +21,7 @@
                       <div class="clearfix"></div>
                       <div class="row">
                           <div id="mapping" class="col-md-12" style="display: block;">
-                              <div style="display:block">{{jobQueue.step2status}}</div>
+                              <div style="display:none">{{jobQueue.step2status}}</div>
                               {{#if isJobQueueStatusRunning jobQueue.step2status}}
                               <div class="pull-left">
                                   <h3>Validation Status</h3>
@@ -48,7 +48,7 @@
                                       </thead>
                                        <tbody>
                                               {{#each jobQueue.arrFileObj}}
-                                                      <tr id="div{{this.validateStatus}}">
+                                                      <tr id="div{{this.fileTypeId}}">
                                                           <td>
                                                               <span id="dpdsysheader_{{rowIndex}}" >{{this.fileType}}</span>
                                                           </td>
@@ -65,7 +65,7 @@
                                                                 <span id="myBar1">{{this.validationProgress}}%</span><span>&nbsp;completed</span>
                                                           </td>
                                                       </tr>
-                                                      {{this.validateStatus}}==={{isJobQueueStatusRunning this.validateStatus}}===
+                                                      <div style="display:none">{{this.validateStatus}}==={{isJobQueueStatusRunning this.validateStatus}}===</div>
                                                       {{#if isJobQueueStatusRunning this.validateStatus }}
 
                                                       {{/if}}
@@ -126,6 +126,16 @@
                                       <span>
                                           The file has been succefully validated withou any error . Now you can proceed to upload it on PDM .
                                       </span>
+                                  </div>
+                                  <div class="row">
+                                      <div class="col-md-12" >
+                                          <button style="display:block" class="progress-button progress-button-small pull-right" id="import_start" data-style="top-line" data-horizontal="">
+                                              <span class="content">Start Import</span>
+                                              <span class="progress">
+                                                  <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                              </span>
+                                          </button>
+                                      </div>
                                   </div>
                                 </div>
                               {{/if}}
