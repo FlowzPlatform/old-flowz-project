@@ -257,7 +257,14 @@ Meteor.validatorFunctions = {
                     let columnName = extraRules[currentRule].columnName;
                     // set column highLight column
                     $.each(arrHeader[sheetName], function(index, value) {
-                        if(value.colHeaders==extraRules[(currentRule)].columnName)
+                        console.log("===========");
+                        console.log(value.colHeaders);
+                        if(value.colHeaders=='undefined')
+                        {
+                          delete(arrHeader[sheetName][index]);
+                          //arrHeader[sheetName][index].renderer = errorRenderer;
+                        }
+                        else if(value.colHeaders==extraRules[(currentRule)].columnName)
                         {
                           arrHeader[sheetName][index].renderer = errorRenderer;
                         }
@@ -444,7 +451,7 @@ function displayErrorMsg(flag, msg) {
 
 let errorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
-    td.style.backgroundColor = invalidColumnColor;
+    $(td).attr("style","border:1px solid "+invalidColumnColor);
 };
 
 function renderHandsonTable(sheetName,dataObject, headers, eleName) {
@@ -604,7 +611,10 @@ function setColumnHeader(sheetName, sheetHeaders) {
         }
         arrHeader[sheetName].push({ colHeaders: "guid", type: 'text', data: '_id' });
         $.each(sheetHeaders, function(index, value) {
-            arrHeader[sheetName].push({ colHeaders: "" + value.column, type: value.type, data: appendString + value.column });
+            if(value.column!=undefined){
+                arrHeader[sheetName].push({ colHeaders: "" + value.column, type: value.type, data: appendString + value.column });
+            }
+
         });
     }
 }

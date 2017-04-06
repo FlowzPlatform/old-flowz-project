@@ -389,7 +389,7 @@ let generateXEditor = function(template, cb) {
             });
             if (existMapping.length > 0) {
                 if (existMapping[index].sysHeader != undefined) {
-                    $(template.find('#dpdsysheader_' + index)).editable('setValue', existMapping[index].sysHeader.toLowerCase());
+                    $(template.find('#dpdsysheader_' + index)).editable('setValue', existMapping[index].sysHeader);
                 }
             }
             // if (_val != undefined) {
@@ -453,12 +453,12 @@ let changeXEditorValue = function(template) {
 
 let resetAll = function(template) {
     $(template.find('#csv-file')).val('');
-    template.find("#mapping").style.display = 'none';
-    template.find("#preview").style.display = 'none';
-    template.find('#btnNext').children[1].children[0].style.width = '0%';
+    $(template.find("#mapping")).hide();
+    $(template.find("#preview")).hide();
+    $(template.find('#btnNext')).find('.progress-inner').css({ 'width': '0%' });
     $(template.find('#btnNext')).removeClass('inProgress');
     $(template.find("#upload-csv-zone")).show();
-    template.find('#btnNext').children[0].innerHTML = 'Proceed';
+    $(template.find('#btnNext')).find('.content').text('Proceed');
     $(template.find('#btnNext')).show();
     $(template.find('#btnAbort')).hide();
     $(template.find("#handson-Zone-during-upload")).hide();
@@ -682,12 +682,13 @@ let setNextFile = function(template, cb) {
         },
         function(isConfirm) {
             if (isConfirm) {
-                resetAll(template);
+                console.log(template);
                 ft[activeFiletypeId].isActive = false;
                 ft[activeFiletypeId].isDone = true;
                 ft[activeFiletypeId + 1].isActive = true;
                 template.filetypes.set(ft);
                 template.abortData.set(true);
+                resetAll(template);
                 Router.go('/upload/' + ft[activeFiletypeId + 1].id);
                 cb();
             } else {
