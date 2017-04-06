@@ -64,6 +64,19 @@ let fileTypes =
     { id: 'ProductVariationPrice', name: 'Variation Price', isDone: false, isActive: false, header: ProductVariationPricingHeaders, collection: CollProductVariationPrice }
 ]
 
+Template.validation.onRendered(function() {
+  Meteor.call("test" , function(error,success){
+    if(error)
+    {
+      console.log(error);
+
+    }
+    else {
+      console.log("success call");
+    }
+  });
+});
+
 Template.validation.onCreated(function() {
     this.filetypes = new ReactiveVar(fileTypes);
 
@@ -104,7 +117,7 @@ Template.validation.helpers({
         }
 
         else {
-            console.log(job);
+            //console.log(job);
             let arrFileObj = [];
             job['arrFileObj']=[];
             $.each(Template.instance().filetypes.get(), function(index, value) {
@@ -148,21 +161,9 @@ Template.validation.helpers({
           return false;
         }
     },
-    isStep2StatusRunning()
+    isStepStatusRunning(status)
     {
-        let job = Meteor.validatorFunctions.getCurrentRunningUploadJob();
-        //console.log(job);
-        let flag=0;
-        $.each(currentjobQueue.arrFileObj , function(index, value) {
-          //console.log(value.validateStatus);
-            if(value.validateStatus=="running" || value.validateStatus=="pending" )
-            {
-              flag=1;
-            }
-        });
-        // there is no running and pending status then job will be completed
-        if(flag==1){
-          //Meteor.validatorFunctions.onClickFindInValidData(newSheetName);
+        if(status == ValidationRunning){
           return true;
         }
         else {
@@ -172,23 +173,28 @@ Template.validation.helpers({
     isJobHasAllPandingStatus()
     {
         let job = Template.instance().jobQueue.get();
-        console.log("=======isJobHasAllPandingStatus========");
-        console.log(currentjobQueue);
+        //console.log("=======isJobHasAllPandingStatus========");
+        //console.log(currentjobQueue);
         let flag=0;
         if(job && job.arrFileObj)
         {
-          $.each(currentjobQueue.arrFileObj , function(index, value) {
-            //console.log(value.validateStatus);
+          $.each(job.arrFileObj , function(index, value) {
+              //console.log(value.validateStatus);
+              if(value.validateStatus=="running" )
+              {
+                flag=0;
+                return false;
+              }
               if(value.validateStatus=="pending" )
               {
                 ++flag;
               }
           });
-          console.log("=====flag=",flag,"==========");
+          //console.log("=====flag=",flag,"==========");
           // there is no running and pending status then job will be completed
-          if(currentjobQueue.arrFileObj && currentjobQueue.arrFileObj.length==flag){
+          if(job.arrFileObj.length==flag){
             //Meteor.validatorFunctions.onClickFindInValidData(newSheetName);
-            Meteor.validatorFunctions.setJobQueusSheetStatus("ProductInformation",job,"running");
+            Meteor.validatorFunctions.setJobQueusSheetValidationStatus("ProductInformation",job,"running");
             return true;
           }
           else {
@@ -202,22 +208,26 @@ Template.validation.helpers({
 Meteor.UploadJob = {
 
 }
+// Step Status
+const ValidationRunning = 'validation_running';
+const ValidationCompleted = 'validation_completed';
+const ImportRunning = 'import_in_progress';
+
+
 
 Meteor.validatorFunctions = {
     importStart:function()
     {
-      let qry={owner:Meteor.userId(),"status":"running","stepStatus":2};
+      let qry={owner:Meteor.userId(),"masterJobStatus":"running","stepStatus":ValidationRunning};
       job = CollUploadJobMaster.find(qry).fetch();
-      console.log(job);
+      job = job[0];
       let guid=job._id;
       var query = {
           "$set": {
-              stepStatus: 3
+              stepStatus: ImportRunning
           }
       };
-      console.log(query);
       let updResult = CollUploadJobMaster.update({_id: guid}, query);
-      console.log(updResult);
     },
     onClickFindInValidData: function(sheetName) {
         if(sheetName=='')
@@ -252,7 +262,7 @@ Meteor.validatorFunctions = {
     },
     getCurrentRunningUploadJob:function(){
       //console.log(Meteor.userId());
-      let qry={owner:Meteor.userId(),"step2status":"running","stepStatus":2};
+      let qry={owner:Meteor.userId(),"masterJobStatus":"running","stepStatus":ValidationRunning};
       jobQueue = CollUploadJobMaster.find(qry).fetch();
       //console.log(jobQueue);
       currentjobQueue=jobQueue[0];
@@ -271,7 +281,7 @@ Meteor.validatorFunctions = {
       job = Meteor.validatorFunctions.getCurrentRunningUploadJob();
 
       // update completed status for current running job
-      Meteor.validatorFunctions.setJobQueusSheetStatus(sheetName,job,"completed",function(){
+      Meteor.validatorFunctions.setJobQueusSheetValidationStatus(sheetName,job,"completed",function(){
         console.log("===========set Job Queus Sheet Status callback====");
         console.log();
           Meteor.validatorFunctions.startValidation(function(newSheetName){
@@ -288,7 +298,7 @@ Meteor.validatorFunctions = {
 
       return false;
     },
-    setJobQueusSheetStatus:function(sheetName,job,status,callback){
+    setJobQueusSheetValidationStatus:function(sheetName,job,status,callback){
       let jobStatusField = sheetName+".validateStatus";
       var query = {
           "$set": {
@@ -296,7 +306,7 @@ Meteor.validatorFunctions = {
           }
       };
       let guid=job._id;
-        console.log("=======guid==========",guid,"::",status);
+      console.log("=======guid==========",guid,"::",status);
       let updResult = CollUploadJobMaster.update({_id: guid}, query);
 
       if(callback)
@@ -320,7 +330,8 @@ Meteor.validatorFunctions = {
       let guid=job._id;
       var query = {
           "$set": {
-              step2status: "completed"
+              "stepStatus":ValidationCompleted
+              //step2status: "completed"
           }
       };
       let updResult = CollUploadJobMaster.update({_id: guid}, query);
@@ -360,7 +371,7 @@ Meteor.validatorFunctions = {
                 else if(job[value.fileTypeId].validateStatus=="pending")
                 {
                   // update completed status for current running job
-                  Meteor.validatorFunctions.setJobQueusSheetStatus(value.fileTypeId,job,"running");
+                  Meteor.validatorFunctions.setJobQueusSheetValidationStatus(value.fileTypeId,job,"running");
                   job[value.fileTypeId].validateStatus="running";
                   if(CurrentValidation=="")
                   {
@@ -385,7 +396,6 @@ Meteor.validatorFunctions = {
         return CurrentValidation;
     }
 }
-
 
 function findjobQueueData() {
     //console.log(currentRuleIdx,"===========",arrRules.length);
@@ -613,10 +623,16 @@ function findInValidData(sheetName, currentRuleIdx, arrRules,sheetHeaders, callb
 function findInvalidDataFromMongo(sheetName, currentRuleIdx, arrRules,sheetHeaders, callback) {
     //console.log(currentRuleIdx,"===========",arrRules.length);
     let query = arrRules[currentRuleIdx].qryMongo;
-    console.log(query);
+    query['fileID']=currentjobQueue[sheetName].id;
+    //query.push({fileID:currentjobQueue[sheetName].id});
+    //console.log(query);
+    //console.log("============InvalidDataFromMongo=========");
+    //console.log(currentjobQueue);
+    //job = Meteor.validatorFunctions.getCurrentRunningUploadJob();
+
 
     let result = eval("Coll"+sheetName).find(query).fetch();
-    console.log(result);
+    //console.log(result);
     if (result.length <= 0) {
         // continue checking with next set of rules
         currentRule = ++currentRuleIdx;

@@ -43,6 +43,10 @@ if (Meteor.isServer) {
                 })
             }
 
+        },
+        'test': function() {
+          console.log("server test console log");
+          return "console.log";
         }
     });
 }
