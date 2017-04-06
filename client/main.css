@@ -763,6 +763,11 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
     color: #494e6b;
 }
 
+.nav-tabs-vertical>li.done>a {
+    background: #1fb58f;
+    color: #fff;
+}
+
 .nav-tabs-vertical>li.active>a {
     background: #494e6b;
     color: #fff;
@@ -773,11 +778,6 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 .nav-tabs-vertical>li.active>a:active,
 .nav-tabs-vertical>li.active>a:visited {
     background: #494e6b;
-    color: #fff;
-}
-
-.nav-tabs-vertical>li.done>a {
-    background: #1fb58f;
     color: #fff;
 }
 
