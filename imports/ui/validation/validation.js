@@ -20,7 +20,7 @@ const divNameOfhandsontable = 'productData';
 const esUrl = 'http://localhost:9200/pdmrowdata/';
 let objHandsontable = null;
 let invalidColumnColor = '#a94442';
-
+let currentjobQueue = null;
 import { ProductInformationRules } from '../../../lib/validatorRules/product_information.js';
 import { ProductPriceRules } from '../../../lib/validatorRules/product_price.js';
 //import { ProductInformationRules } from '../../../lib/validatorRules/product_information.js';
@@ -47,7 +47,11 @@ Template.validation.events({
     },
     'click #proceed_to_next' (event) {
         Meteor.validatorFunctions.proceedToNext();
-    }
+    },
+    'click #import_start' (event) {
+        Meteor.validatorFunctions.importStart();
+    },
+
 });
 let fileTypes =
 [
@@ -60,15 +64,32 @@ let fileTypes =
     { id: 'ProductVariationPrice', name: 'Variation Price', isDone: false, isActive: false, header: ProductVariationPricingHeaders, collection: CollProductVariationPrice }
 ]
 
+Template.validation.onRendered(function() {
+  Meteor.call("test" , function(error,success){
+    if(error)
+    {
+      console.log(error);
+
+    }
+    else {
+      console.log("success call");
+    }
+  });
+});
+
 Template.validation.onCreated(function() {
     this.filetypes = new ReactiveVar(fileTypes);
-    this.jobQueue = new ReactiveVar({});
+
+
+    Meteor.validatorFunctions.startValidation();
+
     //$('#validation_start').click();
     /*
     Meteor.startup(() => {
       //
     });
     */
+    this.jobQueue = new ReactiveVar({});
     setTimeout(function(){
       //jobdata = Template.instance().jobQueue.get();
       CurrentValidation=Meteor.validatorFunctions.startValidation(function(CurrentValidation){
@@ -77,7 +98,7 @@ Template.validation.onCreated(function() {
             Meteor.validatorFunctions.onClickFindInValidData(CurrentValidation);
           }
       });
-    },1000);
+    },3000);
 
 });
 
@@ -91,8 +112,10 @@ Template.validation.helpers({
         let job = Meteor.validatorFunctions.getCurrentRunningUploadJob();
         if(!job)
         {
-          return {};
+          Meteor.validatorFunctions.startValidation();
+          job = Meteor.validatorFunctions.getCurrentRunningUploadJob();
         }
+
         else {
             //console.log(job);
             let arrFileObj = [];
@@ -103,7 +126,7 @@ Template.validation.helpers({
                   let fileId=Meteor.validatorFunctions.uploadedFileObj(job[value.id].id);
                   fileId['fileType']=value.name;
                   fileId['fileTypeId']=value.id;
-                  fileId['validationStatus']=job[value.id].validationStatus;
+                  fileId['validateStatus']=job[value.id].validateStatus;
                   arrFileObj.push(fileId);
                   job['arrFileObj'] = arrFileObj;  //arrFileObj[value.id] = fileId;
                 }
@@ -137,15 +160,75 @@ Template.validation.helpers({
         else {
           return false;
         }
+    },
+    isStepStatusRunning(status)
+    {
+        if(status == ValidationRunning){
+          return true;
+        }
+        else {
+          return false;
+        }
+    },
+    isJobHasAllPandingStatus()
+    {
+        let job = Template.instance().jobQueue.get();
+        //console.log("=======isJobHasAllPandingStatus========");
+        //console.log(currentjobQueue);
+        let flag=0;
+        if(job && job.arrFileObj)
+        {
+          $.each(job.arrFileObj , function(index, value) {
+              //console.log(value.validateStatus);
+              if(value.validateStatus=="running" )
+              {
+                flag=0;
+                return false;
+              }
+              if(value.validateStatus=="pending" )
+              {
+                ++flag;
+              }
+          });
+          //console.log("=====flag=",flag,"==========");
+          // there is no running and pending status then job will be completed
+          if(job.arrFileObj.length==flag){
+            //Meteor.validatorFunctions.onClickFindInValidData(newSheetName);
+            Meteor.validatorFunctions.setJobQueusSheetValidationStatus("ProductInformation",job,"running");
+            return true;
+          }
+          else {
+            return false;
+          }
+        }
+        return false;
     }
 });
 
 Meteor.UploadJob = {
 
 }
+// Step Status
+const ValidationRunning = 'validation_running';
+const ValidationCompleted = 'validation_completed';
+const ImportRunning = 'import_in_progress';
+
+
 
 Meteor.validatorFunctions = {
-
+    importStart:function()
+    {
+      let qry={owner:Meteor.userId(),"masterJobStatus":"running","stepStatus":ValidationRunning};
+      job = CollUploadJobMaster.find(qry).fetch();
+      job = job[0];
+      let guid=job._id;
+      var query = {
+          "$set": {
+              stepStatus: ImportRunning
+          }
+      };
+      let updResult = CollUploadJobMaster.update({_id: guid}, query);
+    },
     onClickFindInValidData: function(sheetName) {
         if(sheetName=='')
           return false;
@@ -179,9 +262,10 @@ Meteor.validatorFunctions = {
     },
     getCurrentRunningUploadJob:function(){
       //console.log(Meteor.userId());
-      let qry={userId:Meteor.userId(),status:"running","stepStatus":2};
+      let qry={owner:Meteor.userId(),"masterJobStatus":"running","stepStatus":ValidationRunning};
       jobQueue = CollUploadJobMaster.find(qry).fetch();
-      //console.log(jobQueue[0]);
+      //console.log(jobQueue);
+      currentjobQueue=jobQueue[0];
       return jobQueue[0];
     },
 
@@ -197,7 +281,7 @@ Meteor.validatorFunctions = {
       job = Meteor.validatorFunctions.getCurrentRunningUploadJob();
 
       // update completed status for current running job
-      Meteor.validatorFunctions.setJobQueusSheetStatus(sheetName,job,"completed",function(){
+      Meteor.validatorFunctions.setJobQueusSheetValidationStatus(sheetName,job,"completed",function(){
         console.log("===========set Job Queus Sheet Status callback====");
         console.log();
           Meteor.validatorFunctions.startValidation(function(newSheetName){
@@ -214,15 +298,15 @@ Meteor.validatorFunctions = {
 
       return false;
     },
-    setJobQueusSheetStatus:function(sheetName,job,status,callback){
-      let jobStatusField = sheetName+".validationStatus";
+    setJobQueusSheetValidationStatus:function(sheetName,job,status,callback){
+      let jobStatusField = sheetName+".validateStatus";
       var query = {
           "$set": {
               [jobStatusField]: status
           }
       };
       let guid=job._id;
-        console.log("=======guid==========",guid,"::",status);
+      console.log("=======guid==========",guid,"::",status);
       let updResult = CollUploadJobMaster.update({_id: guid}, query);
 
       if(callback)
@@ -246,14 +330,15 @@ Meteor.validatorFunctions = {
       let guid=job._id;
       var query = {
           "$set": {
-              status: "completed"
+              "stepStatus":ValidationCompleted
+              //step2status: "completed"
           }
       };
       let updResult = CollUploadJobMaster.update({_id: guid}, query);
     },
     startValidation:function(callback){
         job = Meteor.validatorFunctions.getCurrentRunningUploadJob();
-        console.log(job);
+        //console.log(job);
         if(!job)
         {
           return "";
@@ -273,20 +358,21 @@ Meteor.validatorFunctions = {
                 }
             });
 
-            console.log(job.arrFileObj);
+            //console.log(job.arrFileObj);
             let allCompletedflag=1;
             $.each(job.arrFileObj , function(index, value) {
-                console.log("=====Status==="+job[value.fileTypeId].validationStatus);
-                if(job[value.fileTypeId].validationStatus=="running")
+                //console.log("=====Status==="+job[value.fileTypeId].validateStatus);
+                if(job[value.fileTypeId].validateStatus=="running")
                 {
                   CurrentValidation=value.fileTypeId;
                   allCompletedflag=0;
                   return false;
                 }
-                else if(job[value.fileTypeId].validationStatus=="panding")
+                else if(job[value.fileTypeId].validateStatus=="pending")
                 {
                   // update completed status for current running job
-                  Meteor.validatorFunctions.setJobQueusSheetStatus(value.fileTypeId,job,"running");
+                  Meteor.validatorFunctions.setJobQueusSheetValidationStatus(value.fileTypeId,job,"running");
+                  job[value.fileTypeId].validateStatus="running";
                   if(CurrentValidation=="")
                   {
                     CurrentValidation=value.fileTypeId;
@@ -296,7 +382,7 @@ Meteor.validatorFunctions = {
                 }
             });
 
-            // there is no running and panding status then job will be completed
+            // there is no running and pending status then job will be completed
             if(allCompletedflag==1)
             {
               Meteor.validatorFunctions.updateJobQueueMainStatus(job);
@@ -311,7 +397,6 @@ Meteor.validatorFunctions = {
     }
 }
 
-
 function findjobQueueData() {
     //console.log(currentRuleIdx,"===========",arrRules.length);
     let query = {sku:""};
@@ -323,11 +408,21 @@ function findjobQueueData() {
 
 // display error msg hide/show
 function displayErrorMsg(flag, msg) {
+    //$("#divrunning").
+    console.log(currentValidationName);
+    let row = $('#errorContainer').remove().clone();
+    $('#div'+currentValidationName).after(row);
     var errorMsg = $("#errorDiv").find("#errorStr");
-    errorMsg.html(msg);
-    document.getElementById("mydiv").style.display = !flag ? "none" : "block";
-    document.getElementById("errorDiv").style.display = !flag ? "none" : "block";
-    document.getElementById("buttonDivProceed").style.display = !flag ? "none" : "block";
+    if(errorMsg)
+    {
+      errorMsg.html(msg);
+      if(document.getElementById("mydiv"))
+        document.getElementById("mydiv").style.display = !flag ? "none" : "block";
+      if(document.getElementById("errorDiv"))
+        document.getElementById("errorDiv").style.display = !flag ? "none" : "block";
+      if(document.getElementById("buttonDivProceed"))
+        document.getElementById("buttonDivProceed").style.display = !flag ? "none" : "block";
+    }
 }
 
 let errorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
@@ -351,8 +446,11 @@ function renderHandsonTable(sheetName,dataObject, headers, eleName) {
             updateProductData(changes, source);
         }
     };
-    hotElement = document.querySelector('#' + eleName)
-    objHandsontable = new Handsontable(hotElement, hotSettings);
+    hotElement = document.querySelector('#' + eleName);
+    if(hotElement)
+    {
+      objHandsontable = new Handsontable(hotElement, hotSettings);
+    }
 }
 
 function updateProductData(changes, source) {
@@ -525,8 +623,16 @@ function findInValidData(sheetName, currentRuleIdx, arrRules,sheetHeaders, callb
 function findInvalidDataFromMongo(sheetName, currentRuleIdx, arrRules,sheetHeaders, callback) {
     //console.log(currentRuleIdx,"===========",arrRules.length);
     let query = arrRules[currentRuleIdx].qryMongo;
-    console.log(query);
+    query['fileID']=currentjobQueue[sheetName].id;
+    //query.push({fileID:currentjobQueue[sheetName].id});
+    //console.log(query);
+    //console.log("============InvalidDataFromMongo=========");
+    //console.log(currentjobQueue);
+    //job = Meteor.validatorFunctions.getCurrentRunningUploadJob();
+
+
     let result = eval("Coll"+sheetName).find(query).fetch();
+    //console.log(result);
     if (result.length <= 0) {
         // continue checking with next set of rules
         currentRule = ++currentRuleIdx;
@@ -544,22 +650,26 @@ function findInvalidDataFromMongo(sheetName, currentRuleIdx, arrRules,sheetHeade
 function setValidationProgress(sheetName,currentRuleIdx, ProductInformationLength) {
 
     let elem = document.getElementById("myBar");
-    let width = Math.round(currentRuleIdx / ProductInformationLength * 100);
-    elem.style.width = width + '%';
-    elem.innerHTML = width * 1 + '%';
-    //alert(width);
-    job = Meteor.validatorFunctions.getCurrentRunningUploadJob();
-    console.log(job[sheetName].id);
-    Csvfiles.update(job[sheetName].id, {
-            $set: { 'validationProgress': width }
-        },
-        // function(e, res) {
-        //     if (progress < 100)
-        //         streamer.resume();
-        //     else
-        //         streamer.abort()
-        // }
-    );
+    if(elem)
+    {
+      let width = Math.round(currentRuleIdx / ProductInformationLength * 100);
+      elem.style.width = width + '%';
+      elem.innerHTML = width * 1 + '%';
+      //alert(width);
+      job = Meteor.validatorFunctions.getCurrentRunningUploadJob();
+      console.log(job[sheetName].id);
+      Csvfiles.update(job[sheetName].id, {
+              $set: { 'validationProgress': width }
+          },
+          // function(e, res) {
+          //     if (progress < 100)
+          //         streamer.resume();
+          //     else
+          //         streamer.abort()
+          // }
+      );
+    }
+
     /*
     Meteor.call('products.insertCSVData', 'iZrfNK4XoCsxGPhA3', function() {
         //insertCSVData(fileID, results.data, function(err, res) {

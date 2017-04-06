@@ -25,59 +25,33 @@
                 {{> uploadStep}}
             </div>
             {{> EditorPage}}
-            <div class="product-file-upload-tab-block">
+            <div class="product-file-upload-tab-block" style="position: relative;">
                 <ul class="nav nav-tabs nav-tabs-vertical" role="tablist">
                     {{#each filetypes}}
-                        <li role="presentation" class="{{#if isActive}}active{{/if}} {{#if isDone}}done{{/if}}"><a href="#"><i class="fa fa-check-circle-o"></i>{{name}}</a></li>
+                        <li role="presentation" class="{{#if isActive}}active{{/if}} {{#if isDone}}done{{/if}}"><a href="#{{id}}" class="sheets" role="tab" data-toggle="tab"><i class="fa fa-check-circle-o"></i>{{name}}</a></li>
                     {{/each}}
                 </ul>
+                {{#if isActiveStep2}}
+                    <div style="margin-top: 20px;position: absolute;top: 300px;"> 
+                        {{> buttonGoStep2}}
+                    </div>
+                {{/if}}
                 <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active">
-                        <!--<div> {{previewCollection.length}} </div>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-hover">
-                                <tbody>
-                                    {{#each previewCollection}}
-                                        <tr>
-                                            {{#each  getJsonValues this}}
-                                                <td title="{{this}}"><div> {{this}} </div></td>
-                                            {{/each}}
-                                        </tr>
-                                    {{/each}}     
-                                </tbody>
-                            </table>
-                        </div>-->
-
-                        <div id="upload-csv-zone">
-                            <div class="file-zone">
-                                <span class="dz-message">Drop files here or click to upload.<br/>
-                                    <small>(only csv files are valid.)</small>
-                                </span>
-                                <div class="dz-spinner">
-                                    {{> spinner}}
+                    <div role="tabpanel" class="tab-pane active" style="margin-bottom:20px; ">
+                        {{#if $and previewCollection.length abortData}}
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div class="options">
+                                        <a id="btnAbortRecord" href="#"  class="text-danger" title="Remove all record."><i class="fa fa-times-circle-o"></i></a>
+                                    </div>
+                                    <h3> Uploaded records </h3>
                                 </div>
-                                <input type="file" id="csv-file" name="files" accept=".csv"/>
-                            </div>
-                            
-                        </div>
-                        <div class="clearfix"></div>
-                        <!--<button type="submit" class="btn btn-primary btnReadCsv">Read</button>-->
-                        <div id="preview"  class="row" style="display: none;">
-                            <div class="col-md-12">
-                                <div class="pull-left">
-                                    <h3 style="margin-top: 0px;">Preview</h3>
-                                </div>
-                                <div class="pull-left">
-                                    {{> spinner}}
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="table-responsive" style="margin-bottom: 10px;border-right: 1px solid #ccc;">
-                                    {{#if previewRec.length}}
+                                <div class="panel-body" style="height: 390px;overflow-y: auto;">
+                                    <div id="preview" class="table-responsive">
                                         <table class="table table-bordered table-hover">
                                             <thead>
                                                 <tr>
-                                                    {{#each getJsonKeys previewRec.[0]}}
+                                                    {{#each getJsonKeys previewCollection.[0]}}
                                                         <th>
                                                             {{this}}
                                                         </th>
@@ -85,127 +59,177 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {{#each previewRec}}
+                                                {{#each previewCollection}}
                                                     <tr>
                                                         {{#each  getJsonValues this}}
                                                             <td title="{{this}}"><div> {{this}} </div></td>
                                                         {{/each}}
                                                     </tr>
-                                                {{/each}}
+                                                {{/each}}     
                                             </tbody>
                                         </table>
-                                    {{/if}}
-                                    <!--{{> reactiveTable  class="table table-bordered table-hover" multiColumnSort='false' showNavigation='never' showFilter=false collection=previewRec }}-->
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-12">
-                                <label>
-                                    <input type="checkbox" id="hasheader" checked="checked" /> Has header
-                                </label>
-                                <button id="btnNext" style="margin-left:5px;" class="progress-button progress-button-small pull-right" data-style="top-line" data-horizontal="">
-                                    <span class="content">Proceed</span>
+                        {{else}}
+                            <div id="upload-csv-zone">
+                                <div class="file-zone">
+                                    <span class="dz-message">Drop files here or click to upload.<br/>
+                                        <small>(only csv files are valid.)</small>
+                                    </span>
+                                    <div class="dz-spinner">
+                                        {{> spinner}}
+                                    </div>
+                                    <input type="file" id="csv-file" name="files" accept=".csv"/>
+                                </div>
+                                
+                            </div>
+                            <div class="clearfix"></div>
+                            <!--<button type="submit" class="btn btn-primary btnReadCsv">Read</button>-->
+                            <div id="preview"  class="row" style="display: none;">
+                                <div class="col-md-12">
+                                    <div class="pull-left">
+                                        <h3 style="margin-top: 0px;">Preview</h3>
+                                    </div>
+                                    <div class="pull-left">
+                                        {{> spinner}}
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="table-responsive" style="margin-bottom: 10px;border-right: 1px solid #ccc;">
+                                        {{#if previewRec.length}}
+                                            <table class="table table-bordered table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        {{#each getJsonKeys previewRec.[0]}}
+                                                            <th>
+                                                                {{this}}
+                                                            </th>
+                                                        {{/each}}
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {{#each previewRec}}
+                                                        <tr>
+                                                            {{#each  getJsonValues this}}
+                                                                <td title="{{this}}"><div> {{this}} </div></td>
+                                                            {{/each}}
+                                                        </tr>
+                                                    {{/each}}
+                                                </tbody>
+                                            </table>
+                                        {{/if}}
+                                        <!--{{> reactiveTable  class="table table-bordered table-hover" multiColumnSort='false' showNavigation='never' showFilter=false collection=previewRec }}-->
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <label>
+                                        <input type="checkbox" id="hasheader" checked="checked" /> Has header
+                                    </label>
+                                    <button id="btnNext" style="margin-left:5px;" class="progress-button progress-button-small pull-right" data-style="top-line" data-horizontal="">
+                                        <span class="content">Proceed</span>
+                                        <span class="progress">
+                                            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                        </span>
+                                    </button>
+                                    {{> buttonAbort}}
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div id="handson-Zone-during-upload">
+                                <div class="handson-table">
+                                    <div id="hotErrorDataDuringUpload"></div>
+                                </div>
+                                <span id="errMessageFromSchema" class="pull-left text-danger"></span>
+                                <button style="margin-left:5px;" class="progress-button progress-button-small pull-right" id="buttonProceedNext" data-style="top-line" data-horizontal="">
+                                    <span class="content">Proceed To Next</span>
                                     <span class="progress">
                                         <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
                                     </span>
                                 </button>
                                 {{> buttonAbort}}
                             </div>
-                        </div>
-                        <div class="clearfix"></div>
-                        <div id="handson-Zone-during-upload">
-                            <div class="handson-table">
-                                <div id="hotErrorDataDuringUpload"></div>
-                            </div>
-                            <span id="errMessageFromSchema" class="pull-left text-danger"></span>
-                            <button style="margin-left:5px;" class="progress-button progress-button-small pull-right" id="buttonProceedNext" data-style="top-line" data-horizontal="">
-                                <span class="content">Proceed To Next</span>
-                                <span class="progress">
-                                    <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
-                                </span>
-                            </button>
-                            {{> buttonAbort}}
-                        </div>
-                        <div class="clearfix"></div>
-                        <div class="row">
-                            <div id="mapping" class="col-md-12" style="display: none;">
-                                <div class="pull-left">
-                                    <h3>Headers mapping</h3>
-                                </div>
-                                <div class="pull-left">
-                                    {{> spinner}}
-                                </div>
-                                <div class="view-mapping">
-                                    <table class="table table-bordered table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Column Index</th>
-                                                <th>CSV header</th>
-                                                <th>System headers</th>
-                                                <th>Transform</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {{#each csvHeaders}}
+                            <div class="clearfix"></div>
+                            <div class="row">
+                                <div id="mapping" class="col-md-12" style="display: none;">
+                                    <div class="pull-left">
+                                        <h3>Headers mapping</h3>
+                                    </div>
+                                    <div class="pull-left">
+                                        {{> spinner}}
+                                    </div>
+                                    <div class="view-mapping">
+                                        <table class="table table-bordered table-striped">
+                                            <thead>
                                                 <tr>
-                                                    {{#let rowIndex=@index}}
-                                                        <td style="width: 12%" class="text-center">{{rowIndex}}</td>
-                                                        <td style="width: 30%">
-                                                            <span id="dpdcsvheader_{{rowIndex}}"  selected="selected" data-column="{{this}}" style="text-transform:capitalize">{{this}}</span>
-                                                            <!--<span id="dpdsysheader_{{rowIndex}}"  selected="selected" data-column="{{column}}" style="text-transform:capitalize">{{text}}</span>-->
-                                                        </td>
-                                                        <td style="width: 30%">
-                                                            <a href="#" id="dpdsysheader_{{rowIndex}}" class="dpdsysheader" data-type="select" data-inputclass="form-control"></a>
-                                                            <!--<a href="#" id="dpdcsvheader_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
-                                                        </td>
-                                                        <td style="width: 30%">
-                                                            <!-- Trigger the modal with a button -->
-                                                            <a href="#" id="txtCustomJavascript_{{rowIndex}}" data-toggle="modal" data-target="#javascripEditorModal" data-header="{{column}}" data-code="" title="Click here to add code." style="float: left;"><i class="fa fa-pencil-square-o"></i></a>
-                                                            <div class="transform-function"></div>
-                                                            <!--<a href="#" id="dpddatatype_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
-                                                        </td>
-                                                    {{/let}}
+                                                    <th>Column Index</th>
+                                                    <th>CSV header</th>
+                                                    <th>System headers</th>
+                                                    <th>Transform</th>
                                                 </tr>
-                                            {{/each}}
-                                            <tr>
-                                                <td colspan="3" style="text-align: center;">
-                                                    <a href="#" id="addNewHeader">Add new</a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                {{#each csvHeaders}}
+                                                    <tr>
+                                                        {{#let rowIndex=@index}}
+                                                            <td style="width: 12%" class="text-center">{{rowIndex}}</td>
+                                                            <td style="width: 30%">
+                                                                <!--<span id="dpdcsvheader_{{rowIndex}}"  selected="selected" data-column="{{this}}" style="text-transform:capitalize">{{this}}</span>-->
+                                                                <a href="#" id="dpdcsvheader_{{rowIndex}}" data-type="text" data-inputclass="form-control">{{this}}</a>
+                                                                <!--<span id="dpdsysheader_{{rowIndex}}"  selected="selected" data-column="{{column}}" style="text-transform:capitalize">{{text}}</span>-->
+                                                            </td>
+                                                            <td style="width: 30%">
+                                                                <a href="#" id="dpdsysheader_{{rowIndex}}" class="dpdsysheader" data-type="select" data-inputclass="form-control"></a>
+                                                                <!--<a href="#" id="dpdcsvheader_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
+                                                            </td>
+                                                            <td style="width: 30%">
+                                                                <!-- Trigger the modal with a button -->
+                                                                <a href="#" id="txtCustomJavascript_{{rowIndex}}" data-toggle="modal" data-target="#javascripEditorModal" data-header="{{column}}" data-code="" title="Click here to add code." style="float: left;"><i class="fa fa-pencil-square-o"></i></a>
+                                                                <div class="transform-function"></div>
+                                                                <!--<a href="#" id="dpddatatype_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
+                                                            </td>
+                                                        {{/let}}
+                                                    </tr>
+                                                {{/each}}
+                                                
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div style="text-align: center;border: 1px solid #ddd;background: #f9f9f9;padding: 5px 0px;">
+                                        <a href="#" id="addNewHeader" class="text-success text-bold" style="border-bottom: dashed 1px #3c763d;"><strong>Add new custom header</strong></a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <!--<table  class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        File name
-                                    </th>
-                                    <th style="width: 150px;">
-                                        Progress
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{#each files}}
+                            <!--<table  class="table table-bordered">
+                                <thead>
                                     <tr>
-                                        <td>
-                                            {{name}}
-                                        </td>
-                                        <td >
-                                            <div class="progress">
-                                                <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar"
-                                                aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{progress}}%">
-                                                    {{progress}}%
-                                                </div>
-                                            </div>
-                                        </td>
+                                        <th>
+                                            File name
+                                        </th>
+                                        <th style="width: 150px;">
+                                            Progress
+                                        </th>
                                     </tr>
-                                {{/each}}
-                            </tbody>
-                        </table>-->
-
+                                </thead>
+                                <tbody>
+                                    {{#each files}}
+                                        <tr>
+                                            <td>
+                                                {{name}}
+                                            </td>
+                                            <td >
+                                                <div class="progress">
+                                                    <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar"
+                                                    aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{progress}}%">
+                                                        {{progress}}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>-->
+                        {{/if}}
                     </div>
                 </div>
             </div>
@@ -213,6 +237,12 @@
      </div>
 </template>
 
+
+<template name="buttonGoStep2">
+    <button class="progress-button progress-button-small pull-right" id="btngostep2" data-style="top-line" data-horizontal="">
+        <span class="content">Start validation</span>
+    </button>
+</template>
 
 <template name="spinner">
     <div class="sk-wave spinner">
@@ -228,8 +258,8 @@
     <div id="steps-block" class="step-progress">
         <ol class="progress">
             <li class="is-active" data-step="1"> <a href="/upload"> Upload </a> </li>
-            <li data-step="2"> <a href="/validation"> Validate </a> </li>
-            <li data-step="3" class="progress__last"> <a href="/import"> Import </a> </li>
+            <li data-step="2"> <a href="#"> Validate </a> </li>
+            <li data-step="3" class="progress__last"> <a href="#"> Import </a> </li>
         </ol>
     </div>
 </template>

@@ -21,6 +21,7 @@ import { CollUploadJobMaster } from '../api/collections.js';
 
 import './body.html';
 
+
 let abortChecked = false;
 let editor;
 Template.registerHelper('formatDate', function(date) {
@@ -28,6 +29,43 @@ Template.registerHelper('formatDate', function(date) {
 });
 
 Template.readCSV.events({
+    "click #btngostep2": function(event, template) {
+        let Id = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running', stepStatus: 'upload_pending' })._id;
+        CollUploadJobMaster.update(Id, { $set: { stepStatus: 'validation_running' } }, function() {
+            Router.go('/validation');
+        });
+    },
+    "click #btnAbortRecord": function(event, template) {
+        swal({
+                title: "Are you sure?",
+                text: "All your existing uploaded data will be deleted and you have to upload the files again",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Abort it!",
+                closeOnConfirm: false
+            },
+            function() {
+                template.abortData.set(false);
+                swal("Aborted!", "Your data has been deleted.", "success");
+            });
+    },
+    "click .sheets": function(event, template) {
+        var currentEl = event.currentTarget;
+        var _href = $(currentEl).attr('href').split('#')[1];
+        let ft = template.filetypes.get(); // all file type
+        let activeFiletypeId = _.indexOf(ft, _.find(ft, function(d) { return d.isActive }));
+        let newFiletypeId = _.indexOf(ft, _.find(ft, function(d) { return d.id == _href }));
+
+        ft[activeFiletypeId].isActive = false;
+        ft[newFiletypeId].isActive = true;
+        template.filetypes.set(ft);
+        template.abortData.set(true);
+        Router.go('/upload/' + _href);
+
+        return;
+
+    },
     "click #btnSaveCustomjavascript": function(event, template) {
         var code = editor.getValue();
         let $selectedDom = $(template.find("a[data-target='#javascripEditorModal'].open"));
@@ -54,6 +92,7 @@ Template.readCSV.events({
         setTimeout(function() {
             if (editor == undefined) {
                 editor = CodeMirror.fromTextArea(template.find("#customJavascript"), {
+                    //placeholder: 'return row[' + $(currentEl).attr('data-header') + ']',
                     lineNumbers: true,
                     mode: "javascript" // set any of supported language modes here
                 });
@@ -149,6 +188,55 @@ Template.readCSV.events({
     },
     'click #addNewHeader': function(event, template) {
 
+        //$(".view-mapping").scrollTop($(".view-mapping")[0].scrollHeight);
+
+        $(template.find('#mapping')).find('.spinner').show();
+        let oldHeaders = template.csvHeaders.get();
+
+        oldHeaders.push('header_' + oldHeaders.length);
+        template.csvHeaders.set(oldHeaders);
+        //generateMapping(template);
+        let _hasHeader = $(template.find('#hasheader')).prop('checked');
+
+        let csvHeaders = template.csvHeaders.get();
+
+
+        let existMapping; //Csvfilemapping.findOne({ owner: Meteor.userId(), fileTypeID: activeFiletype.id });
+
+        if (_hasHeader) {
+            existMapping = template.mappingWithHeader.get();
+
+            existMapping.push({
+                sysHeader: undefined,
+                csvHeader: 'header_' + oldHeaders.length,
+                transform: "",
+                csvSysHeaderDetail: undefined
+            });
+
+            template.mappingWithHeader.set(existMapping);
+        } else {
+            existMapping = template.mappingWithOutHeader.get();
+            existMapping.push({
+                sysHeader: undefined,
+                csvHeader: 'header_' + oldHeaders.length,
+                transform: "",
+                csvSysHeaderDetail: undefined
+            });
+            template.mappingWithOutHeader.set(existMapping);
+        }
+        template.csvHeaders.set(csvHeaders);
+
+        generateXEditor(template, function() {
+            $(template.find('#mapping')).find('.spinner').hide();
+            $(".view-mapping").scrollTop($(".view-mapping")[0].scrollHeight);
+            $(template.find('#preview')).find('.spinner').show();
+            setTimeout(function() {
+                // generate Preview
+                generatePreview(template.find('#csv-file').files[0], template, function() {
+                    $(template.find('#preview')).find('.spinner').hide();
+                });
+            }, 2000);
+        });
     }
 });
 
@@ -183,7 +271,7 @@ let generateMapping = function(template) {
     csvHeaders.forEach(function(result, index) {
         mapping.push({
             sysHeader: $(template.find('#dpdsysheader_' + index)).editable('getValue')['dpdsysheader_' + index],
-            csvHeader: $(template.find('#dpdcsvheader_' + index)).text(),
+            csvHeader: $(template.find('#dpdcsvheader_' + index)).editable('getValue')['dpdcsvheader_' + index], //$(template.find('#dpdcsvheader_' + index)).text(),
             transform: $(template.find('#txtCustomJavascript_' + index)).attr('data-code'),
             csvSysHeaderDetail: _.find(activefile, function(d) { return d.text == $(template.find('#dpdsysheader_' + index)).text() })
         })
@@ -222,6 +310,14 @@ let generateXEditor = function(template, cb) {
             // } else {
             //     _val = activefile[index]
             // }
+            $(template.find('#dpdcsvheader_' + index)).editable("destroy");
+            $(template.find('#dpdcsvheader_' + index)).editable({
+                success: function(response, newValue) {
+                    generatePreview(template.find('#csv-file').files[0], template, function() {
+                        $(template.find('#preview')).find('.spinner').hide();
+                    });
+                }
+            });
 
             $(template.find('#dpdsysheader_' + index)).editable("destroy");
             $(template.find('#dpdsysheader_' + index)).editable({
@@ -346,8 +442,8 @@ let insertCSVMapping = function(fileTypeID, template, cb) {
             mapping: mapping,
             fileTypeID: fileTypeID,
             createdAt: new Date(),
-            updateAt: new Date(),
-            deleteAt: null,
+            updatedAt: new Date(),
+            deletedAt: null,
             hasHeader: _hasHeader,
             owner: Meteor.userId(),
             username: Meteor.user().username
@@ -465,6 +561,7 @@ let generateDatawithNewHeader = function(chunk, _hasHeader, mapping, isPreview, 
             } else {
                 rows[i][inx] = oldRows[i][inx];
             }
+            rows[i][inx] = (rows[i][inx] == undefined) ? '' : rows[i][inx];
         }
         let headerText = d.csvHeader.trim();
         if (!isPreview && d.sysHeader != undefined) {
@@ -514,14 +611,14 @@ let generatePreview = function(_file, template, cb) {
 
 let setNextFile = function(template) {
     let ft = template.filetypes.get(); // all file type
-
     let activeFiletypeId = _.indexOf(ft, _.find(ft, function(d) { return d.isActive }));
-
     ft[activeFiletypeId].isActive = false;
     ft[activeFiletypeId].isDone = true;
     ft[activeFiletypeId + 1].isActive = true;
-
     template.filetypes.set(ft);
+    template.abortData.set(true);
+
+    Router.go('/upload/' + ft[activeFiletypeId + 1].id);
 }
 
 let parseCSV = function(_file, template, cb) {
@@ -539,8 +636,8 @@ let parseCSV = function(_file, template, cb) {
         totalNoOfRecords: 0,
         uploadedRecords: 0,
         createdAt: new Date(),
-        updateAt: new Date(),
-        deleteAt: '',
+        updatedAt: new Date(),
+        deletedAt: '',
         owner: Meteor.userId(),
         username: Meteor.user().username
     };
@@ -667,35 +764,59 @@ let getActiveHeaders = function(template) {
 
 Template.readCSV.onCreated(function() {
     //console.log(Router.current().params.id);
-    toastr.options = {
-        "closeButton": true,
-        "showMethod": "show",
-        "hideDuration": "1000",
-        "showDuration": "0",
-        "timeOut": "10000000"
-    }
+    //console.log(this);
+    // if (this.data == undefined) {
+    //     Router.go('/');
+    // }
+    //console.log(Meteor.userId());
+    //let masterJob = this.data;
+
+    let masterJob = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running' });
+    let a =
+        toastr.options = {
+            "closeButton": true,
+            "showMethod": "show",
+            "hideDuration": "1000",
+            "showDuration": "0",
+            "timeOut": "10000000"
+        }
     this.files = new ReactiveVar([]);
     this.csvHeaders = new ReactiveVar([]);
     this.headers = new ReactiveVar([]);
     this.previewRec = new ReactiveVar([]);
     this.filetypes = new ReactiveVar(
         [
-            { id: 'ProductInformation', name: 'Product Information', isDone: false, isActive: true, header: ProductInformationHeaders, collection: CollProductInformation },
-            { id: 'ProductPrice', name: 'Product Pricing', isDone: false, isActive: false, header: ProductPriceHeaders, collection: CollProductPrice },
-            { id: 'ProductImprintData', name: 'Imprint Data', isDone: false, isActive: false, header: ProductImprintDataHeaders, collection: CollProductImprintData },
-            { id: 'ProductImage', name: 'Image', isDone: false, isActive: false, header: ProductImageHeaders, collection: CollProductImage },
-            { id: 'ProductShipping', name: 'Shipping', isDone: false, isActive: false, header: ProductShippingHeaders, collection: CollProductShipping },
-            { id: 'ProductAdditionalCharges', name: 'Additional Charges', isDone: false, isActive: false, header: ProductAdditionalChargeHeaders, collection: CollProductAdditionalCharges },
-            { id: 'ProductVariationPrice', name: 'Variation Price', isDone: false, isActive: false, header: ProductVariationPricingHeaders, collection: CollProductVariationPrice }
+            { id: 'ProductInformation', name: 'Product Information', isDone: masterJob.hasOwnProperty('ProductInformation') ? true : false, isActive: false, header: ProductInformationHeaders, collection: CollProductInformation, require: true },
+            { id: 'ProductPrice', name: 'Product Pricing', isDone: masterJob.hasOwnProperty('ProductPrice') ? true : false, isActive: false, header: ProductPriceHeaders, collection: CollProductPrice, require: false },
+            { id: 'ProductImprintData', name: 'Imprint Data', isDone: masterJob.hasOwnProperty('ProductImprintData') ? true : false, isActive: false, header: ProductImprintDataHeaders, collection: CollProductImprintData, require: false },
+            { id: 'ProductImage', name: 'Image', isDone: masterJob.hasOwnProperty('ProductImage') ? true : false, isActive: false, header: ProductImageHeaders, collection: CollProductImage, require: false },
+            { id: 'ProductShipping', name: 'Shipping', isDone: masterJob.hasOwnProperty('ProductShipping') ? true : false, isActive: false, header: ProductShippingHeaders, collection: CollProductShipping, require: false },
+            { id: 'ProductAdditionalCharges', name: 'Additional Charges', isDone: masterJob.hasOwnProperty('ProductAdditionalCharges') ? true : false, isActive: false, header: ProductAdditionalChargeHeaders, collection: CollProductAdditionalCharges, require: false },
+            { id: 'ProductVariationPrice', name: 'Variation Price', isDone: masterJob.hasOwnProperty('ProductVariationPrice') ? true : false, isActive: false, header: ProductVariationPricingHeaders, collection: CollProductVariationPrice, require: false }
         ]
     );
     this.mapping = new ReactiveVar([]);
     this.mappingWithOutHeader = new ReactiveVar([]);
     this.mappingWithHeader = new ReactiveVar([]);
+    this.abortData = new ReactiveVar(true);
+
+    let ft = Template.instance().filetypes.get();
+
+    let pendingFiles = _.find(ft, function(d) { return !masterJob.hasOwnProperty(d.id) });
+    if (pendingFiles != undefined) {
+        ft[_.indexOf(ft, pendingFiles)].isActive = true;
+        Router.go('/upload/' + pendingFiles.id);
+    } else {
+        ft[0].isActive = true;
+        Router.go('/upload/' + ft[0].id);
+    }
+
+    Template.instance().filetypes.set(ft);
 });
 
 
 Template.readCSV.helpers({
+    abortData() { return Template.instance().abortData.get() },
     files() {
         return Template.instance().files.get();
     },
@@ -738,17 +859,25 @@ Template.readCSV.helpers({
         return Object.values(obj);
     },
     getJsonKeys(obj) {
-        console.log('obj', obj);
         return Object.keys(obj);
     },
     previewCollection() {
+
         let ft = Template.instance().filetypes.get(); // all file type
         let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
-        let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), deleteAt: '' });
-        if (obj != undefined) {
-            return activeFiletype.collection.find({ fileID: obj[activeFiletype.id].id });
+        let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running' });
+        if (obj != undefined && activeFiletype != undefined) {
+            if (obj.hasOwnProperty(activeFiletype.id)) {
+                return activeFiletype.collection.find({ fileID: obj[activeFiletype.id].id }, { fields: { 'everythingButThisField': 0 } }).fetch();
+            }
         }
         return [];
+    },
+    isActiveStep2() {
+        let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running' });
+        let ft = Template.instance().filetypes.get();
+
+        return !_.chain(ft).filter(function(d) { return d.require }).map(function(d) { return d.id }).map(function(d) { return _.contains(_.keys(obj), d) }).contains(false).value();
     }
 });
 
@@ -756,7 +885,7 @@ let updateJobMaster = function(filename, fileID, cb) {
     //return CollUploadJobMaster.findOne({ owner: Meteor.userId(),deleteAt:'',stepStatus:1 });
     let data = {};
     data[filename] = { id: fileID, validateStatus: 'pending', uploadStatus: 'completed', uplodedAt: new Date() };
-    let Obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), deleteAt: '', stepStatus: 1 });
+    let Obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running', stepStatus: 'upload_pending' });
     CollUploadJobMaster.upsert(Obj._id, { $set: data }, function() {
         cb();
     });
