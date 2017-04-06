@@ -39,3 +39,9 @@ Router.route('/history', function() {
 Router.route('/validation', function() {
     this.render('validation');
 });
+
+
+
+Router.route('/import', function() {
+    this.render('import');
+});

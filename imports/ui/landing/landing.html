@@ -1,3 +1,5 @@
+
+
 <template name="landing">
    {{> header}}
 
@@ -8,7 +10,7 @@
         {{#if getStatusFromMaster.count}}
           {{#each getStatusFromMaster}}
           <div id="landingPageStatusReport" class="clearfix">
-            <h3>Welcome back  {{username}}</h3>
+            <h3 style="text-transform:uppercase">Welcome back , {{username}}</h3>
             <p>Following is the latest status of your file upload process.You can continue with your current status or abort the whole process to start again</p>
             <table border='1|1' style='margin:auto;width:850px; border:solid 1px #ccc; border-collapse: collapse;'>
               <tr style='color:#4e4e4e; font-size:16px; font-weight:bold; padding:5px; background-color: #f5f5f5;'>
@@ -16,21 +18,38 @@
                   uploadType
                 </td>
                 <td style='color:#000; font-size:14px; padding:5px;word-break: break-all;'>
-                  {{uploadType}}
+                  <div class="upload-type">
+                    <span>
+                        <i class="fa {{#if $eq uploadType "replace"}} fa-dot-circle-o {{else}} fa-circle-o {{/if}}"></i>
+                      Replace
+                    </span>
+                    <span>
+                      <i class="fa {{#if $eq uploadType "append"}} fa-dot-circle-o {{else}} fa-circle-o {{/if}}"></i>
+                      Append
+                    </span>
+                    <span>
+                      <i class="fa {{#if $eq uploadType "upsert"}} fa-dot-circle-o {{else}} fa-circle-o {{/if}}"></i>
+                      Upsert
+                    </span>
+                    <span>
+                      <i class="fa {{#if $eq uploadType "update"}} fa-dot-circle-o {{else}} fa-circle-o {{/if}}"></i>
+                      Update
+                    </span>
+                  </div>
                 </td>
               </tr>
                 <tr style='color:#4e4e4e; font-size:16px; font-weight:bold; padding:5px; background-color: #f5f5f5;'>
                   <td style='color:#000; font-size:14px; padding:5px;word-break: break-all;'>
                     Started Process at
                   </td>
-                  <td style='color:#000; font-size:14px; padding:5px;word-break: break-all;'>
+                  <td style='color:#000; font-size:14px; padding:5px;word-break: break-all; font-weight:500'>
                     {{createdAt}}
                   </td>
                 </tr>
               </table>
 
               {{#if hasStatus}}
-              <table border='1|1' style='background-color: #192231;color: #fff;margin:auto;width:850px; border:solid 1px #ccc; border-collapse: collapse;'>
+              <table border='1|1'  style='background-color: #192231;color: #fff;margin:auto;width:850px; border:solid 1px #ccc; border-collapse: collapse;'>
                 <th style="text-align:center">File</th><th style="text-align:center">Upload Status</th><th style="text-align:center">validation Status</th>
               {{#each hasStatus}}
 
