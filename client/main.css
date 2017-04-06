@@ -1212,7 +1212,7 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
   color: #fff;
 }
 
-.imageOrFileButton .active{
+.imageOrFileButton.active{
   background-color: #494e6b !important;
   color: #fff !important;
 }
