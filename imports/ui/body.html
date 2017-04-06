@@ -31,18 +31,26 @@
                         <li role="presentation" class="{{#if isActive}}active{{/if}} {{#if isDone}}done{{/if}}"><a href="#{{id}}" class="sheets" role="tab" data-toggle="tab"><i class="fa fa-check-circle-o"></i>{{name}}</a></li>
                     {{/each}}
                 </ul>
-                {{#if isActiveStep2}}
-                    <div style="margin-top: 20px;position: absolute;top: 300px;"> 
-                        {{> buttonGoStep2}}
-                    </div>
-                {{/if}}
+                
+                <div style="margin-top: 20px;position: absolute;top: 300px;">            
+                    {{#if isActiveStep2}}
+                        <button class="progress-button progress-button-small pull-right" id="btngostep2" data-style="top-line" data-horizontal="">
+                            <span class="content">Start validation&nbsp;<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i></span>
+                        </button>
+                    {{else}}
+                        <button class="progress-button progress-button-small pull-right" id="btngostep2" data-style="top-line" data-horizontal="" disabled="disabled">
+                            <span class="content">Start validation&nbsp;<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i></span>
+                        </button>
+                    {{/if}}
+                </div>
+                
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" style="margin-bottom:20px; ">
                         {{#if $and previewCollection.length abortData}}
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <div class="options">
-                                        <a id="btnAbortRecord" href="#"  class="text-danger" title="Remove all record."><i class="fa fa-times-circle-o"></i></a>
+                                        <a id="btnAbortRecord" href="#"  class="text-danger" title="Remove all records."><i class="fa fa-times-circle-o"></i></a>
                                     </div>
                                     <h3> Uploaded records </h3>
                                 </div>
@@ -149,7 +157,7 @@
                                     <div class="handson-table">
                                         <div id="hotErrorDataDuringUpload"></div>
                                     </div>
-                                    <span id="errMessageFromSchema" class="pull-left text-danger"></span>
+                                    <span id="errMessageFromSchema" class="pull-left text-danger" style="font-weight: 600;"></span>
                                     <button style="margin-left:5px;" class="progress-button progress-button-small pull-right" id="buttonProceedNext" data-style="top-line" data-horizontal="">
                                         <span class="content">Proceed To Next</span>
                                         <span class="progress">
@@ -254,11 +262,6 @@
 </template>
 
 
-<template name="buttonGoStep2">
-    <button class="progress-button progress-button-small pull-right" id="btngostep2" data-style="top-line" data-horizontal="">
-        <span class="content">Start validation&nbsp;<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i></span>
-    </button>
-</template>
 
 <template name="spinner">
     <div class="sk-wave spinner">
@@ -282,7 +285,7 @@
 
 
 <template name="buttonAbort">
-    <button style="display: none;" class="progress-button progress-button-small progress-button-danger pull-right" id="btnAbort" data-style="top-line" data-horizontal="">
+    <button style="display: block;" class="progress-button progress-button-small progress-button-danger pull-right" id="btnAbort" data-style="top-line" data-horizontal="">
         <span class="content">Abort</span>
         <span class="progress">
             <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>

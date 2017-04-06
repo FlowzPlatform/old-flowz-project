@@ -102,7 +102,11 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 
 .progress-button[disabled],
 .progress-button[disabled].state-loading {
-    cursor: default;
+    cursor: not-allowed;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    opacity: .65;
 }
 
 .progress-button .content {
