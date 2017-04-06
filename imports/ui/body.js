@@ -1,7 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveDict } from 'meteor/reactive-dict';
-
+import { ReactiveVar } from 'meteor/reactive-var';
+// import { UploadedFiles } from '../lib/collections.js';
 // import  Headers
 import { ProductInformationHeaders } from '../../lib/headers/product_information.js'
 import { ProductPriceHeaders } from '../../lib/headers/product_price.js'
@@ -27,6 +28,89 @@ let editor;
 Template.registerHelper('formatDate', function(date) {
     return moment(date).format('lll');
 });
+
+
+Template.imageUpload.onRendered(function() {
+    //this.csv_files = new ReactiveArray();
+
+    // Meteor.Dropzone.options.maxFiles = 1;
+    //  Meteor.Dropzone.options.previewTemplate = '<div id="preview-template" >';
+    Meteor.Dropzone.options.dictDefaultMessage = 'Drag and drop images here to upload ';
+    //Meteor.Dropzone.options.addRemoveLinks = true;
+    //Meteor.Dropzone.options.dictRemoveFile = "Remove File"; // Remove button text
+
+    //Meteor.Dropzone.options.acceptedFiles = 'image/jpeg,image/png,image/gif';
+    Meteor.Dropzone.options.acceptedFiles = '.jpg';
+    Meteor.Dropzone.options.autoProcessQueue = true;
+    Meteor.Dropzone.options.parallelUploads = 5; // Number of parallel upload file
+    Meteor.Dropzone.options.processingmultiple = false;
+    Meteor.Dropzone.options.uploadMultiple = false;
+
+    var options = _.extend({}, Meteor.Dropzone.options, this.data);
+    this.dropzone = new Dropzone('#my-awesome-dropzone.dropzone', options);
+
+    var self = this;
+
+    // this is how you get the response from the ajax call.
+    this.dropzone.on('addedfile', function(file) {
+        console.log("fileName:", file);
+        //  UploadedFiles.insert(file.name, function(e, res) {
+        //    if (e) {
+        //      log(e);
+        //    }
+        //    console.log("inserted into mongo collection");
+        //  })
+    });
+    this.dropzone.on('complete', function(file) {
+
+        var uploader = new Slingshot.Upload("myFileUploads");
+
+        uploader.send(file, function(error, downloadUrl) {
+            if (error) {
+                // Log service detailed response.
+                console.error('Error uploading');
+                console.log(error);
+            } else {
+                console.log("success");
+                //  Meteor.users.update(Meteor.userId(), {$push: {"profile.files": downloadUrl}});
+            }
+        });
+
+
+        //FS.Utility.eachFile(e, function(file) {
+        //  var newFile = new FS.File(file);
+        console.log(file);
+        //   Images.insert(file, function (error, fileObj) {
+        //     if (error) {
+        //       toastr.error("Upload failed... please try again.");
+        //     } else {
+        //       toastr.success('Upload succeeded!');
+        //     }
+        // });
+        // });
+    });
+
+    this.dropzone.on("uploadprogress", function(file, progress) {
+        // Update progress bar with the value in the variable "progress", which
+        // is the % total upload progress from 0 to 100
+
+        console.log("progress:", progress);
+
+    });
+
+    this.dropzone.on('queuecomplete', function() {
+        console.log("queuecomplete");
+
+
+        //location.reload();
+        //Router.go("uploaded_file", mergeObjects(Router.currentRouteParams(), {}));
+    });
+
+    this.dropzone.on('accept', function(file) {
+        alert(4)
+    })
+    dz = this.dropzone;
+})
 
 Template.readCSV.events({
     "click #btngostep2": function(event, template) {
@@ -285,6 +369,14 @@ Template.readCSV.events({
                 });
             }, 2000);
         });
+    },
+    'click #btnUploadImage': function(event, template) {
+        $(template.find('#uploadCsv')).hide();
+        $(template.find('#uploadImage')).show();
+    },
+    'click #btnUploadCsv': function(event, template) {
+        $(template.find('#uploadCsv')).show();
+        $(template.find('#uploadImage')).hide();
     }
 });
 
@@ -462,6 +554,8 @@ let resetAll = function(template) {
     $(template.find('#btnNext')).show();
     $(template.find('#btnAbort')).hide();
     $(template.find("#handson-Zone-during-upload")).hide();
+    $(template.find('#uploadCsv')).show();
+    $(template.find('#uploadImage')).hide();
     toastr.clear();
 
     // destroyXEditor
@@ -960,6 +1054,9 @@ Template.readCSV.helpers({
         let ft = Template.instance().filetypes.get();
 
         return !_.chain(ft).filter(function(d) { return d.require }).map(function(d) { return d.id }).map(function(d) { return _.contains(_.keys(obj), d) }).contains(false).value();
+    },
+    isImagesTab() {
+        return Router.current().params.id == "ProductImage";
     }
 });
 
