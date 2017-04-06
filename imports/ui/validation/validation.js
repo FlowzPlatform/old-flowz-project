@@ -84,7 +84,6 @@ Template.validation.events({
                   var query = {
                       "$set": {
                           "stepStatus":UploadPending
-                          //step2status: "completed"
                       }
                   };
                   job['arrFileObj']=[];
