@@ -52,19 +52,47 @@ Template.readCSV.events({
     },
     "click .sheets": function(event, template) {
         var currentEl = event.currentTarget;
-        var _href = $(currentEl).attr('href').split('#')[1];
-        let ft = template.filetypes.get(); // all file type
-        let activeFiletypeId = _.indexOf(ft, _.find(ft, function(d) { return d.isActive }));
-        let newFiletypeId = _.indexOf(ft, _.find(ft, function(d) { return d.id == _href }));
+        if (template.find('#csv-file').files.length > 0) {
+            swal({
+                    title: "Are you sure?",
+                    text: "Your mapping is loss.",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "Yes",
+                    closeOnConfirm: true
+                },
+                function(isConfirm) {
+                    if (isConfirm) {
 
-        ft[activeFiletypeId].isActive = false;
-        ft[newFiletypeId].isActive = true;
-        template.filetypes.set(ft);
-        template.abortData.set(true);
-        Router.go('/upload/' + _href);
+                        var _href = $(currentEl).attr('href').split('#')[1];
+                        let ft = template.filetypes.get(); // all file type
+                        let activeFiletypeId = _.indexOf(ft, _.find(ft, function(d) { return d.isActive }));
+                        let newFiletypeId = _.indexOf(ft, _.find(ft, function(d) { return d.id == _href }));
 
-        return;
+                        ft[activeFiletypeId].isActive = false;
+                        ft[newFiletypeId].isActive = true;
+                        template.filetypes.set(ft);
+                        template.abortData.set(true);
+                        resetAll(template);
+                        Router.go('/upload/' + _href);
 
+                    }
+                });
+        } else {
+            var _href = $(currentEl).attr('href').split('#')[1];
+            let ft = template.filetypes.get(); // all file type
+            let activeFiletypeId = _.indexOf(ft, _.find(ft, function(d) { return d.isActive }));
+            let newFiletypeId = _.indexOf(ft, _.find(ft, function(d) { return d.id == _href }));
+
+            ft[activeFiletypeId].isActive = false;
+            ft[newFiletypeId].isActive = true;
+            template.filetypes.set(ft);
+            template.abortData.set(true);
+            resetAll(template);
+            Router.go('/upload/' + _href);
+        }
+        return
     },
     "click .remove-custom-javascript": function(event, template) {
         var currentEl = event.currentTarget;
@@ -196,7 +224,7 @@ Template.readCSV.events({
         insertCSVMapping(activeFiletypeId, template, function(e, res) {
             // upload csv file in db
             parseCSV(template.find('#csv-file').files[0], template, function() {
-                resetAll(template);
+
             });
         });
     },
@@ -332,6 +360,14 @@ let generateXEditor = function(template, cb) {
             // }
             $(template.find('#dpdcsvheader_' + index)).editable("destroy");
             $(template.find('#dpdcsvheader_' + index)).editable({
+                validate: function(value) {
+                    if ($.trim(value) == '') {
+                        return 'This field is required';
+                    }
+                    if (_.chain(existMapping).map(function(d) { return d.csvHeader }).contains(value).value()) {
+                        return 'Already exist,Please try some one else.'
+                    }
+                },
                 success: function(response, newValue) {
                     $(template.find('#preview')).find('.spinner').show();
                     setTimeout(function() {
@@ -339,7 +375,6 @@ let generateXEditor = function(template, cb) {
                             $(template.find('#preview')).find('.spinner').hide();
                         });
                     }, 1000);
-
                 }
             });
 
@@ -647,6 +682,7 @@ let setNextFile = function(template, cb) {
         },
         function(isConfirm) {
             if (isConfirm) {
+                resetAll(template);
                 ft[activeFiletypeId].isActive = false;
                 ft[activeFiletypeId].isDone = true;
                 ft[activeFiletypeId + 1].isActive = true;
@@ -963,7 +999,7 @@ let insertCSVData = function(data, fileID, collection, cb) {
 }
 let errorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
-    td.style.backgroundColor = 'red';
+    td.style.backgroundColor = '#a94442';
 };
 
 let getHandsonHeader = function(headers, invalidKeys) {

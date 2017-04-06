@@ -9,18 +9,20 @@ import { ProductPriceSchemas } from '../../lib/schema/product_price.js';
 import { ProductShippingSchemas } from '../../lib/schema/product_shipping.js';
 import { ProductVariationPricingSchemas } from '../../lib/schema/product_variation_pricing.js';
 
-export const CollProductInformation = new Mongo.Collection('collproductinformation');
-export const CollProductPrice = new Mongo.Collection('collproductprice');
-export const CollProductImprintData = new Mongo.Collection('collproductimprintdata');
-export const CollProductImage = new Mongo.Collection('collproductimage');
-export const CollProductShipping = new Mongo.Collection('collproductshipping');
-export const CollProductAdditionalCharges = new Mongo.Collection('collProductadditionalcharges');
-export const CollProductVariationPrice = new Mongo.Collection('collproductvariationprice');
+const collectionPrefix = 'uploader';
 
-export const CollUploadJobMaster = new Mongo.Collection('uploadJobMaster');
+export const CollProductInformation = new Mongo.Collection(collectionPrefix + 'Productinformation');
+export const CollProductPrice = new Mongo.Collection(collectionPrefix + 'Productprice');
+export const CollProductImprintData = new Mongo.Collection(collectionPrefix + 'Productimprintdata');
+export const CollProductImage = new Mongo.Collection(collectionPrefix + 'Productimage');
+export const CollProductShipping = new Mongo.Collection(collectionPrefix + 'Productshipping');
+export const CollProductAdditionalCharges = new Mongo.Collection(collectionPrefix + 'Productadditionalcharges');
+export const CollProductVariationPrice = new Mongo.Collection(collectionPrefix + 'Productvariationprice');
 
-export const Csvfiles = new Mongo.Collection('csvfiles');
-export const Csvfilemapping = new Mongo.Collection('csvfilemapping');
+export const CollUploadJobMaster = new Mongo.Collection(collectionPrefix + 'JobMaster');
+
+export const Csvfiles = new Mongo.Collection(collectionPrefix + 'CSVFiles');
+export const Csvfilemapping = new Mongo.Collection(collectionPrefix + 'CSVFileMapping');
 
 
 // add schema
