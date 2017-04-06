@@ -299,23 +299,28 @@ Template.readCSV.events({
         });
     },
     'click #btnNext': function(event, template) {
-
-        $(template.find('#btnNext')).addClass('inProgress');
-
-        $(template.find('#mapping')).hide();
-        //$(template.find('#btnAbort')).show();
-        //let mapping = generateMapping(template); // generate new Mapping
-
-        // insert csv maaping in db
-
         let ft = template.filetypes.get(); // all file type
         let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
-        insertCSVMapping(activeFiletypeId, template, function(e, res) {
-            // upload csv file in db
-            parseCSV(template.find('#csv-file').files[0], template, function() {
 
+        let mapping = generateMapping(template); // generate new Mapping
+
+        let activefile = _.map(getActiveHeaders(template), function(d) { return (d.text == undefined) ? '' : d.text });
+
+        let mappedArr = _.chain(mapping).map(function(d) { return d.sysHeader }).filter(function(d) { return d != '' }).value();
+
+        if (_.difference(_.filter(activefile, function(d) { return d != '' }), mappedArr).length > 0) {
+            swal("Warning!", "Please map all the mandatory fields before proceed", "warning");
+        } else {
+            $(template.find('#btnNext')).addClass('inProgress');
+
+            $(template.find('#mapping')).hide();
+            insertCSVMapping(activeFiletypeId, template, function(e, res) {
+                // upload csv file in db
+                parseCSV(template.find('#csv-file').files[0], template, function() {
+
+                });
             });
-        });
+        }
     },
     'click #btnAbort': function(event, template) {
         swal({
@@ -335,6 +340,9 @@ Template.readCSV.events({
             });
     },
     'click #addNewHeader': function(event, template) {
+        var currentEl = event.currentTarget;
+        $(currentEl).append('<i class="fa fa-spinner fa-spin"></i>');
+
 
         //$(".view-mapping").scrollTop($(".view-mapping")[0].scrollHeight);
 
@@ -376,6 +384,7 @@ Template.readCSV.events({
 
         generateXEditor(template, function() {
             $(template.find('#mapping')).find('.spinner').hide();
+            $(currentEl).children('i').remove();
             $(".view-mapping").scrollTop($(".view-mapping")[0].scrollHeight);
             $(template.find('#preview')).find('.spinner').show();
             setTimeout(function() {
@@ -427,7 +436,7 @@ let generateMapping = function(template) {
     csvHeaders.forEach(function(result, index) {
         mapping.push({
             sysHeader: $(template.find('#dpdsysheader_' + index)).editable('getValue')['dpdsysheader_' + index],
-            csvHeader: $(template.find('#dpdcsvheader_' + index)).editable('getValue')['dpdcsvheader_' + index], //$(template.find('#dpdcsvheader_' + index)).text(),
+            csvHeader: $(template.find('#dpdcsvheader_' + index)).text(), //$(template.find('#dpdcsvheader_' + index)).editable('getValue')['dpdcsvheader_' + index]
             transform: $(template.find('#txtCustomJavascript_' + index)).attr('data-code'),
             csvSysHeaderDetail: _.find(activefile, function(d) { return d.text == $(template.find('#dpdsysheader_' + index)).text() })
         })
@@ -443,7 +452,7 @@ let generateMapping = function(template) {
 }
 
 let generateXEditor = function(template, cb) {
-    let activefile = _.map(getActiveHeaders(template), function(d) { return d.text }); // get active file type data
+    let activefile = _.map(getActiveHeaders(template), function(d) { return (d.text == undefined) ? '' : d.text }); // get active file type data
 
     let _csvHeader = template.csvHeaders.get();
     let _hasHeader = $(template.find('#hasheader')).prop('checked');
@@ -460,31 +469,36 @@ let generateXEditor = function(template, cb) {
 
     setTimeout(function() {
         _csvHeader.forEach(function(result, index) {
-            //let _val;
-            // if (_hasHeader) {
-            //     _val = getHeaderDistance(result, activefile);
+            // console.log('result', result);
+            // console.log('activefile', activefile);
+            // console.log(getHeaderDistance(result, activefile));
+            let _val = '';
+            if (_hasHeader) {
+                _val = getHeaderDistance(result, activefile);
+            }
             // } else {
             //     _val = activefile[index]
             // }
-            $(template.find('#dpdcsvheader_' + index)).editable("destroy");
-            $(template.find('#dpdcsvheader_' + index)).editable({
-                validate: function(value) {
-                    if ($.trim(value) == '') {
-                        return 'This field is required';
-                    }
-                    if (_.chain(existMapping).map(function(d) { return d.csvHeader }).contains(value).value()) {
-                        return 'Already exist,Please try some one else.'
-                    }
-                },
-                success: function(response, newValue) {
-                    $(template.find('#preview')).find('.spinner').show();
-                    setTimeout(function() {
-                        generatePreview(template.find('#csv-file').files[0], template, function() {
-                            $(template.find('#preview')).find('.spinner').hide();
-                        });
-                    }, 1000);
-                }
-            });
+
+            // $(template.find('#dpdcsvheader_' + index)).editable("destroy");
+            // $(template.find('#dpdcsvheader_' + index)).editable({
+            //     validate: function(value) {
+            //         if ($.trim(value) == '') {
+            //             return 'This field is required';
+            //         }
+            //         if (_.chain(existMapping).map(function(d) { return d.csvHeader }).contains(value).value()) {
+            //             return 'Already exist,Please try some one else.'
+            //         }
+            //     },
+            //     success: function(response, newValue) {
+            //         $(template.find('#preview')).find('.spinner').show();
+            //         setTimeout(function() {
+            //             generatePreview(template.find('#csv-file').files[0], template, function() {
+            //                 $(template.find('#preview')).find('.spinner').hide();
+            //             });
+            //         }, 1000);
+            //     }
+            // });
 
             $(template.find('#dpdsysheader_' + index)).editable("destroy");
             $(template.find('#dpdsysheader_' + index)).editable({
@@ -495,10 +509,10 @@ let generateXEditor = function(template, cb) {
                     changeXEditorValue(template);
                 }
             });
-            if (existMapping.length > 0) {
-                if (existMapping[index].sysHeader != undefined) {
-                    $(template.find('#dpdsysheader_' + index)).editable('setValue', existMapping[index].sysHeader);
-                }
+
+            $(template.find('#dpdsysheader_' + index)).editable('setValue', _val);
+            if (_val != '') {
+                activefile = _.without(activefile, _val);
             }
             // if (_val != undefined) {
             //     //$(template.find('#dpdsysheader_' + index)).editable('setValue', _val.toLowerCase());
@@ -597,6 +611,7 @@ let getHeaderDistance = function(sysColumn, csvHeaders) {
     csvHeaders.forEach(function(d) {
         res = Levenshtein.get(col, d) < Levenshtein.get(col, res) ? d : res;
     });
+    res = Levenshtein.get(res, sysColumn) < 2 ? res : '';
     return res;
 }
 
