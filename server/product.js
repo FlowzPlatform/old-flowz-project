@@ -23,55 +23,54 @@ Meteor.methods({
 */
 if (Meteor.isServer) {
     Meteor.methods({
-       'abortInLanding': function(userId , documentId , action){
-      //action == abort / compleated
+        'abortInLanding': function(userId, documentId, action) {
+            //action == abort / completed
 
 
-      if (CollUploadJobMaster.findOne().owner == this.userId) {
-        //return  CollUploadJobMaster.remove({_id: documentId});
+            if (CollUploadJobMaster.findOne().owner == this.userId) {
+                //return  CollUploadJobMaster.remove({_id: documentId});
 
-        let updateData = {
-            masterJobStatus: action
+                let updateData = {
+                    masterJobStatus: action
+                }
+                if (action == "completed") {
+                    updateData['stepStatus'] = 'import_completed'
+                }
+                CollUploadJobMaster.update({ _id: documentId }, {
+                    $set: updateData
+                }, function(e, res) {
+                    if (e) {
+                        log(e);
+                    }
+                    console.log("updated deleteAt into master collection", Meteor.userId());
+                    //Router.go("upload")
+                })
+            }
         }
-        if (action == "compleated") {
-          updateData['stepStatus'] = 'import_compleated'
+    });
+
+
+
+    Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
+        bucket: "airflowbucket1",
+
+        //acl: "public-read",
+
+        authorize: function() {
+            //  Deny uploads if user is not logged in.
+            if (!this.userId) {
+                var message = "Please login before posting files";
+                throw new Meteor.Error("Login Required", message);
+            }
+
+            return true;
+        },
+
+        key: function(file) {
+            var user = Meteor.users.findOne(this.userId);
+            return "uploader_prod_image" + "/" + user.username + "/" + file.name;
         }
-        CollUploadJobMaster.update({ _id: documentId },
-          {
-            $set: updateData
-        }, function(e, res) {
-          if (e) {
-            log(e);
-          }
-          console.log("updated deleteAt into master collection" ,Meteor.userId());
-          //Router.go("upload")
-        })
-      }
-    }
-});
-
-
-
-Slingshot.createDirective("myFileUploads", Slingshot.S3Storage, {
-  bucket: "airflowbucket1",
-
-  //acl: "public-read",
-
-  authorize: function () {
-  //  Deny uploads if user is not logged in.
-    if (!this.userId) {
-      var message = "Please login before posting files";
-      throw new Meteor.Error("Login Required", message);
-    }
-
-    return true;
-  },
-
-  key: function (file) {
-    var user = Meteor.users.findOne(this.userId);
-    return  "uploader_prod_image"+"/"+user.username + "/" + file.name;
-  }
-});
+    });
 
 
 }
