@@ -22,11 +22,12 @@ Template.landing.onRendered(function() {
 
 Template.landing.helpers({
   getStatusFromMaster() {
-    console.log(CollUploadJobMaster.find({ owner: Meteor.userId() , deleteAt : "" ,masterJobStatus : {$ne : "compleated"}}).count());
-      return CollUploadJobMaster.find({ owner: Meteor.userId() , deleteAt : "", masterJobStatus : {$ne : "compleated"}});
+    console.log(CollUploadJobMaster.find({ owner: Meteor.userId() , masterJobStatus : "running"}).count());
+      //return CollUploadJobMaster.find({ owner: Meteor.userId() , deleteAt : "", masterJobStatus : {$ne : "compleated"}});
+      return CollUploadJobMaster.find({ owner: Meteor.userId() ,  masterJobStatus : "running"});
   },
   hasStatus(){
-      all = CollUploadJobMaster.find({ owner: Meteor.userId() , deleteAt : "", masterJobStatus : {$ne : "compleated"}}).fetch();
+      all = CollUploadJobMaster.find({ owner: Meteor.userId() , masterJobStatus : "running"}).fetch();
       showStatusOnLanding = [];
       for(var i =0; i<reactiveArray.length; i++ ){
         let findExistingId = reactiveArray[i].id;
@@ -109,13 +110,15 @@ Template.landing.events({
 
     'click #landingContinuetBtnId' (event){
 
-      let getStepStatus = CollUploadJobMaster.findOne({ owner: Meteor.userId() ,deleteAt : "", masterJobStatus : {$ne : "compleated"}}).stepStatus;
-      if (getStepStatus == 1) {
+      let getStepStatus = CollUploadJobMaster.findOne({ owner: Meteor.userId() , masterJobStatus : "running"}).stepStatus;
+      if (getStepStatus == "upload_pending") {
         Router.go("upload")
-      }else if (getStepStatus == 2) {
+      }else if (getStepStatus == "validation_running" || getStepStatus == "validation_compleated") {
         Router.go("validation")
-      }else if (getStepStatus == undefined) {
+      }else if (getStepStatus == "import_in_proress") {
         console.log("go to pdm");
+      }else {
+        Router.go("/");
       }
     },
     'click #landingAbortBtnId' (event){
@@ -129,7 +132,7 @@ Template.landing.events({
             closeOnConfirm: false
           },
           function(){
-            let _id = CollUploadJobMaster.findOne({ owner: Meteor.userId() ,deleteAt : "", masterJobStatus : {$ne : "compleated"}})._id;
+            let _id = CollUploadJobMaster.findOne({ owner: Meteor.userId() , masterJobStatus : "running"})._id;
             console.log(_id);
             Meteor.call("abortInLanding" , Meteor.userId(),_id,function (err , success) {
               if (err) {
@@ -173,9 +176,9 @@ Template.landing.events({
             // Modifier
 
                 createdAt: new Date(),
-                deleteAt: '',
+                
                 owner: Meteor.userId(),
-                stepStatus: 1,
+                stepStatus: "upload_pending",
                 username: Meteor.user().username,
                 uploadType: selected_option.toLowerCase(),
                 masterJobStatus : "running"
@@ -189,5 +192,20 @@ Template.landing.events({
         })
       }
 
-    }
+    },
+    // "click #upload" (event) {
+    //   var uploader = new Slingshot.Upload("myFileUploads");
+    //
+    //     uploader.send(document.getElementById('input').files[0], function (error, downloadUrl) {
+    //       if (error) {
+    //         // Log service detailed response.
+    //         console.error('Error uploading');
+    //         console.log(error);
+    //       }
+    //       else {
+    //         console.log(downloadUrl);
+    //         //Meteor.users.update(Meteor.userId(), {$push: {"profile.files": downloadUrl}});
+    //       }
+    //     });
+    // }
 });

@@ -1,5 +1,6 @@
 <template name="landing">
    {{> header}}
+
    <div class="landing_container">
       {{#if currentUser}}
 
@@ -42,7 +43,7 @@
                   {{uploadStatus}}
                 </td>
                 <td style='color:#000; font-size:14px; padding:5px;word-break: break-all;'>
-                  {{validationStatus}}
+                  {{validateStatus}}
                 </td>
 
               </tr>
@@ -100,14 +101,8 @@
         </form>
         </div>
         {{/if}}
-
-
-
-
-
-
-
-
       {{/if}}
+
    </div>
+
 </template>

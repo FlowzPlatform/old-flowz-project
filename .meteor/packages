@@ -46,3 +46,13 @@ zimme:bootstrap-hover-dropdown
 chrismbeckett:toastr
 perak:codemirror
 kevohagan:sweetalert
+
+
+
+vue:vue
+
+cfs:gridfs
+cfs:filesystem
+cfs:standard-packages
+cfs:s3
+edgee:slingshot

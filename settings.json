@@ -1,0 +1,14 @@
+{
+  "AWSAccessKeyId" : "AKIAJQW2JIUUGYHJMCJA",
+  "AWSSecretAccessKey" : "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",
+  "AWSBucket" : "airflowbucket1",
+  "AWSRegion" : "us-west-2",
+  "AWSCfdomain" : "https://dp6ct51vh4t01.cloudfront.net",
+  "DRKeyId" : "pezn0cba8ecmkci",
+  "DRSecretAccessKey" : "ydxskaq9gkva7x7",
+  "DRToken" : "rbSOQdVIP5AAAAAAAAAACUnkZubR-NmK8n_Jte1SldixlKK8kQtkt4PdUMVRuv_a",
+  "FTHost" : "ftp3.officebeacon.com",
+  "FTPort" : 21,
+  "FTUser" : "prozoom",
+  "FTPass" : "e6354wdfgbnm"
+}
