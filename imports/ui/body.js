@@ -31,11 +31,11 @@ Template.registerHelper('formatDate', function(date) {
 
 
 Template.imageUpload.onRendered(function() {
-  document.getElementById('btnUploadCsv').focus();
-  $('.imageOrFileButton').on('click', function(){
-    $('.imageOrFileButton').removeClass('active');
-    $(this).addClass('active');
-  });
+    document.getElementById('btnUploadCsv').focus();
+    $('.imageOrFileButton').on('click', function() {
+        $('.imageOrFileButton').removeClass('active');
+        $(this).addClass('active');
+    });
     //this.csv_files = new ReactiveArray();
 
     // Meteor.Dropzone.options.maxFiles = 1;
@@ -1143,12 +1143,15 @@ let getHandsonHeader = function(headers, invalidKeys) {
     });
     return newHeaders;
 }
-
+let objHandsontable;
 let renderHandsonTable = function(dataObject, headers, eleName, error, fileID, collection, cb) {
     //Csvfiles.update(fileID, {$set: { 'errorString' :  error }});
     //  console.log(headers);
     //console.log('error', error.invalidKeys);
     //console.log('headers', headers);
+    if (objHandsontable != undefined) {
+        objHandsontable.destroy();
+    }
     let newHeaders = getHandsonHeader(headers, error.invalidKeys);
     //console.log('newHeaders', newHeaders);
     let hotSettings = {
