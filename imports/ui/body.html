@@ -38,7 +38,7 @@
                             <span class="content">Start validation&nbsp;<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i></span>
                         </button>
                     {{else}}
-                        <button title="Please upload mandatory files" class="progress-button progress-button-small pull-right" id="btngostep2" data-style="top-line" data-horizontal="" disabled="disabled">
+                        <button title="Please upload atleast product information files before start validation." class="progress-button progress-button-small pull-right" id="btngostep2" data-style="top-line" data-horizontal="" disabled="disabled">
                             <span class="content">Start validation&nbsp;<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i></span>
                         </button>
                     {{/if}}
@@ -52,10 +52,10 @@
                                     <div class="options">
                                         <a id="btnAbortRecord" href="#"  class="text-danger" title="Remove all records."><i class="fa fa-times-circle-o"></i></a>
                                     </div>
-                                    <h3> Uploaded records </h3>
+                                    <h3> {{currentSheetName}} <span style="font-size: 15px;font-weight: 600;"> (Uploaded records) </span> </h3>
                                 </div>
                                 <div class="panel-body" style="height: 390px;overflow-y: auto;">
-                                    <div id="preview" class="table-responsive">
+                                    <div class="table-responsive preview">
                                         <table class="table table-bordered table-hover">
                                             <thead>
                                                 <tr>
@@ -91,7 +91,7 @@
 
                                     <div class="file-zone">
 
-                                        <span class="dz-message">Drop files here or click to upload.<br/>
+                                        <span class="dz-message">Drop <span style="color: #494e6b">"{{currentSheetName}}"</span> files here<br/>
                                             <small>(only csv files are valid.)</small>
                                         </span>
                                         <div class="dz-spinner">
@@ -157,7 +157,7 @@
                                     <div class="handson-table">
                                         <div id="hotErrorDataDuringUpload"></div>
                                     </div>
-                                    <span id="errMessageFromSchema" class="pull-left text-danger" style="font-weight: 600;"></span>
+                                    <span id="errMessageFromSchema" class="pull-left bg-danger" style="font-weight: 600;padding: 8px;"></span>
                                     <span id="allowMessageFromSchema" class="pull-left text-success" style="margin-left:10px;"></span>
 
                                     <button style="margin-left:5px;" class="progress-button progress-button-small pull-right" id="buttonProceedNext" data-style="top-line" data-horizontal="">

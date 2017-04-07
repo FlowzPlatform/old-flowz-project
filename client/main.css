@@ -68,6 +68,14 @@
     text-overflow: ellipsis;
 }
 
+.preview table td>div,
+.preview table th {
+    white-space: nowrap;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 
 /*************  progress buttons *************/
 
@@ -1208,30 +1216,30 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 }
 
 .imageOrFileButton:focus {
-  background-color: #494e6b;
-  color: #fff;
+    background-color: #494e6b;
+    color: #fff;
 }
 
-.imageOrFileButton.active{
-  background-color: #494e6b !important;
-  color: #fff !important;
+.imageOrFileButton.active {
+    background-color: #494e6b !important;
+    color: #fff !important;
 }
 
 .dropzone {
     /* min-height: 150px; */
-    border : 2px dashed rgb(73, 78, 107);
+    border: 2px dashed rgb(73, 78, 107);
     background: white;
     padding: 20px 20px;
     height: 198px !important;
     overflow-y: scroll !important;
 }
 
-.dz-message span .first{
-  color:gray !important;
-  font-size: 1.7em !important;
+.dz-message span .first {
+    color: gray !important;
+    font-size: 1.7em !important;
 }
 
-.dz-message span .second{
-  color:#b7b7b7 !important;
-  font-size: 1em !important;
+.dz-message span .second {
+    color: #b7b7b7 !important;
+    font-size: 1em !important;
 }
