@@ -479,7 +479,7 @@ function displayErrorMsg(flag, msg) {
     var errorMsg = $("#errorDiv").find("#errorStr");
     if(errorMsg)
     {
-      errorMsg.html(msg);
+      errorMsg.html(msg +", please provide valid data for the highlighted rows.");
       if(document.getElementById("mydiv"))
         document.getElementById("mydiv").style.display = !flag ? "none" : "block";
       if(document.getElementById("errorDiv"))
