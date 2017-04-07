@@ -310,7 +310,7 @@ Template.readCSV.events({
         let mappedArr = _.chain(mapping).map(function(d) { return d.sysHeader }).filter(function(d) { return d != '' }).value();
 
         if (_.difference(_.filter(activefile, function(d) { return d != '' }), mappedArr).length > 0) {
-            swal("Warning!", "Please map all the mandatory fields before proceed", "warning");
+            swal("Error!", "Please map all the mandatory fields before proceeding", "warning");
         } else {
             $(template.find('#btnNext')).addClass('inProgress');
 
@@ -614,7 +614,7 @@ let getHeaderDistance = function(sysColumn, csvHeaders) {
     csvHeaders.forEach(function(d) {
         res = Levenshtein.get(col, d) < Levenshtein.get(col, res) ? d : res;
     });
-    res = Levenshtein.get(res, sysColumn) < 2 ? res : '';
+    res = Levenshtein.get(res, sysColumn) < 4 ? res : '';
     return res;
 }
 
@@ -1103,6 +1103,14 @@ let updateJobMaster = function(filename, fileID, cb) {
         cb();
     });
 }
+// import schema
+import { ProductInformationSchema } from '../../lib/schema/product_information.js';
+import { ProductAdditionalChargeSchemas } from '../../lib/schema/product_additional_charge.js';
+import { ProductImagesSchemas } from '../../lib/schema/product_images.js';
+import { ProductImprintDataSchemas } from '../../lib/schema/product_imprint_data.js';
+import { ProductPriceSchemas } from '../../lib/schema/product_price.js';
+import { ProductShippingSchemas } from '../../lib/schema/product_shipping.js';
+import { ProductVariationPricingSchemas } from '../../lib/schema/product_variation_pricing.js';
 
 let insertCSVData = function(data, fileID, collection, cb) {
     let copedata = $.extend({}, data);
@@ -1113,8 +1121,21 @@ let insertCSVData = function(data, fileID, collection, cb) {
     // return;
     collection.insert(data, function(err, res) {
         if (err) {
+
+            //console.log(err);
             //console.log('errmessage', err.message);
-            //console.log('err', err.invalidKeys);
+            //console.log('err', err.invalidKeys[0].name);
+            let keyName=  err.invalidKeys[0].name;
+            let schemaObj=eval("ProductInformationSchema");
+            let typeObj=eval("schemaObj._schema."+keyName);
+            //console.log(typeObj);
+            let allowedValuesObj='';
+            if(typeObj.type.definitions[0] && typeObj.type.definitions[0].allowedValues)
+            {
+              allowedValuesObj=" [ Allowed Values : "+ typeObj.type.definitions[0].allowedValues.join(", ")+" ]";
+            }
+            //console.log(typeObj.definitions[0]);
+
             //console.log('data', data);
             $("#upload-csv-zone,#preview").hide();
             $("#handson-Zone-during-upload").show();
@@ -1123,6 +1144,8 @@ let insertCSVData = function(data, fileID, collection, cb) {
             $('#btnNext').hide();
             //toastr.error(err.message);
             $("#errMessageFromSchema").text(err.message);
+            $("#allowMessageFromSchema").text(allowedValuesObj);
+
 
             renderHandsonTable(copedata, Object.keys(copedata), 'hotErrorDataDuringUpload', err, fileID, collection, cb);
         } else {
