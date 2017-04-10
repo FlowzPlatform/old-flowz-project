@@ -10,7 +10,7 @@
         {{#if getStatusFromMaster.count}}
           {{#each getStatusFromMaster}}
           <div id="landingPageStatusReport" class="clearfix">
-            <h3 style="text-transform:uppercase">Welcome back , {{username}}</h3>
+            <h3 style="text-transform:uppercase">Welcome back, {{username}}</h3>
             <p>Following is the latest status of your file upload process.You can continue with your current status or abort the whole process to start again</p>
             <table border='1|1' style='margin:auto;width:850px; border:solid 1px #ccc; border-collapse: collapse;'>
               <tr style='color:#4e4e4e; font-size:16px; font-weight:bold; padding:5px; background-color: #f5f5f5;'>
@@ -50,7 +50,7 @@
 
               {{#if hasStatus}}
               <table border='1|1'  style='background-color: #192231;color: #fff;margin:auto;width:850px; border:solid 1px #ccc; border-collapse: collapse;'>
-                <th style="text-align:center">File</th><th style="text-align:center">Upload Status</th><th style="text-align:center">validation Status</th>
+                <th style="text-align:center">File</th><th style="text-align:center">Upload Status</th><th style="text-align:center">validation Status</th><th style="text-align:center">Import Status</th>
               {{#each hasStatus}}
 
               <tr id="we" style='color:#4e4e4e; font-size:16px; font-weight:bold; padding:5px; background-color: #f5f5f5;'>
@@ -59,10 +59,15 @@
                    {{sheetName}}
                 </td>
                 <td style='color:#000; font-size:14px; padding:5px;word-break: break-all;'>
-                  {{uploadStatus}}
+
+                  {{#if $eq uploadStatus "completed"}}<i class="fa fa-check-square-o" aria-hidden="true"></i>{{else}}{{/if}}   {{uploadStatus}}
                 </td>
                 <td style='color:#000; font-size:14px; padding:5px;word-break: break-all;'>
-                  {{validateStatus}}
+
+                  {{#if $eq validateStatus "completed"}}<i class="fa fa-check-square-o" aria-hidden="true"></i>{{else}}{{/if}}   {{validateStatus}}
+                </td>
+                <td style='color:#000; font-size:14px; padding:5px;word-break: break-all;'>
+                  Pending
                 </td>
 
               </tr>
