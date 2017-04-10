@@ -16,7 +16,33 @@ const reactiveArray = [
     { id: 'ProductVariationPrice', name: 'Variation Price', isDone: false, isActive: false }
 ]
 
+let selectedValue ;
 
+let showHintsDiv = function showdiv(data) {
+  if(data == "REPLACE") {
+
+      $( "#get" ).html( "<p> By choosing <b>Replace</b> method you can remove all your old data and add the new one.Replace all the old products with new one.</p><table border=1 style='position:absolute;left:34%;width:37%;'><tr><th colspan='2' style='background-color:#494e6b;color:#fff;text-align:center'>Example</th></tr><tr><td> Old records </td><td> A, B, C </td></tr> <tr><td>New records </td><td> <span style='color:blue;font-weight:bold'>C'</span>, D, E</td></tr><tr><td style='background-color:#e2e2e2'> Result </td><td style='background-color:#e2e2e2'> <span style='color:blue;font-weight:bold'>C'</span>, D, E</td></tr></table>");
+  }
+  else if(data == "APPEND") {
+
+
+      $( "#get" ).html( "<p> By choosing <b>Append</b> method you can Keep all the old products and add the new one . No old records will be updated .</p><p><table border=1 style='position:absolute;left:34%;width:37%'><tr><th colspan='2' style='background-color:#494e6b;color:#fff;text-align:center'>Example</th></tr><tr><td> Old records </td><td> A, B, C </td></tr> <tr><td>New records </td><td> <span style='color:blue;font-weight:bold'>C'</span>, D, E</td></tr><tr><td style='background-color:#e2e2e2'> Result </td><td style='background-color:#e2e2e2'> A, B, C, D, E</td></tr></table>" );
+
+  }
+  else if(data == "UPSERT") {
+
+
+      $( "#get" ).html( " <p> By choosing <b>Upsert</b> method you can Keep all the old products , update old records and add the new one .</p><p><table border=1 style='position:absolute;left:37%;width:34%'><tr><th colspan='2' style='background-color:#494e6b;color:#fff;text-align:center'>Example</th></tr><tr><td> Old records </td><td> A, B, C </td></tr> <tr><td>New records </td><td> <span style='color:blue;font-weight:bold'>C'</span>, D, E</td></tr><tr><td style='background-color:#e2e2e2'> Result </td><td style='background-color:#e2e2e2'>A, B, <span style='color:blue;font-weight:bold'>C'</span>, D, E</td></tr></table>" );
+
+  }
+  else if(data == "UPDATE") {
+
+
+      $( "#get" ).html( "<p> By choosing <b>Update</b> method you can Keep all the old products and update old records . No new products can be added in this method</p><p>  <table border=1 style='position:absolute;left:34%;width:37%'><tr><th colspan='2' style='background-color:#494e6b;color:#fff;text-align:center'>Example</th></tr><tr><td> Old records </td><td> A, B, C </td></tr> <tr><td>New records </td><td> <span style='color:blue;font-weight:bold'>C'</span>, D, E</td></tr><tr><td style='background-color:#e2e2e2'> Result </td><td style='background-color:#e2e2e2'>A, B, <span style='color:blue;font-weight:bold'>C'</span> </td></tr></table>" );
+
+  }
+
+}
 
 
 
@@ -56,6 +82,8 @@ Template.landing.events({
 
     'change .show_infoDiv': function(event, template) {
         var data = $("input[name='myOptions']:checked").val();
+        selectedValue = data;
+        console.log(data.toUpperCase());
         if (data == "replace") {
             $(".selected_tick1").css("display", "block");
             $(".selected_tick2").css("display", "none");
@@ -83,31 +111,16 @@ Template.landing.events({
 
     'mouseover .btn' (event) {
       document.getElementById("dv").style.display="block";
-      var img = $('#dv_img');
       var data = event.currentTarget.innerText;
-      if(data == "REPLACE") {
-          $("selected_tick").css("display" , "block");
-          $( "#get" ).html( "<p> By choosing <b>Replace</b> method you can remove all your old data and add the new one.Replace all the old products with new one.</p><table border=1 style='position:absolute;left:34%;width:37%;'><tr><th colspan='2' style='background-color:#494e6b;color:#fff;text-align:center'>Example</th></tr><tr><td> Old records </td><td> A, B, C </td></tr> <tr><td>New records </td><td> <span style='color:blue;font-weight:bold'>C'</span>, D, E</td></tr><tr><td style='background-color:#e2e2e2'> Result </td><td style='background-color:#e2e2e2'> <span style='color:blue;font-weight:bold'>C'</span>, D, E</td></tr></table>");
-      }
-      else if(data == "APPEND") {
-
-          $("selected_tick").css("display" , "block");
-          $( "#get" ).html( "<p> By choosing <b>Append</b> method you can Keep all the old products and add the new one . No old records will be updated .</p><p><table border=1 style='position:absolute;left:34%;width:37%'><tr><th colspan='2' style='background-color:#494e6b;color:#fff;text-align:center'>Example</th></tr><tr><td> Old records </td><td> A, B, C </td></tr> <tr><td>New records </td><td> <span style='color:blue;font-weight:bold'>C'</span>, D, E</td></tr><tr><td style='background-color:#e2e2e2'> Result </td><td style='background-color:#e2e2e2'> A, B, C, D, E</td></tr></table>" );
-
-      }
-      else if(data == "UPSERT") {
-
-          $("selected_tick").css("display" , "block");
-          $( "#get" ).html( " <p> By choosing <b>Upsert</b> method you can Keep all the old products , update old records and add the new one .</p><p><table border=1 style='position:absolute;left:37%;width:34%'><tr><th colspan='2' style='background-color:#494e6b;color:#fff;text-align:center'>Example</th></tr><tr><td> Old records </td><td> A, B, C </td></tr> <tr><td>New records </td><td> <span style='color:blue;font-weight:bold'>C'</span>, D, E</td></tr><tr><td style='background-color:#e2e2e2'> Result </td><td style='background-color:#e2e2e2'>A, B, <span style='color:blue;font-weight:bold'>C'</span>, D, E</td></tr></table>" );
-
-      }
-      else if(data == "UPDATE") {
-
-          $("selected_tick").css("display" , "block");
-          $( "#get" ).html( "<p> By choosing <b>Update</b> method you can Keep all the old products and update old records . No new products can be added in this method</p><p>  <table border=1 style='position:absolute;left:34%;width:37%'><tr><th colspan='2' style='background-color:#494e6b;color:#fff;text-align:center'>Example</th></tr><tr><td> Old records </td><td> A, B, C </td></tr> <tr><td>New records </td><td> <span style='color:blue;font-weight:bold'>C'</span>, D, E</td></tr><tr><td style='background-color:#e2e2e2'> Result </td><td style='background-color:#e2e2e2'>A, B, <span style='color:blue;font-weight:bold'>C'</span> </td></tr></table>" );
-
+      showHintsDiv(data);
+    },
+    'mouseout .btn' (event) {
+      if (selectedValue.toUpperCase() != undefined) {
+        showHintsDiv(selectedValue.toUpperCase());
       }
     },
+
+
 
 
 
