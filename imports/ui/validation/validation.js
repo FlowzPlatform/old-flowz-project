@@ -19,7 +19,7 @@ const divNameOfhandsontable = 'productData';
 // const esUrl='http:/localhost:9200/pdmrawdata/';
 const esUrl = 'http://localhost:9200/pdmrowdata/';
 let objHandsontable = null;
-let invalidColumnColor = '#a94442';
+let invalidColumnColor = 'red';
 let currentjobQueue = null;
 import { ProductInformationRules } from '../../../lib/validatorRules/product_information.js';
 import { ProductPriceRules } from '../../../lib/validatorRules/product_price.js';
@@ -91,6 +91,48 @@ Template.validation.events({
                       if(job[value.id])
                       {
                         query["$set"][value.id]=job[value.id];
+                        query["$set"][value.id]['validateStatus']='pending';
+                      }
+                  });
+                  //console.log(query);
+                  let updResult = CollUploadJobMaster.update({_id: guid}, query,function(err,result){
+                    if(!err)
+                    {
+                        Router.go("/");
+                    }
+                  });
+                }
+            });
+    },
+    'click #validationCompletedAbortBtnId' (event) {
+        swal({
+                title: "Are you sure?",
+                text: "All validation are successfully completed. you have to start again",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Abort it!",
+                closeOnConfirm: true
+            },
+            function(isConfirm) {
+                if(isConfirm)
+                {
+                  let qry={owner:Meteor.userId(),"masterJobStatus":"running","stepStatus":ValidationCompleted};
+                  jobQueue = CollUploadJobMaster.find(qry).fetch();
+                  //console.log(jobQueue);
+                  jobQueue=jobQueue[0];
+
+                  let guid=jobQueue._id;
+                  var query = {
+                      "$set": {
+                          "stepStatus":UploadPending
+                      }
+                  };
+                  jobQueue['arrFileObj']=[];
+                  $.each(fileTypes, function(index, value) {
+                      if(jobQueue[value.id])
+                      {
+                        query["$set"][value.id]=jobQueue[value.id];
                         query["$set"][value.id]['validateStatus']='pending';
                       }
                   });
@@ -297,8 +339,8 @@ Meteor.validatorFunctions = {
                     let columnName = extraRules[currentRule].columnName;
                     // set column highLight column
                     $.each(arrHeader[sheetName], function(index, value) {
-                        console.log("===========");
-                        console.log(value.colHeaders);
+                        //console.log("===========");
+                        //console.log(value.colHeaders);
                         if(value.colHeaders=='undefined')
                         {
                           delete(arrHeader[sheetName][index]);
@@ -477,9 +519,11 @@ function displayErrorMsg(flag, msg) {
     let row = $('#errorContainer').remove().clone();
     $('#div'+currentValidationName).after(row);
     var errorMsg = $("#errorDiv").find("#errorStr");
+    console.log("====================flag=",flag);
+
     if(errorMsg)
     {
-      errorMsg.html(msg);
+      errorMsg.html(msg +", please provide valid data for the highlighted rows.");
       if(document.getElementById("mydiv"))
         document.getElementById("mydiv").style.display = !flag ? "none" : "block";
       if(document.getElementById("errorDiv"))
@@ -670,12 +714,14 @@ function findInValidData(sheetName, currentRuleIdx, arrRules,sheetHeaders, callb
     currentValidationName=sheetName;
     if (arrRules.length <= currentRuleIdx) {
         displayErrorMsg(false, '');
-
+        setTimeout(function(){$("[id*='errorSpinner"+sheetName+"']").hide();},200);
         Meteor.validatorFunctions.setNextValidation(sheetName,currentRuleIdx);
         //document.getElementById("validation_successful").style.display = "block";
         // all rules are completed
         return false;
     }
+    $("[id*='errorSpinner"+sheetName+"']").show();
+    setTimeout(function(){$("[id*='errorSpinner"+sheetName+"']").show();},200);
     if(currentRuleIdx<=0)
     {
       setValidationProgress(sheetName,currentRuleIdx, arrRules.length);
@@ -708,11 +754,17 @@ function findInvalidDataFromMongo(sheetName, currentRuleIdx, arrRules,sheetHeade
         Meteor.validatorFunctions.setJobQueusSheetRuleStatus(sheetName,currentRule);
         setValidationProgress(sheetName,currentRuleIdx, arrRules.length);
         findInValidData(sheetName, currentRuleIdx, arrRules,sheetHeaders, callback);
+
+        setTimeout(function(){$("[id*='errorSpinner']").hide();},200);
+        setTimeout(function(){$("[id*='errorSpinner"+sheetName+"']").show();},200);
     } else {
-        //console.log(result);
+        //console.log($("div[id|='errorSpinner']"));
+      //  $("div[id|='errorSpinner']").hide();
+
         displayErrorMsg(true, arrRules[currentRuleIdx].errorString);
         result = result.map(function(a) { return a; });
         callback(null,sheetName, result,sheetHeaders);
+        setTimeout(function(){$("[id*='errorSpinner']").hide();},500);
     }
 }
 
@@ -736,7 +788,10 @@ function setValidationProgress(sheetName,currentRuleIdx, ProductInformationLengt
           //     else
           //         streamer.abort()
           // }
+
       );
+
+      setTimeout(function(){$("[id*='errorSpinner"+sheetName+"']").show();},500);
     }
 
     /*

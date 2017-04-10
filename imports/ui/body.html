@@ -31,19 +31,19 @@
                         <li role="presentation" class="{{#if isActive}}active{{/if}} {{#if isDone}}done{{/if}}"><a href="#{{id}}" class="sheets" role="tab" data-toggle="tab"><i class="fa fa-check-circle-o"></i>{{name}}</a></li>
                     {{/each}}
                 </ul>
-                
-                <div style="margin-top: 20px;position: absolute;top: 300px;">            
+
+                <div style="margin-top: 20px;position: absolute;top: 300px;">
                     {{#if isActiveStep2}}
                         <button class="progress-button progress-button-small pull-right" id="btngostep2" data-style="top-line" data-horizontal="">
                             <span class="content">Start validation&nbsp;<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i></span>
                         </button>
                     {{else}}
-                        <button class="progress-button progress-button-small pull-right" id="btngostep2" data-style="top-line" data-horizontal="" disabled="disabled">
+                        <button title="Please upload atleast product information files before start validation." class="progress-button progress-button-small pull-right" id="btngostep2" data-style="top-line" data-horizontal="" disabled="disabled">
                             <span class="content">Start validation&nbsp;<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i></span>
                         </button>
                     {{/if}}
                 </div>
-                
+
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active" style="margin-bottom:20px; ">
                         {{#if $and previewCollection.length abortData}}
@@ -52,10 +52,10 @@
                                     <div class="options">
                                         <a id="btnAbortRecord" href="#"  class="text-danger" title="Remove all records."><i class="fa fa-times-circle-o"></i></a>
                                     </div>
-                                    <h3> Uploaded records </h3>
+                                    <h3> {{currentSheetName}} <span style="font-size: 15px;font-weight: 600;"> (Uploaded records) </span> </h3>
                                 </div>
                                 <div class="panel-body" style="height: 390px;overflow-y: auto;">
-                                    <div id="preview" class="table-responsive">
+                                    <div class="table-responsive preview">
                                         <table class="table table-bordered table-hover">
                                             <thead>
                                                 <tr>
@@ -88,10 +88,10 @@
                             {{/if}}
                             <div id="uploadCsv">
                                 <div id="upload-csv-zone">
-                                    
+
                                     <div class="file-zone">
-                                    
-                                        <span class="dz-message">Drop files here or click to upload.<br/>
+
+                                        <span class="dz-message">Drop <span style="color: #494e6b">"{{currentSheetName}}"</span> files here<br/>
                                             <small>(only csv files are valid.)</small>
                                         </span>
                                         <div class="dz-spinner">
@@ -99,7 +99,7 @@
                                         </div>
                                         <input type="file" id="csv-file" name="files" accept=".csv"/>
                                     </div>
-                                    
+
                                 </div>
                                 <div class="clearfix"></div>
                                 <!--<button type="submit" class="btn btn-primary btnReadCsv">Read</button>-->
@@ -157,7 +157,9 @@
                                     <div class="handson-table">
                                         <div id="hotErrorDataDuringUpload"></div>
                                     </div>
-                                    <span id="errMessageFromSchema" class="pull-left text-danger" style="font-weight: 600;"></span>
+                                    <span id="errMessageFromSchema" class="pull-left bg-danger" style="font-weight: 600;padding: 8px;"></span>
+                                    <span id="allowMessageFromSchema" class="pull-left text-success" style="margin-left:10px;"></span>
+
                                     <button style="margin-left:5px;" class="progress-button progress-button-small pull-right" id="buttonProceedNext" data-style="top-line" data-horizontal="">
                                         <span class="content">Proceed To Next</span>
                                         <span class="progress">
@@ -209,7 +211,7 @@
                                                             {{/let}}
                                                         </tr>
                                                     {{/each}}
-                                                    
+
                                                 </tbody>
                                             </table>
                                         </div>

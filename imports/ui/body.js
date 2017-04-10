@@ -20,6 +20,16 @@ import { Csvfiles } from '../api/collections.js';
 import { Csvfilemapping } from '../api/collections.js';
 import { CollUploadJobMaster } from '../api/collections.js';
 
+
+// import schema
+import { ProductInformationSchema } from '../../lib/schema/product_information.js';
+import { ProductAdditionalChargeSchemas } from '../../lib/schema/product_additional_charge.js';
+import { ProductImagesSchemas } from '../../lib/schema/product_images.js';
+import { ProductImprintDataSchemas } from '../../lib/schema/product_imprint_data.js';
+import { ProductPriceSchemas } from '../../lib/schema/product_price.js';
+import { ProductShippingSchemas } from '../../lib/schema/product_shipping.js';
+import { ProductVariationPricingSchemas } from '../../lib/schema/product_variation_pricing.js';
+
 import './body.html';
 
 
@@ -141,7 +151,7 @@ Template.readCSV.events({
     },
     "click .sheets": function(event, template) {
         var currentEl = event.currentTarget;
-        if (template.find('#csv-file').files.length > 0) {
+        if ($(template.find('#csv-file')).files != undefined && $(template.find('#csv-file')).files.length > 0) {
             swal({
                     title: "Are you sure?",
                     text: "Your mapping is loss.",
@@ -163,7 +173,9 @@ Template.readCSV.events({
                         ft[newFiletypeId].isActive = true;
                         template.filetypes.set(ft);
                         template.abortData.set(true);
+                        template.currentSheetName.set(ft[newFiletypeId].name);
                         resetAll(template);
+                        setPreviewCollection(newFiletypeId, template);
                         Router.go('/upload/' + _href);
 
                     }
@@ -178,7 +190,9 @@ Template.readCSV.events({
             ft[newFiletypeId].isActive = true;
             template.filetypes.set(ft);
             template.abortData.set(true);
+            template.currentSheetName.set(ft[newFiletypeId].name);
             resetAll(template);
+            setPreviewCollection(newFiletypeId, template);
             Router.go('/upload/' + _href);
         }
         return
@@ -308,9 +322,14 @@ Template.readCSV.events({
         let activefile = _.map(getActiveHeaders(template), function(d) { return (d.text == undefined) ? '' : d.text });
 
         let mappedArr = _.chain(mapping).map(function(d) { return d.sysHeader }).filter(function(d) { return d != '' }).value();
-
-        if (_.difference(_.filter(activefile, function(d) { return d != '' }), mappedArr).length > 0) {
-            swal("Warning!", "Please map all the mandatory fields before proceed", "warning");
+        let diff = _.difference(_.filter(activefile, function(d) { return d != '' }), mappedArr);
+        if (diff.length > 0) {
+            swal({
+                title: "Error!",
+                text: "Please map <b>'" + diff.join('\', \'') + "'</b>  fields before proceeding as those are mandatory",
+                type: "warning",
+                html: true
+            });
         } else {
             $(template.find('#btnNext')).addClass('inProgress');
 
@@ -349,8 +368,8 @@ Template.readCSV.events({
 
         $(template.find('#mapping')).find('.spinner').show();
         let oldHeaders = template.csvHeaders.get();
-
-        oldHeaders.push('header_' + oldHeaders.length);
+        let oldHeadersLength = oldHeaders.length;
+        oldHeaders.push('header_' + oldHeadersLength);
         template.csvHeaders.set(oldHeaders);
         //generateMapping(template);
         let _hasHeader = $(template.find('#hasheader')).prop('checked');
@@ -364,8 +383,8 @@ Template.readCSV.events({
             existMapping = template.mappingWithHeader.get();
 
             existMapping.push({
-                sysHeader: undefined,
-                csvHeader: 'header_' + oldHeaders.length,
+                sysHeader: "",
+                csvHeader: 'header_' + oldHeadersLength,
                 transform: "",
                 csvSysHeaderDetail: undefined
             });
@@ -374,8 +393,8 @@ Template.readCSV.events({
         } else {
             existMapping = template.mappingWithOutHeader.get();
             existMapping.push({
-                sysHeader: undefined,
-                csvHeader: 'header_' + oldHeaders.length,
+                sysHeader: "",
+                csvHeader: 'header_' + oldHeadersLength,
                 transform: "",
                 csvSysHeaderDetail: undefined
             });
@@ -405,6 +424,19 @@ Template.readCSV.events({
         $(template.find('#uploadImage')).hide();
     }
 });
+
+let setPreviewCollection = function(newFiletypeId, template) {
+    let ft = template.filetypes.get(); // all file type
+    let activeFiletype = ft[newFiletypeId]; // find active filetype
+    let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running' });
+    let data = [];
+    if (obj != undefined && activeFiletype != undefined) {
+        if (obj.hasOwnProperty(activeFiletype.id)) {
+            data = activeFiletype.collection.find({ fileID: obj[activeFiletype.id].id }).fetch();
+        }
+    }
+    template.previewCollection.set(data);
+}
 
 let setMapping = function(template, cb) {
     let _hasHeader = $(template.find('#hasheader')).prop('checked');
@@ -467,39 +499,26 @@ let generateXEditor = function(template, cb) {
     } else {
         existMapping = template.mappingWithOutHeader.get();
     }
+    //console.log('existMapping', $.extend([], existMapping));
 
     setTimeout(function() {
+        //console.log('_csvHeader', _csvHeader);
         _csvHeader.forEach(function(result, index) {
             // console.log('result', result);
             // console.log('activefile', activefile);
             // console.log(getHeaderDistance(result, activefile));
             let _val = '';
-            if (_hasHeader) {
+
+            if (existMapping.length > 0) {
+                let sysHeaderObj = _.chain(existMapping).find(function(d) { return d.csvHeader == result }).value();
+                //console.log('sysHeaderObj', sysHeaderObj);
+                if (sysHeaderObj.csvSysHeaderDetail != undefined) {
+                    _val = result == sysHeaderObj.csvSysHeaderDetail.column ? sysHeaderObj.csvSysHeaderDetail.text : '';
+                }
+            }
+            if (_val == '') {
                 _val = getHeaderDistance(result, activefile);
             }
-            // } else {
-            //     _val = activefile[index]
-            // }
-
-            // $(template.find('#dpdcsvheader_' + index)).editable("destroy");
-            // $(template.find('#dpdcsvheader_' + index)).editable({
-            //     validate: function(value) {
-            //         if ($.trim(value) == '') {
-            //             return 'This field is required';
-            //         }
-            //         if (_.chain(existMapping).map(function(d) { return d.csvHeader }).contains(value).value()) {
-            //             return 'Already exist,Please try some one else.'
-            //         }
-            //     },
-            //     success: function(response, newValue) {
-            //         $(template.find('#preview')).find('.spinner').show();
-            //         setTimeout(function() {
-            //             generatePreview(template.find('#csv-file').files[0], template, function() {
-            //                 $(template.find('#preview')).find('.spinner').hide();
-            //             });
-            //         }, 1000);
-            //     }
-            // });
 
             $(template.find('#dpdsysheader_' + index)).editable("destroy");
             $(template.find('#dpdsysheader_' + index)).editable({
@@ -521,8 +540,10 @@ let generateXEditor = function(template, cb) {
             //activefile = _.without(activefile, _val);
 
             if (existMapping.length > 0) {
-                if (existMapping[index].transform.trim() != '') {
-                    let code = existMapping[index].transform;
+                let sysHeaderObj = _.chain(existMapping).find(function(d) { return d.csvHeader == result }).value();
+                //console.log('sysHeaderObj', sysHeaderObj);
+                if (sysHeaderObj.transform != undefined) {
+                    let code = sysHeaderObj.transform;
                     $(template.find('#txtCustomJavascript_' + index)).attr('data-code', code).attr('title', 'Edit').parent('td').addClass('has-edit').children('.transform-function').text(code).attr('title', code);
                 }
             }
@@ -614,7 +635,7 @@ let getHeaderDistance = function(sysColumn, csvHeaders) {
     csvHeaders.forEach(function(d) {
         res = Levenshtein.get(col, d) < Levenshtein.get(col, res) ? d : res;
     });
-    res = Levenshtein.get(res, sysColumn) < 2 ? res : '';
+    res = Levenshtein.get(res, sysColumn) < 4 ? res : '';
     return res;
 }
 
@@ -802,7 +823,7 @@ let setNextFile = function(template, cb) {
     swal({
             title: "Upload successfully",
             text: "Are you ready to upload next file?",
-            type: "warning",
+            type: "success",
             showCancelButton: true,
             confirmButtonColor: "#DD6B55",
             confirmButtonText: "Yes",
@@ -999,7 +1020,7 @@ Template.readCSV.onCreated(function() {
             { id: 'ProductInformation', name: 'Product Information', isDone: masterJob.hasOwnProperty('ProductInformation') ? true : false, isActive: false, header: ProductInformationHeaders, collection: CollProductInformation, require: true },
             { id: 'ProductPrice', name: 'Product Pricing', isDone: masterJob.hasOwnProperty('ProductPrice') ? true : false, isActive: false, header: ProductPriceHeaders, collection: CollProductPrice, require: false },
             { id: 'ProductImprintData', name: 'Imprint Data', isDone: masterJob.hasOwnProperty('ProductImprintData') ? true : false, isActive: false, header: ProductImprintDataHeaders, collection: CollProductImprintData, require: false },
-            { id: 'ProductImage', name: 'Image', isDone: masterJob.hasOwnProperty('ProductImage') ? true : false, isActive: false, header: ProductImageHeaders, collection: CollProductImage, require: false },
+            { id: 'ProductImage', name: 'Images', isDone: masterJob.hasOwnProperty('ProductImage') ? true : false, isActive: false, header: ProductImageHeaders, collection: CollProductImage, require: false },
             { id: 'ProductShipping', name: 'Shipping', isDone: masterJob.hasOwnProperty('ProductShipping') ? true : false, isActive: false, header: ProductShippingHeaders, collection: CollProductShipping, require: false },
             { id: 'ProductAdditionalCharges', name: 'Additional Charges', isDone: masterJob.hasOwnProperty('ProductAdditionalCharges') ? true : false, isActive: false, header: ProductAdditionalChargeHeaders, collection: CollProductAdditionalCharges, require: false },
             { id: 'ProductVariationPrice', name: 'Variation Price', isDone: masterJob.hasOwnProperty('ProductVariationPrice') ? true : false, isActive: false, header: ProductVariationPricingHeaders, collection: CollProductVariationPrice, require: false }
@@ -1009,6 +1030,8 @@ Template.readCSV.onCreated(function() {
     this.mappingWithOutHeader = new ReactiveVar([]);
     this.mappingWithHeader = new ReactiveVar([]);
     this.abortData = new ReactiveVar(true);
+    this.previewCollection = new ReactiveVar([]);
+    this.currentSheetName = new ReactiveVar();
 
     let ft = Template.instance().filetypes.get();
 
@@ -1026,6 +1049,12 @@ Template.readCSV.onCreated(function() {
 
 
 Template.readCSV.helpers({
+    currentSheetName() {
+        let ft = Template.instance().filetypes.get(); // all file type
+        let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
+        Template.instance().currentSheetName.set(activeFiletype.name);
+        return Template.instance().currentSheetName.get();
+    },
     abortData() { return Template.instance().abortData.get() },
     files() {
         return Template.instance().files.get();
@@ -1076,12 +1105,14 @@ Template.readCSV.helpers({
         let ft = Template.instance().filetypes.get(); // all file type
         let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
         let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running' });
+        let data = [];
         if (obj != undefined && activeFiletype != undefined) {
             if (obj.hasOwnProperty(activeFiletype.id)) {
-                return activeFiletype.collection.find({ fileID: obj[activeFiletype.id].id }, { fields: { 'everythingButThisField': 0 } }).fetch();
+                data = activeFiletype.collection.find({ fileID: obj[activeFiletype.id].id }).fetch();
             }
         }
-        return [];
+        Template.instance().previewCollection.set(data);
+        return Template.instance().previewCollection.get();
     },
     isActiveStep2() {
         let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running' });
@@ -1104,6 +1135,7 @@ let updateJobMaster = function(filename, fileID, cb) {
     });
 }
 
+
 let insertCSVData = function(data, fileID, collection, cb) {
     let copedata = $.extend({}, data);
     data['fileID'] = fileID;
@@ -1113,8 +1145,20 @@ let insertCSVData = function(data, fileID, collection, cb) {
     // return;
     collection.insert(data, function(err, res) {
         if (err) {
+
+            //console.log(err);
             //console.log('errmessage', err.message);
-            //console.log('err', err.invalidKeys);
+            //console.log('err', err.invalidKeys[0].name);
+            let keyName = err.invalidKeys[0].name;
+            let schemaObj = eval("ProductInformationSchema");
+            let typeObj = eval("schemaObj._schema." + keyName);
+            //console.log(typeObj);
+            let allowedValuesObj = '';
+            if (typeObj.type.definitions[0] && typeObj.type.definitions[0].allowedValues) {
+                allowedValuesObj = " [ Allowed Values : " + typeObj.type.definitions[0].allowedValues.join(", ") + " ]";
+            }
+            //console.log(typeObj.definitions[0]);
+
             //console.log('data', data);
             $("#upload-csv-zone,#preview").hide();
             $("#handson-Zone-during-upload").show();
@@ -1123,6 +1167,8 @@ let insertCSVData = function(data, fileID, collection, cb) {
             $('#btnNext').hide();
             //toastr.error(err.message);
             $("#errMessageFromSchema").text(err.message);
+            $("#allowMessageFromSchema").text(allowedValuesObj);
+
 
             renderHandsonTable(copedata, Object.keys(copedata), 'hotErrorDataDuringUpload', err, fileID, collection, cb);
         } else {
@@ -1132,7 +1178,7 @@ let insertCSVData = function(data, fileID, collection, cb) {
 }
 let errorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
-    td.style.border = "2px solid #a94442";
+    td.style.border = "2px solid red";
 };
 
 let getHandsonHeader = function(headers, invalidKeys) {
