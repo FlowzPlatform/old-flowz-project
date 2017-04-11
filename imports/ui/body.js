@@ -314,7 +314,7 @@ Template.readCSV.events({
                 _files.push(template.find('#csv-file').files[i]);
             }
         }
-        Papa.LocalChunkSize = 1000000; // 1000kb
+        Papa.LocalChunkSize = 100000; // 1000kb
         for (let i = 0; i < _files.length; i++) {
             template.mappingWithHeader.set([]);
             template.mappingWithOutHeader.set([]);
@@ -751,7 +751,7 @@ let arrayToCSV = function(row) {
         }
         row[i] = row[i].join(',');
     }
-    //console.log('row', row.join('\r\n'));
+    //console.log('row', row);
     return row.join('\n');
 }
 
@@ -835,6 +835,7 @@ let generateDatawithNewHeader = function(chunk, _hasHeader, mapping, isPreview, 
             newHeading[inx] = headerText; // (d.sysHeader != undefined) ? d.sysHeader.trim() : d.csvHeader.trim();
         }
     });
+
     return (!_hasHeader ? (newHeading.join(',') + '\n') : "") + arrayToCSV(rows);
 }
 
@@ -849,12 +850,12 @@ let generatePreview = function(_file, template, cb) {
         dynamicTyping: true,
         encoding: "UTF-8",
         skipEmptyLines: true,
-        //newline: "\r\n",
+        newline: "\n",
         beforeFirstChunk: function(chunk) {
-            //return chunk;
-            // console.log('chunk');
-            // console.log(chunk);
-            return generateDatawithNewHeader(chunk, _hasHeader, mapping, true, template);
+            //console.log('chunk', chunk);
+            let newrows = generateDatawithNewHeader(chunk, _hasHeader, mapping, true, template);
+            //console.log(newrows);
+            return newrows;
         },
         complete: function(results) {
             //console.log('results', results);
@@ -864,7 +865,7 @@ let generatePreview = function(_file, template, cb) {
             console.log("ERROR:", error, f);
         },
         chunk: function(results, streamer) {
-            //console.log(results);
+            console.log('results', results);
             template.previewRec.set(results.data.slice(0, 5));
             //template.previewRec.set(results.data);
             streamer.abort();
@@ -945,6 +946,7 @@ let parseCSV = function(_file, template, cb) {
             dynamicTyping: true,
             encoding: "UTF-8",
             skipEmptyLines: true,
+            newline: "\n",
             //newline: "\r\n",
             complete: function(results) {
                 if (!abortChecked && progress == 100) {
