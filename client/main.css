@@ -69,6 +69,7 @@
 }
 
 .preview table td>div,
+.preview table td,
 .preview table th {
     white-space: nowrap;
     max-width: 150px;

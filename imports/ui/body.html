@@ -52,11 +52,12 @@
                                     <div class="options">
                                         <a id="btnAbortRecord" href="#"  class="text-danger" title="Remove all records."><i class="fa fa-times-circle-o"></i></a>
                                     </div>
-                                    <h3> {{currentSheetName}} <span style="font-size: 15px;font-weight: 600;"> (Uploaded records) </span> </h3>
+                                    <h3 style="text-transform: capitalize;"> Uploaded records of {{currentSheetName}}  </h3>
                                 </div>
-                                <div class="panel-body" style="height: 390px;overflow-y: auto;">
+                                <div class="panel-body">
+                                    
                                     <div class="table-responsive preview">
-                                        <table class="table table-bordered table-hover">
+                                        <!--<table class="table table-bordered table-hover">
                                             <thead>
                                                 <tr>
                                                     {{#each getJsonKeys previewCollection.[0]}}
@@ -75,7 +76,8 @@
                                                     </tr>
                                                 {{/each}}
                                             </tbody>
-                                        </table>
+                                        </table>-->
+                                        {{> tblPreview id='tblPreview'  collection=previewCollection  fields=fields}}
                                     </div>
                                 </div>
                             </div>
@@ -106,7 +108,7 @@
                                 <div id="preview"  class="row" style="display: none;">
                                     <div class="col-md-12">
                                         <div class="pull-left">
-                                            <h3 style="margin-top: 0px;">Preview</h3>
+                                            <h3 style="margin-top: 0px;text-transform: capitalize;">Preview of {{currentSheetName}}</h3>
                                         </div>
                                         <div class="pull-left">
                                             {{> spinner}}
@@ -172,7 +174,7 @@
                                 <div class="row">
                                     <div id="mapping" class="col-md-12" style="display: none;">
                                         <div class="pull-left">
-                                            <h3>Headers mapping</h3>
+                                            <h3 style="text-transform: capitalize;">Headers mapping of {{currentSheetName}}</h3>
                                         </div>
                                         <div class="pull-left">
                                             {{> spinner}}
@@ -263,6 +265,12 @@
      </div>
 </template>
 
+<template name="tblPreview">
+    <div class="col-md-2" >
+        <button id="btnDeleteRow" class="progress-button progress-button-danger progress-button-small" disabled="disabled" style="margin: 5px 0 0 0;"><span><i class="fa fa-trash"></i>&nbsp; Delete</span> </button>
+    </div>
+    {{> reactiveTable id=id class="table table-bordered table-hover"  collection=collection showNavigation='auto' showFilter=true fields=fields rowsPerPage=7}}
+</template>
 
 
 <template name="spinner">
