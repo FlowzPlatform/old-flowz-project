@@ -674,12 +674,11 @@ let resetAll = function(template) {
 let getHeaderDistance = function(sysColumn, csvHeaders) {
     let res = csvHeaders[0];
     // console.log(this.csvHeaders);
-    let col = sysColumn;
+    let col = sysColumn.toLowerCase();
     csvHeaders.forEach(function(d) {
-
         res = Levenshtein.get(col, d.toLowerCase()) < Levenshtein.get(col, res.toLowerCase()) ? d : res;
     });
-    res = Levenshtein.get(res.toLowerCase(), sysColumn) < 4 ? res : '';
+    res = Levenshtein.get(res.toLowerCase(), col) < 4 ? res : '';
     return res;
 }
 
