@@ -676,9 +676,10 @@ let getHeaderDistance = function(sysColumn, csvHeaders) {
     // console.log(this.csvHeaders);
     let col = sysColumn;
     csvHeaders.forEach(function(d) {
-        res = Levenshtein.get(col, d) < Levenshtein.get(col, res) ? d : res;
+
+        res = Levenshtein.get(col, d.toLowerCase()) < Levenshtein.get(col, res.toLowerCase()) ? d : res;
     });
-    res = Levenshtein.get(res, sysColumn) < 4 ? res : '';
+    res = Levenshtein.get(res.toLowerCase(), sysColumn) < 4 ? res : '';
     return res;
 }
 
@@ -741,10 +742,17 @@ let CSVtoArray = function(text) {
 let arrayToCSV = function(row) {
     for (let i in row) {
         for (let j in row[i]) {
-            row[i][j] = "\"" + row[i][j] + "\"";
+            let item = row[i][j];
+            if (item.indexOf && (item.indexOf(',') !== -1 || item.indexOf('"') !== -1)) {
+                item = '"' + item.replace(/"/g, '""') + '"';
+            } else {
+                item = "\"" + item + "\"";
+            }
+            row[i][j] = item;
         }
         row[i] = row[i].join(',');
     }
+    //console.log('row', row.join('\r\n'));
     return row.join('\n');
 }
 
@@ -797,6 +805,7 @@ let getTransformVal = function(headings, row, transformStr, oldValue, index) {
 
 let generateDatawithNewHeader = function(chunk, _hasHeader, mapping, isPreview, template) {
     let rows = CSVtoArray(chunk);
+
     let headings = template.csvHeaders.get(); //  _.extend([], rows[0]);
 
     let oldRows = CSVtoArray(chunk);
@@ -835,13 +844,17 @@ let generatePreview = function(_file, template, cb) {
     // generateMapping
     generateMapping(template);
     mapping = template.mapping.get();
-
+    //Papa.LocalChunkSize = _file.size; 
     Papa.parse(_file, {
         header: true,
         dynamicTyping: true,
         encoding: "UTF-8",
         skipEmptyLines: true,
+        //newline: "\r\n",
         beforeFirstChunk: function(chunk) {
+            //return chunk;
+            // console.log('chunk');
+            // console.log(chunk);
             return generateDatawithNewHeader(chunk, _hasHeader, mapping, true, template);
         },
         complete: function(results) {
@@ -852,7 +865,9 @@ let generatePreview = function(_file, template, cb) {
             console.log("ERROR:", error, f);
         },
         chunk: function(results, streamer) {
+            //console.log(results);
             template.previewRec.set(results.data.slice(0, 5));
+            //template.previewRec.set(results.data);
             streamer.abort();
             cb();
             return;
@@ -914,6 +929,8 @@ let parseCSV = function(_file, template, cb) {
         username: Meteor.user().username
     };
 
+    Papa.LocalChunkSize = _file.size;
+
     Csvfiles.insert(file, function(e, res) {
         $('#buttonProceedNext').hide();
         let fileID = res; // new file id
@@ -929,6 +946,7 @@ let parseCSV = function(_file, template, cb) {
             dynamicTyping: true,
             encoding: "UTF-8",
             skipEmptyLines: true,
+            //newline: "\r\n",
             complete: function(results) {
                 if (!abortChecked && progress == 100) {
                     updateJobMaster(activeFiletype.id, fileID, function() {
@@ -942,13 +960,12 @@ let parseCSV = function(_file, template, cb) {
                 console.log("ERROR:", error, f);
             },
             step: function(results, parser) {
-                //console.log("Row:", results);
+                console.log("results", $.extend({}, results));
                 if (abortChecked) {
                     parser.abort();
                     return;
                 }
                 parser.pause();
-
                 insertCSVData(results.data[0], fileID, activeFiletype.collection, function() {
 
                     //$("#errMessageFromSchema").text('');
@@ -966,7 +983,7 @@ let parseCSV = function(_file, template, cb) {
                         $(template.find('#buttonProceedNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
                         $(template.find('#buttonProceedNext')).find('.content').text(newProgress + '% completed');
                         Csvfiles.update(fileID, { $set: { progress: newProgress, uploadedRecords: uploadedRecords } }, function(e, res) {
-                            console.log('csvupload');
+                            //console.log('csvupload');
                             parser.resume();
                         });
                     }
@@ -975,10 +992,11 @@ let parseCSV = function(_file, template, cb) {
             },
             beforeFirstChunk: function(chunk) {
                 let rows = CSVtoArray(chunk);
-                console.log('rows.length', rows.length);
+                //console.log('rows.length', rows.length);
                 totalRecords = (_hasHeader) ? rows.length - 1 : rows.length - 0; // last row getting empty
                 Csvfiles.update(fileID, { $set: { totalNoOfRecords: totalRecords } }, function(e, res) {});
-                return generateDatawithNewHeader(chunk, _hasHeader, mapping, false, template);
+                let newrows = generateDatawithNewHeader(chunk, _hasHeader, mapping, false, template);
+                return newrows;
             },
             // chunk: function(results, streamer) {
 
@@ -1168,7 +1186,7 @@ Template.readCSV.helpers({
             return {
                 key: d,
                 label: d,
-                fn: function(value, object) { return new Spacebars.SafeString("<div title='" + value + "'>" + _.escape(value) + "</div>"); }
+                fn: function(value, object) { return new Spacebars.SafeString('<div title="' + _.escape(value) + '">' + _.escape(value) + '</div>'); }
             }
         }).value());
 
@@ -1203,6 +1221,7 @@ let insertCSVData = function(data, fileID, collection, cb) {
     data['username'] = Meteor.user().username;
     // console.log('data', data);
     // return;
+    console.log('Sr_no', data.Sr_no);
     collection.insert(data, function(err, res) {
         if (err) {
 
@@ -1279,7 +1298,7 @@ let renderHandsonTable = function(dataObject, headers, eleName, error, fileID, c
         afterChange: function(changes, source) {
             //updateErrorData(changes, source, dataObject, fileID);
             $("#buttonProceedNext").unbind('click').click(function() {
-                console.log('afterchange', dataObject);
+                //console.log('afterchange', dataObject);
                 insertCSVData(dataObject, fileID, collection, cb);
             });
         }
