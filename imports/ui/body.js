@@ -314,7 +314,7 @@ Template.readCSV.events({
                 _files.push(template.find('#csv-file').files[i]);
             }
         }
-        Papa.LocalChunkSize = 1000000; // 1000kb
+        Papa.LocalChunkSize = 100000; // 1000kb
         for (let i = 0; i < _files.length; i++) {
             template.mappingWithHeader.set([]);
             template.mappingWithOutHeader.set([]);
@@ -751,7 +751,7 @@ let arrayToCSV = function(row) {
         }
         row[i] = row[i].join(',');
     }
-    //console.log('row', row.join('\r\n'));
+    //console.log('row', row);
     return row.join('\n');
 }
 
@@ -835,6 +835,7 @@ let generateDatawithNewHeader = function(chunk, _hasHeader, mapping, isPreview, 
             newHeading[inx] = headerText; // (d.sysHeader != undefined) ? d.sysHeader.trim() : d.csvHeader.trim();
         }
     });
+
     return (!_hasHeader ? (newHeading.join(',') + '\n') : "") + arrayToCSV(rows);
 }
 
@@ -849,12 +850,12 @@ let generatePreview = function(_file, template, cb) {
         dynamicTyping: true,
         encoding: "UTF-8",
         skipEmptyLines: true,
-        //newline: "\r\n",
+        newline: "\n",
         beforeFirstChunk: function(chunk) {
-            //return chunk;
-            // console.log('chunk');
-            // console.log(chunk);
-            return generateDatawithNewHeader(chunk, _hasHeader, mapping, true, template);
+            //console.log('chunk', chunk);
+            let newrows = generateDatawithNewHeader(chunk, _hasHeader, mapping, true, template);
+            //console.log(newrows);
+            return newrows;
         },
         complete: function(results) {
             //console.log('results', results);
@@ -864,7 +865,7 @@ let generatePreview = function(_file, template, cb) {
             console.log("ERROR:", error, f);
         },
         chunk: function(results, streamer) {
-            //console.log(results);
+            //console.log('results', results);
             template.previewRec.set(results.data.slice(0, 5));
             //template.previewRec.set(results.data);
             streamer.abort();
@@ -888,7 +889,7 @@ let setNextFile = function(template, cb) {
         },
         function(isConfirm) {
             if (isConfirm) {
-                console.log(template);
+                //                console.log(template);
                 ft[activeFiletypeId].isActive = false;
                 ft[activeFiletypeId].isDone = true;
                 ft[activeFiletypeId + 1].isActive = true;
@@ -945,6 +946,7 @@ let parseCSV = function(_file, template, cb) {
             dynamicTyping: true,
             encoding: "UTF-8",
             skipEmptyLines: true,
+            newline: "\n",
             //newline: "\r\n",
             complete: function(results) {
                 if (!abortChecked && progress == 100) {
@@ -959,7 +961,7 @@ let parseCSV = function(_file, template, cb) {
                 console.log("ERROR:", error, f);
             },
             step: function(results, parser) {
-                console.log("results", $.extend({}, results));
+                //console.log("results", $.extend({}, results));
                 if (abortChecked) {
                     parser.abort();
                     return;
@@ -994,8 +996,7 @@ let parseCSV = function(_file, template, cb) {
                 //console.log('rows.length', rows.length);
                 totalRecords = (_hasHeader) ? rows.length - 1 : rows.length - 0; // last row getting empty
                 Csvfiles.update(fileID, { $set: { totalNoOfRecords: totalRecords } }, function(e, res) {});
-                let newrows = generateDatawithNewHeader(chunk, _hasHeader, mapping, false, template);
-                return newrows;
+                return generateDatawithNewHeader(chunk, _hasHeader, mapping, false, template);
             },
             // chunk: function(results, streamer) {
 
@@ -1175,21 +1176,25 @@ Template.readCSV.helpers({
         return Template.instance().previewCollection.get();
     },
     fields: function() {
-        let fields = Object.keys(Template.instance().previewCollection.get()[0]);
-        let newFields = _.union({
-            key: '_id',
-            label: function(value, object) { return new Spacebars.SafeString("<input id='ckbSelectAll' type='checkbox'  />"); },
-            fn: function(value, object) { return new Spacebars.SafeString("<input type='checkbox' class='chk' value='" + value + "' />"); },
-            sortable: false,
-        }, _.chain(fields).reject(function(d) { return d == '_id' || d == 'fileID' || d == 'owner' || d == 'username' }).map(function(d) {
-            return {
-                key: d,
-                label: d,
-                fn: function(value, object) { return new Spacebars.SafeString('<div title="' + _.escape(value) + '">' + _.escape(value) + '</div>'); }
-            }
-        }).value());
+        if (Template.instance().previewCollection.get().length > 0) {
+            let fields = Object.keys(Template.instance().previewCollection.get()[0]);
+            let newFields = _.union({
+                key: '_id',
+                label: function(value, object) { return new Spacebars.SafeString("<input id='ckbSelectAll' type='checkbox'  />"); },
+                fn: function(value, object) { return new Spacebars.SafeString("<input type='checkbox' class='chk' value='" + value + "' />"); },
+                sortable: false,
+            }, _.chain(fields).reject(function(d) { return d == '_id' || d == 'fileID' || d == 'owner' || d == 'username' }).map(function(d) {
+                return {
+                    key: d,
+                    label: d,
+                    fn: function(value, object) { return new Spacebars.SafeString('<div title="' + _.escape(value) + '">' + _.escape(value) + '</div>'); }
+                }
+            }).value());
 
-        return newFields;
+            return newFields;
+        } else {
+            return [];
+        }
     },
     isActiveStep2() {
         let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running' });
@@ -1220,7 +1225,7 @@ let insertCSVData = function(data, fileID, collection, cb) {
     data['username'] = Meteor.user().username;
     // console.log('data', data);
     // return;
-    console.log('Sr_no', data.Sr_no);
+    //console.log('Sr_no', data.Sr_no);
     collection.insert(data, function(err, res) {
         if (err) {
 
