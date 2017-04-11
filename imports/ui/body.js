@@ -125,9 +125,52 @@ Template.imageUpload.onRendered(function() {
         alert(4)
     })
     dz = this.dropzone;
-})
+});
+
+Template.tblPreview.events({
+
+});
 
 Template.readCSV.events({
+    'click #ckbSelectAll': function(event, template) {
+        var currentEl = event.currentTarget;
+        if ($(currentEl).is(':checked')) {
+            $(template.find('tbody')).find('tr').addClass('active').find('.chk').each(function() { $(this).prop('checked', true) });
+            $(template.find('#btnDeleteRow')).removeAttr('disabled');
+        } else {
+            $(template.find('tbody')).find('tr').removeClass('active').find('.chk').each(function() { $(this).prop('checked', false) });
+            $(template.find('#btnDeleteRow')).attr('disabled', 'disabled');
+        }
+    },
+    'click table tr td .chk': function(event, template) {
+        var currentEl = event.currentTarget;
+        if ($(currentEl).is(':checked')) {
+            $(currentEl).closest('tr').addClass('active');
+        } else {
+            $(currentEl).closest('tr').removeClass('active');
+        }
+
+        $(template.find('#ckbSelectAll')).prop('checked', true);
+        $(template.find('#btnDeleteRow')).attr('disabled', 'disabled');
+        $(template.find('table')).find('tr td .chk').each(function() {
+            if (!$(this).is(':checked')) {
+                $(template.find(' #ckbSelectAll')).prop('checked', false);
+                //return false;
+            } else {
+                $(template.find('#btnDeleteRow')).removeAttr('disabled');
+            }
+        });
+    },
+    'click #btnDeleteRow': function(event, template) {
+        let ft = template.filetypes.get(); // all file type
+        let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
+        $(template.find('table')).find('tr td .chk').each(function() {
+            if ($(this).is(':checked')) {
+                activeFiletype.collection.remove($(this).val());
+                $(template.find(' #ckbSelectAll')).prop('checked', false);
+            }
+        });
+    },
     "click #btngostep2": function(event, template) {
         let Id = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running', stepStatus: 'upload_pending' })._id;
         CollUploadJobMaster.update(Id, { $set: { stepStatus: 'validation_running' } }, function() {
@@ -1114,6 +1157,23 @@ Template.readCSV.helpers({
         Template.instance().previewCollection.set(data);
         return Template.instance().previewCollection.get();
     },
+    fields: function() {
+        let fields = Object.keys(Template.instance().previewCollection.get()[0]);
+        let newFields = _.union({
+            key: '_id',
+            label: function(value, object) { return new Spacebars.SafeString("<input id='ckbSelectAll' type='checkbox'  />"); },
+            fn: function(value, object) { return new Spacebars.SafeString("<input type='checkbox' class='chk' value='" + value + "' />"); },
+            sortable: false,
+        }, _.chain(fields).reject(function(d) { return d == '_id' || d == 'fileID' || d == 'owner' || d == 'username' }).map(function(d) {
+            return {
+                key: d,
+                label: d,
+                fn: function(value, object) { return new Spacebars.SafeString("<div title='" + value + "'>" + _.escape(value) + "</div>"); }
+            }
+        }).value());
+
+        return newFields;
+    },
     isActiveStep2() {
         let obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running' });
         let ft = Template.instance().filetypes.get();
@@ -1149,14 +1209,17 @@ let insertCSVData = function(data, fileID, collection, cb) {
             //console.log(err);
             //console.log('errmessage', err.message);
             //console.log('err', err.invalidKeys[0].name);
-            let keyName = err.invalidKeys[0].name;
-            let schemaObj = eval("ProductInformationSchema");
-            let typeObj = eval("schemaObj._schema." + keyName);
+
             //console.log(typeObj);
             let allowedValuesObj = '';
-            if (typeObj.type.definitions[0] && typeObj.type.definitions[0].allowedValues) {
-                allowedValuesObj = " [ Allowed Values : " + typeObj.type.definitions[0].allowedValues.join(", ") + " ]";
-            }
+            try {
+                let keyName = err.invalidKeys[0].name;
+                let schemaObj = eval("ProductInformationSchema");
+                let typeObj = eval("schemaObj._schema." + keyName);
+                if (typeObj.type.definitions[0] && typeObj.type.definitions[0].allowedValues) {
+                    allowedValuesObj = " [ Allowed Values : " + typeObj.type.definitions[0].allowedValues.join(", ") + " ]";
+                }
+            } catch (e) {};
             //console.log(typeObj.definitions[0]);
 
             //console.log('data', data);

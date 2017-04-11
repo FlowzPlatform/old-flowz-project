@@ -56,3 +56,4 @@ cfs:filesystem
 cfs:standard-packages
 cfs:s3
 edgee:slingshot
+ephemer:reactive-datatables
