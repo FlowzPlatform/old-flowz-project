@@ -127,10 +127,6 @@ Template.imageUpload.onRendered(function() {
     dz = this.dropzone;
 });
 
-Template.tblPreview.events({
-
-});
-
 Template.readCSV.events({
     'click #ckbSelectAll': function(event, template) {
         var currentEl = event.currentTarget;
@@ -245,12 +241,15 @@ Template.readCSV.events({
         $(currentEl).closest('td').removeClass('has-edit').find('[data-target="#javascripEditorModal"]').attr('data-code', '');
         $(currentEl).closest('td').find('.transform-function').text('').attr('title', '');
         $(template.find('#preview')).find('.spinner').show();
-        // generate Preview
-        generatePreview(template.find('#csv-file').files[0], template, function() {
-            let ft = template.filetypes.get(); // all file type
-            let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
-            insertCSVMapping(activeFiletypeId, template, function(e, res) {
-                $(template.find('#preview')).find('.spinner').hide();
+        generateMapping(template);
+        generateXEditor(template, function() {
+            // generate Preview
+            generatePreview(template.find('#csv-file').files[0], template, function() {
+                let ft = template.filetypes.get(); // all file type
+                let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
+                insertCSVMapping(activeFiletypeId, template, function(e, res) {
+                    $(template.find('#preview')).find('.spinner').hide();
+                });
             });
         });
     },
@@ -267,12 +266,16 @@ Template.readCSV.events({
         $('#javascripEditorModal').modal('hide');
 
         $(template.find('#preview')).find('.spinner').show();
-        // generate Preview
-        generatePreview(template.find('#csv-file').files[0], template, function() {
-            let ft = template.filetypes.get(); // all file type
-            let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
-            insertCSVMapping(activeFiletypeId, template, function(e, res) {
-                $(template.find('#preview')).find('.spinner').hide();
+
+        generateMapping(template);
+        generateXEditor(template, function() {
+            // generate Preview
+            generatePreview(template.find('#csv-file').files[0], template, function() {
+                let ft = template.filetypes.get(); // all file type
+                let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
+                insertCSVMapping(activeFiletypeId, template, function(e, res) {
+                    $(template.find('#preview')).find('.spinner').hide();
+                });
             });
         });
     },
@@ -362,10 +365,13 @@ Template.readCSV.events({
 
         let mapping = generateMapping(template); // generate new Mapping
 
-        let activefile = _.map(getActiveHeaders(template), function(d) { return (d.text == undefined) ? '' : d.text });
+        //let activefile = _.map(getActiveHeaders(template), function(d) { return (d.text == undefined) ? '' : d.text });
 
-        let mappedArr = _.chain(mapping).map(function(d) { return d.sysHeader }).filter(function(d) { return d != '' }).value();
-        let diff = _.difference(_.filter(activefile, function(d) { return d != '' }), mappedArr);
+
+
+        //let mappedArr = _.chain(mapping).map(function(d) { return d.sysHeader }).filter(function(d) { return d != '' }).value();
+        //let diff = _.difference(_.filter(activefile, function(d) { return d != '' }), mappedArr);
+        let diff = _.chain(mapping).filter(function(d) { return d.csvHeader == '' }).map(function(d) { return d.sysHeader }).value();
         if (diff.length > 0) {
             swal({
                 title: "Error!",
@@ -406,7 +412,6 @@ Template.readCSV.events({
         var currentEl = event.currentTarget;
         $(currentEl).append('<i class="fa fa-spinner fa-spin"></i>');
 
-
         //$(".view-mapping").scrollTop($(".view-mapping")[0].scrollHeight);
 
         $(template.find('#mapping')).find('.spinner').show();
@@ -426,9 +431,9 @@ Template.readCSV.events({
             existMapping = template.mappingWithHeader.get();
 
             existMapping.push({
-                sysHeader: "",
-                csvHeader: 'header_' + oldHeadersLength,
-                transform: "",
+                sysHeader: 'header_' + oldHeadersLength,
+                csvHeader: '',
+                transform: '',
                 csvSysHeaderDetail: undefined
             });
 
@@ -436,13 +441,14 @@ Template.readCSV.events({
         } else {
             existMapping = template.mappingWithOutHeader.get();
             existMapping.push({
-                sysHeader: "",
-                csvHeader: 'header_' + oldHeadersLength,
-                transform: "",
+                sysHeader: 'header_' + oldHeadersLength,
+                csvHeader: '',
+                transform: '',
                 csvSysHeaderDetail: undefined
             });
             template.mappingWithOutHeader.set(existMapping);
         }
+
         template.csvHeaders.set(csvHeaders);
 
         generateXEditor(template, function() {
@@ -507,14 +513,13 @@ let generateMapping = function(template) {
     let csvHeaders = template.csvHeaders.get();
 
     let activefile = getActiveHeaders(template); // get active file type data
-
     // create mapping
-    csvHeaders.forEach(function(result, index) {
+    activefile.forEach(function(result, index) {
         mapping.push({
-            sysHeader: $(template.find('#dpdsysheader_' + index)).editable('getValue')['dpdsysheader_' + index],
-            csvHeader: $(template.find('#dpdcsvheader_' + index)).text(), //$(template.find('#dpdcsvheader_' + index)).editable('getValue')['dpdcsvheader_' + index]
+            sysHeader: $(template.find('#dpdsysheader_' + index)).text(),
+            csvHeader: $(template.find('#dpdcsvheader_' + index)).editable('getValue')['dpdcsvheader_' + index], //$(template.find('#dpdcsvheader_' + index)).editable('getValue')['dpdcsvheader_' + index]
             transform: $(template.find('#txtCustomJavascript_' + index)).attr('data-code'),
-            csvSysHeaderDetail: _.find(activefile, function(d) { return d.text == $(template.find('#dpdsysheader_' + index)).text() })
+            csvSysHeaderDetail: result
         })
     });
     template.mapping.set(mapping);
@@ -528,7 +533,7 @@ let generateMapping = function(template) {
 }
 
 let generateXEditor = function(template, cb) {
-    let activefile = _.map(getActiveHeaders(template), function(d) { return (d.text == undefined) ? '' : d.text }); // get active file type data
+    let activefile = _.map(getActiveHeaders(template), function(d) { return (d.label == undefined) ? '' : d.label }); // get active file type data
 
     let _csvHeader = template.csvHeaders.get();
     let _hasHeader = $(template.find('#hasheader')).prop('checked');
@@ -542,96 +547,111 @@ let generateXEditor = function(template, cb) {
     } else {
         existMapping = template.mappingWithOutHeader.get();
     }
-    //console.log('existMapping', $.extend([], existMapping));
 
-    setTimeout(function() {
-        //console.log('_csvHeader', _csvHeader);
-        _csvHeader.forEach(function(result, index) {
-            // console.log('result', result);
-            // console.log('activefile', activefile);
-            // console.log(getHeaderDistance(result, activefile));
-            let _val = '';
+    // if (existMapping != undefined) {
+    //     activefile = _.union(activefile, _.chain(existMapping).map(function(d) { return d.sysHeader }).value());
+    //     template.headers.set(activefile);
+    // }
 
-            if (existMapping.length > 0) {
-                let sysHeaderObj = _.chain(existMapping).find(function(d) { return d.csvHeader == result }).value();
-                //console.log('sysHeaderObj', sysHeaderObj);
-                if (sysHeaderObj.csvSysHeaderDetail != undefined) {
-                    _val = result == sysHeaderObj.csvSysHeaderDetail.column ? sysHeaderObj.csvSysHeaderDetail.text : '';
-                }
-            }
-            if (_val == '') {
-                _val = getHeaderDistance(result, activefile);
-            }
+    //console.log('existMapping', existMapping);
 
-            $(template.find('#dpdsysheader_' + index)).editable("destroy");
-            $(template.find('#dpdsysheader_' + index)).editable({
-                //value: _val.toLowerCase(),
-                emptytext: '--NA--',
-                source: activefile,
-                success: function(response, newValue) {
-                    changeXEditorValue(template);
-                }
-            });
+    activefile.forEach(function(result, index) {
+        let _val = '';
 
-            $(template.find('#dpdsysheader_' + index)).editable('setValue', _val);
-            if (_val != '') {
-                activefile = _.without(activefile, _val);
-            }
-            // if (_val != undefined) {
-            //     //$(template.find('#dpdsysheader_' + index)).editable('setValue', _val.toLowerCase());
-            // }
-            //activefile = _.without(activefile, _val);
-
-            if (existMapping.length > 0) {
-                let sysHeaderObj = _.chain(existMapping).find(function(d) { return d.csvHeader == result }).value();
-                //console.log('sysHeaderObj', sysHeaderObj);
-                if (sysHeaderObj.transform != undefined) {
-                    let code = sysHeaderObj.transform;
-                    $(template.find('#txtCustomJavascript_' + index)).attr('data-code', code).attr('title', 'Edit').parent('td').addClass('has-edit').children('.transform-function').text(code).attr('title', code);
-                }
-            }
-        });
-        reGenerateXEditor(template);
-        cb();
-    }, 1000);
-}
-
-let reGenerateXEditor = function(template) {
-    let activefile = _.map(getActiveHeaders(template), function(d) { return d.text }); // get active file type data
-
-    let _csvHeader = template.csvHeaders.get();
-    let _hasHeader = $(template.find('#hasheader')).prop('checked');
-    // create mapping
-
-    let ft = template.filetypes.get(); // all file type
-    let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
-
-    _csvHeader.forEach(function(result, index) {
-        let oldValue = $(template.find('#dpdsysheader_' + index)).editable('getValue')['dpdsysheader_' + index];
-        if (oldValue != undefined) {
-            activefile = _.without(activefile, oldValue);
+        if (existMapping.length > 0) {
+            let sysHeaderObj = _.chain(existMapping).find(function(d) { return d.sysHeader == result.toLowerCase(); }).value();
+            _val = sysHeaderObj.csvHeader;
         }
-    });
 
-    _csvHeader.forEach(function(result, index) {
-        let _oldvalue = $(template.find('#dpdsysheader_' + index)).editable('getValue')['dpdsysheader_' + index];
-        $(template.find('#dpdsysheader_' + index)).editable("destroy");
-        $(template.find('#dpdsysheader_' + index)).editable({
-            value: _oldvalue,
+        if (_val == '' || _val == 'Custom function') {
+            _val = getHeaderDistance(result, _csvHeader);
+        }
+
+        $(template.find('#dpdcsvheader_' + index)).editable("destroy");
+        $(template.find('#dpdcsvheader_' + index)).editable({
+            //value: _val.toLowerCase(),
+            type: 'select',
             emptytext: '--NA--',
-            source: activefile,
+            source: _csvHeader,
             success: function(response, newValue) {
                 changeXEditorValue(template);
             }
         });
+        if (_val != '') {
+            $(template.find('#dpdcsvheader_' + index)).editable('setValue', _val);
+        } else {
+            $(template.find('#dpdcsvheader_' + index)).editable('setValue', '');
+        }
+
+        $(template.find('#txtCustomJavascript_' + index)).attr('data-header', _val != '' ? _val : index).attr('data-code', '').attr('title', 'Add custom code').parent('td').removeClass('has-edit').children('.transform-function').text('').attr('title', '');
+        if (existMapping.length > 0) {
+            let sysHeaderObj = _.chain(existMapping).find(function(d) { return d.sysHeader == result.toLowerCase(); }).value();
+            if (sysHeaderObj.transform != '') {
+                let code = sysHeaderObj.transform;
+                $(template.find('#txtCustomJavascript_' + index)).attr('data-code', code).attr('title', 'Edit').parent('td').addClass('has-edit').children('.transform-function').text(code).attr('title', code);
+
+                $(template.find('#dpdcsvheader_' + index)).editable("destroy");
+                $(template.find('#dpdcsvheader_' + index)).editable({
+                    type: 'text',
+                    value: 'Custom function',
+                    disabled: true
+                });
+
+                $(template.find('#dpdcsvheader_' + index)).editable('setValue', 'Custom function');
+            }
+        }
     });
+
+    // _csvHeader.forEach(function(result, index) {
+    //     let _val = '';
+
+    //     if (existMapping.length > 0) {
+    //         let sysHeaderObj = _.chain(existMapping).find(function(d) { return d.csvHeader == result }).value();
+    //         //console.log('sysHeaderObj', sysHeaderObj);
+    //         if (sysHeaderObj.csvSysHeaderDetail != undefined) {
+    //             _val = result == sysHeaderObj.csvSysHeaderDetail.column ? sysHeaderObj.csvSysHeaderDetail.text : '';
+    //         }
+    //     }
+    //     if (_val == '') {
+    //         _val = getHeaderDistance(result, activefile);
+    //     }
+
+    //     $(template.find('#dpdsysheader_' + index)).editable("destroy");
+    //     $(template.find('#dpdsysheader_' + index)).editable({
+    //         //value: _val.toLowerCase(),
+    //         emptytext: '--NA--',
+    //         source: activefile,
+    //         success: function(response, newValue) {
+    //             changeXEditorValue(template);
+    //         }
+    //     });
+
+    //     $(template.find('#dpdsysheader_' + index)).editable('setValue', _val);
+    //     if (_val != '') {
+    //         activefile = _.without(activefile, _val);
+    //     }
+    //     // if (_val != undefined) {
+    //     //     //$(template.find('#dpdsysheader_' + index)).editable('setValue', _val.toLowerCase());
+    //     // }
+    //     //activefile = _.without(activefile, _val);
+
+    //     if (existMapping.length > 0) {
+    //         let sysHeaderObj = _.chain(existMapping).find(function(d) { return d.csvHeader == result }).value();
+    //         //console.log('sysHeaderObj', sysHeaderObj);
+    //         if (sysHeaderObj.transform != undefined) {
+    //             let code = sysHeaderObj.transform;
+    //             $(template.find('#txtCustomJavascript_' + index)).attr('data-code', code).attr('title', 'Edit').parent('td').addClass('has-edit').children('.transform-function').text(code).attr('title', code);
+    //         }
+    //     }
+    // });
+    cb();
+
 }
 
 let changeXEditorValue = function(template) {
     //console.log('success');
     $(template.find('#preview')).find('.spinner').show();
     setTimeout(function() {
-        reGenerateXEditor(template);
         generatePreview(template.find('#csv-file').files[0], template, function() {
             $(template.find('#preview')).find('.spinner').hide();
         });
@@ -811,32 +831,40 @@ let generateDatawithNewHeader = function(chunk, _hasHeader, mapping, isPreview, 
     let activeHeaders = getActiveHeaders(template).slice(1, -1);
     // let extraHeaders = _.reject(headings, function(d) { return _.indexOf(_.map(mapping, function(v) { return v.csvHeader }), d) != -1 })
 
-    let newHeading = _.map(mapping, function(v) { return v.csvHeader });
+    let newHeading = _.map(mapping, function(v) { return v.sysHeader });
     //console.log('activeHeaders', activeHeaders);
-    _.each(mapping, function(d, inx) {
-        for (let i = _hasHeader ? 1 : 0; i < oldRows.length; i++) {
-            if (d.transform.trim() != '') {
-                rows[i][inx] = getTransformVal(headings, oldRows[i], d.transform.trim(), oldRows[i][inx], i);
-            } else {
-                rows[i][inx] = oldRows[i][inx];
+
+    let newData = [];
+    //console.log('mapping', mapping);
+    _.each(rows, function(row, index) {
+        let newRow = [];
+        _.each(mapping, function(d, inx) {
+            let item = '';
+            if (d.csvHeader != "") {
+                if (d.transform.trim() != '') {
+                    item = getTransformVal(headings, oldRows[index], d.transform.trim(), oldRows[index][inx], index);
+                } else {
+                    item = row[_.indexOf(headings, d.csvHeader)];
+                }
             }
-            rows[i][inx] = (rows[i][inx] == undefined) ? '' : rows[i][inx];
-        }
-        let headerText = d.csvHeader.trim();
-        if (!isPreview && d.sysHeader != undefined) {
-            //let mapHeader = _.find(activeHeaders, function(v) { return v.text == d.sysHeader });
-            headerText = (d.csvSysHeaderDetail != undefined) ? d.csvSysHeaderDetail.column.trim() : d.csvHeader.trim();
-        } else {
-            headerText = (d.sysHeader != undefined && d.sysHeader != '') ? d.sysHeader.trim() : d.csvHeader.trim();
-        }
+            newRow.push(item == undefined ? '' : item);
+        });
+        newData.push(newRow);
+    });
+
+    // set headers
+    _.each(mapping, function(d, inx) {
         if (_hasHeader) {
-            rows[0][inx] = headerText; // (d.sysHeader != undefined) ? d.sysHeader.trim() : d.csvHeader.trim();
+            newData[0][inx] = (isPreview) ? d.sysHeader : d.csvSysHeaderDetail.text;
         } else {
-            newHeading[inx] = headerText; // (d.sysHeader != undefined) ? d.sysHeader.trim() : d.csvHeader.trim();
+            newHeading[inx] = (isPreview) ? d.sysHeader : d.csvSysHeaderDetail.text;
         }
     });
 
-    return (!_hasHeader ? (newHeading.join(',') + '\n') : "") + arrayToCSV(rows);
+
+    //console.log('newData', newData);
+
+    return (!_hasHeader ? (newHeading.join(',') + '\n') : "") + arrayToCSV(newData);
 }
 
 let generatePreview = function(_file, template, cb) {
@@ -844,6 +872,7 @@ let generatePreview = function(_file, template, cb) {
     // generateMapping
     generateMapping(template);
     mapping = template.mapping.get();
+
     //Papa.LocalChunkSize = _file.size; 
     Papa.parse(_file, {
         header: true,
@@ -1050,8 +1079,11 @@ let parseCSV = function(_file, template, cb) {
 let getActiveHeaders = function(template) {
     let ft = template.filetypes.get(); // all file type
     let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
-    activeFiletype.header.unshift("--NA--");
-    return _.uniq(activeFiletype.header);
+    let header = _.chain(activeFiletype.schema._schema).map(function(d, k) { d['text'] = k; return d; }).reject(function(d) { return d.text == 'fileID' || d.text == 'owner' || d.text == 'username' }).value();
+    // .each(function(d, k) { d['text'] = k; })
+    //header.unshift("Custom value");
+    //console.log('header', header);
+    return _.uniq(header);
 }
 
 Template.readCSV.onCreated(function() {
@@ -1062,7 +1094,7 @@ Template.readCSV.onCreated(function() {
     // }
     //console.log(Meteor.userId());
     //let masterJob = this.data;
-
+    //console.log('schema', _.chain(ProductInformationSchema._schema).filter(function(d) { return d.optional }).map(function(d) { return d.label }).value());
     let masterJob = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running' });
     let a =
         toastr.options = {
@@ -1078,13 +1110,13 @@ Template.readCSV.onCreated(function() {
     this.previewRec = new ReactiveVar([]);
     this.filetypes = new ReactiveVar(
         [
-            { id: 'ProductInformation', name: 'Product Information', isDone: masterJob.hasOwnProperty('ProductInformation') ? true : false, isActive: false, header: ProductInformationHeaders, collection: CollProductInformation, require: true },
-            { id: 'ProductPrice', name: 'Product Pricing', isDone: masterJob.hasOwnProperty('ProductPrice') ? true : false, isActive: false, header: ProductPriceHeaders, collection: CollProductPrice, require: false },
-            { id: 'ProductImprintData', name: 'Imprint Data', isDone: masterJob.hasOwnProperty('ProductImprintData') ? true : false, isActive: false, header: ProductImprintDataHeaders, collection: CollProductImprintData, require: false },
-            { id: 'ProductImage', name: 'Images', isDone: masterJob.hasOwnProperty('ProductImage') ? true : false, isActive: false, header: ProductImageHeaders, collection: CollProductImage, require: false },
-            { id: 'ProductShipping', name: 'Shipping', isDone: masterJob.hasOwnProperty('ProductShipping') ? true : false, isActive: false, header: ProductShippingHeaders, collection: CollProductShipping, require: false },
-            { id: 'ProductAdditionalCharges', name: 'Additional Charges', isDone: masterJob.hasOwnProperty('ProductAdditionalCharges') ? true : false, isActive: false, header: ProductAdditionalChargeHeaders, collection: CollProductAdditionalCharges, require: false },
-            { id: 'ProductVariationPrice', name: 'Variation Price', isDone: masterJob.hasOwnProperty('ProductVariationPrice') ? true : false, isActive: false, header: ProductVariationPricingHeaders, collection: CollProductVariationPrice, require: false }
+            { id: 'ProductInformation', name: 'Product Information', isDone: masterJob.hasOwnProperty('ProductInformation') ? true : false, isActive: false, header: ProductInformationHeaders, collection: CollProductInformation, require: true, schema: ProductInformationSchema },
+            { id: 'ProductPrice', name: 'Product Pricing', isDone: masterJob.hasOwnProperty('ProductPrice') ? true : false, isActive: false, header: ProductPriceHeaders, collection: CollProductPrice, require: false, schema: ProductPriceSchemas },
+            { id: 'ProductImprintData', name: 'Imprint Data', isDone: masterJob.hasOwnProperty('ProductImprintData') ? true : false, isActive: false, header: ProductImprintDataHeaders, collection: CollProductImprintData, require: false, schema: ProductImprintDataSchemas },
+            { id: 'ProductImage', name: 'Images', isDone: masterJob.hasOwnProperty('ProductImage') ? true : false, isActive: false, header: ProductImageHeaders, collection: CollProductImage, require: false, schema: ProductImagesSchemas },
+            { id: 'ProductShipping', name: 'Shipping', isDone: masterJob.hasOwnProperty('ProductShipping') ? true : false, isActive: false, header: ProductShippingHeaders, collection: CollProductShipping, require: false, schema: ProductShippingSchemas },
+            { id: 'ProductAdditionalCharges', name: 'Additional Charges', isDone: masterJob.hasOwnProperty('ProductAdditionalCharges') ? true : false, isActive: false, header: ProductAdditionalChargeHeaders, collection: CollProductAdditionalCharges, require: false, schema: ProductAdditionalChargeSchemas },
+            { id: 'ProductVariationPrice', name: 'Variation Price', isDone: masterJob.hasOwnProperty('ProductVariationPrice') ? true : false, isActive: false, header: ProductVariationPricingHeaders, collection: CollProductVariationPrice, require: false, schema: ProductVariationPricingSchemas }
         ]
     );
     this.mapping = new ReactiveVar([]);
@@ -1123,9 +1155,9 @@ Template.readCSV.helpers({
     headers() {
         let ft = Template.instance().filetypes.get(); // all file type
         let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
-        //console.log('activeFiletype', activeFiletype);
-        //console.log(activeFiletype.header);
-        Template.instance().headers.set(activeFiletype.header);
+        let header = _.chain(activeFiletype.schema._schema).reject(function(d, k) { return k == 'fileID' || k == 'owner' || k == 'username' }).map(function(d) { return d.label.toLowerCase() }).value();
+
+        Template.instance().headers.set(header);
         return Template.instance().headers.get();
     },
     csvHeaders() {

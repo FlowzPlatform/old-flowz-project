@@ -63,6 +63,9 @@
 #preview table td>div,
 #preview table th {
     white-space: nowrap;
+}
+
+#preview table td>div {
     max-width: 150px;
     overflow: hidden;
     text-overflow: ellipsis;
