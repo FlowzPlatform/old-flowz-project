@@ -371,7 +371,8 @@ Template.readCSV.events({
 
         //let mappedArr = _.chain(mapping).map(function(d) { return d.sysHeader }).filter(function(d) { return d != '' }).value();
         //let diff = _.difference(_.filter(activefile, function(d) { return d != '' }), mappedArr);
-        let diff = _.chain(mapping).filter(function(d) { return d.csvHeader == '' }).map(function(d) { return d.sysHeader }).value();
+        //console.log('mapping', mapping);
+        let diff = _.chain(mapping).filter(function(d) { return d.csvHeader == '' && !d.csvSysHeaderDetail.optional }).map(function(d) { return d.sysHeader }).value();
         if (diff.length > 0) {
             swal({
                 title: "Error!",
@@ -672,6 +673,7 @@ let resetAll = function(template) {
     template.mappingWithHeader.set([]);
     template.mappingWithOutHeader.set([]);
     toastr.clear();
+    template.headers.set([]);
 
     // destroyXEditor
 
@@ -694,9 +696,9 @@ let getHeaderDistance = function(sysColumn, csvHeaders) {
     // console.log(this.csvHeaders);
     let col = sysColumn.toLowerCase();
     csvHeaders.forEach(function(d) {
-        res = Levenshtein.get(col, d.toLowerCase()) < Levenshtein.get(col, res.toLowerCase()) ? d : res;
+        res = Levenshtein.get(col.replace(/[^a-z0-9]/gi, ''), d.toLowerCase().replace(/[^a-z0-9]/gi, '')) < Levenshtein.get(col.replace(/[^a-z0-9]/gi, ''), res.toLowerCase().replace(/[^a-z0-9]/gi, '')) ? d : res;
     });
-    res = Levenshtein.get(res.toLowerCase(), col) < 4 ? res : '';
+    res = Levenshtein.get(res.toLowerCase().replace(/[^a-z0-9]/gi, ''), col.replace(/[^a-z0-9]/gi, '')) < 4 ? res : '';
     return res;
 }
 
