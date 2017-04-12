@@ -40,17 +40,21 @@
                                       <thead>
                                           <tr>
                                               <th>Validation File Type</th>
-                                              <th>Validation Start At</th>
+                                              <th>Validation File Name</th>
+                                              <th>File Uploaded On</th>
                                               <th>Validation Status</th>
-                                              <th>Number of Record</th>
+                                              <th>Total Records</th>
                                               <th>Validation Progress</th>
                                           </tr>
                                       </thead>
                                        <tbody>
                                               {{#each jobQueue.arrFileObj}}
-                                                      <tr id="div{{this.fileTypeId}}">
+                                                      <tr id="div{{this.fileTypeId}}" class="cls{{this.validateStatus}}">
                                                           <td>
                                                               <span id="dpdsysheader_{{rowIndex}}" >{{this.fileType}}</span>
+                                                          </td>
+                                                          <td>
+                                                              <span id="dpdsysheader_{{rowIndex}}" >{{this.name}}</span>
                                                           </td>
                                                           <td>
                                                               <span id="dpdsysheader_{{rowIndex}}"  selected="selected">{{this.createdAt}}</span>
@@ -74,7 +78,7 @@
 
                                               {{/each}}
                                               <tr id="errorContainer">
-                                                  <td colspan="5" width="100%" >
+                                                  <td colspan="6" width="100%" >
                                                     <div class="row">
                                                         <div class="col-md-12" >
                                                             <button style="display:none" class="progress-button progress-button-small pull-left" id="validation_start" data-style="top-line" data-horizontal="">

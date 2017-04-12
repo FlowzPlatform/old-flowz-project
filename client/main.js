@@ -8,6 +8,7 @@ import '../imports/ui/body.js';
 //import '../imports/ui/upload/upload.js';
 import '../imports/ui/history/history.js';
 import '../imports/ui/validation/validation.js';
+import '../imports/ui/validation/validation.css';
 
 import '../imports/ui/import/import.js';
 import '../imports/ui/import/import.css';
