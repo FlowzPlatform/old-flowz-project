@@ -23,11 +23,11 @@ let invalidColumnColor = 'red';
 let currentjobQueue = null;
 import { ProductInformationRules } from '../../../lib/validatorRules/product_information.js';
 import { ProductPriceRules } from '../../../lib/validatorRules/product_price.js';
-//import { ProductInformationRules } from '../../../lib/validatorRules/product_information.js';
-//import { ProductInformationRules } from '../../../lib/validatorRules/product_information.js';
-//import { ProductInformationRules } from '../../../lib/validatorRules/product_information.js';
-//import { ProductInformationRules } from '../../../lib/validatorRules/product_information.js';
-
+import { ProductImageRules } from '../../../lib/validatorRules/product_images.js';
+import { ProductShippingRules } from '../../../lib/validatorRules/product_shipping.js';
+import { ProductImprintDataRules } from '../../../lib/validatorRules/product_imprint_data.js';
+import { ProductVariationPriceRules } from '../../../lib/validatorRules/product_variation_pricing.js';
+import { ProductAdditionalChargesRules } from '../../../lib/validatorRules/product_additional_charge.js';
 
 
 // import  Headers
@@ -56,6 +56,8 @@ let fileTypes =
     { id: 'ProductAdditionalCharges', name: 'Additional Charges', isDone: false, isActive: false, header: ProductAdditionalChargeHeaders, collection: CollProductAdditionalCharges },
     { id: 'ProductVariationPrice', name: 'Variation Price', isDone: false, isActive: false, header: ProductVariationPricingHeaders, collection: CollProductVariationPrice }
 ];
+
+let secoundTimeValidate = [];
 Template.validation.events({
     'click #validation_start' (event) {
         Meteor.validatorFunctions.getCurrentRunningUploadJob();
@@ -213,6 +215,7 @@ Template.validation.helpers({
                   fileId['fileType']=value.name;
                   fileId['fileTypeId']=value.id;
                   fileId['validateStatus']=job[value.id].validateStatus;
+                  //console.log(fileId);
                   arrFileObj.push(fileId);
                   job['arrFileObj'] = arrFileObj;  //arrFileObj[value.id] = fileId;
                 }
@@ -351,7 +354,8 @@ Meteor.validatorFunctions = {
                           arrHeader[sheetName][index].renderer = errorRenderer;
                         }
                         else {
-                          delete(arrHeader[sheetName][index].renderer);
+                          if(arrHeader[sheetName][index].colHeaders!="guid")
+                            delete(arrHeader[sheetName][index].renderer);
                         }
                     });
                     //console.log(arrHeader[sheetName]);
@@ -385,21 +389,30 @@ Meteor.validatorFunctions = {
     setNextValidation:function(sheetName) {
 
       job = Meteor.validatorFunctions.getCurrentRunningUploadJob();
+      console.log(secoundTimeValidate);
+      if(secoundTimeValidate[sheetName])
+      {
+        // update completed status for current running job
+        Meteor.validatorFunctions.setJobQueusSheetValidationStatus(sheetName,job,"completed",function(){
+          console.log("===========set Job Queus Sheet Status callback====");
+          console.log();
+            Meteor.validatorFunctions.startValidation(function(newSheetName){
+              console.log("===========newSheetName callback====");
+              console.log(newSheetName);
+              if(newSheetName!='')
+              {
+                CurrentValidation=newSheetName;currentRule=0;
+                Meteor.validatorFunctions.onClickFindInValidData(newSheetName);
+              }
+            });
+        });
+      }
+      else {
+        CurrentValidation=sheetName;currentRule=0;
+        secoundTimeValidate[sheetName]=true;
+        Meteor.validatorFunctions.onClickFindInValidData(sheetName);
+      }
 
-      // update completed status for current running job
-      Meteor.validatorFunctions.setJobQueusSheetValidationStatus(sheetName,job,"completed",function(){
-        console.log("===========set Job Queus Sheet Status callback====");
-        console.log();
-          Meteor.validatorFunctions.startValidation(function(newSheetName){
-            console.log("===========newSheetName callback====");
-            console.log(newSheetName);
-            if(newSheetName!='')
-            {
-              CurrentValidation=newSheetName;currentRule=0;
-              Meteor.validatorFunctions.onClickFindInValidData(newSheetName);
-            }
-          });
-      });
       //console.log("============="+updResult+"==========");
 
       return false;
@@ -429,7 +442,7 @@ Meteor.validatorFunctions = {
           }
       };
       let guid=job._id;
-        console.log("=======guid==========",guid,"::",status);
+        //console.log("=======guid==========",guid,"::",status);
       let updResult = CollUploadJobMaster.update({_id: guid}, query);
     },
     updateJobQueueMainStatus:function(job){
@@ -515,11 +528,11 @@ function findjobQueueData() {
 // display error msg hide/show
 function displayErrorMsg(flag, msg) {
     //$("#divrunning").
-    console.log(currentValidationName);
+    console.log("========",currentValidationName);
     let row = $('#errorContainer').remove().clone();
     $('#div'+currentValidationName).after(row);
     var errorMsg = $("#errorDiv").find("#errorStr");
-    console.log("====================flag=",flag);
+    //console.log("====================flag=",flag);
 
     if(errorMsg)
     {
@@ -535,11 +548,29 @@ function displayErrorMsg(flag, msg) {
 
 let errorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
+    //console.log($(row:first-child));
     $(td).attr("style","border:1px solid "+invalidColumnColor);
 };
 
+let hideColumnRenderer = function(instance, td, row, col, prop, value, cellProperties) {
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
+    //console.log(td);
+    //$(".htCore").find("thead tr:first-child th:nth-child(2)").attr("style","display:none");
+    //$(".htCore").find("thead tr:first-child th:nth-child(3)").attr("style","border-left:1px solid #CCC");
+    //$(".htCore").find("table thead tr td:nth-child("+col+")").attr("style","display:none");
+    //console.log($(".htCore").find('tr:'));
+    //$(td).attr("style","display:none");
+    //$(td).hidden=true;
+    //$(".ht_clone_top_left_corner").attr("style","display:none");
+    //document.querySelector('.ht_clone_top').style.display = "none";
+    //document.querySelector('.ht_clone_left').style.display = "none";
+    //document.querySelector('.ht_clone_corner').style.display = "none";
+    //document.querySelector('.ht_master').style.display = "";
+};
+let currentDataObj=null;
 function renderHandsonTable(sheetName,dataObject, headers, eleName) {
     //console.log(arrHeader[sheetName]);
+    currentDataObj=dataObject;
     let hotSettings = {
         data: dataObject,
         columns: arrHeader[sheetName],
@@ -555,11 +586,14 @@ function renderHandsonTable(sheetName,dataObject, headers, eleName) {
         }
     };
     hotElement = document.querySelector('#' + eleName);
+    hotElement.innerHTML='';
     if(hotElement)
     {
       objHandsontable = new Handsontable(hotElement, hotSettings);
       console.log("========objHandsontable=========",currentRule);
       objHandsontable.selectCell(1,currentRule);
+      //$(".htCore").find("thead tr:first-child th:nth-child(2)").attr("style","display:none");
+      //$(".htCore").find("thead tr:first-child th:nth-child(3)").attr("style","border-left:1px solid #CCC");
     }
 }
 
@@ -567,47 +601,68 @@ function updateProductData(changes, source) {
     if (!changes) {
         return;
     }
-    var cellChange = {
+    //$(".htCore").find("thead tr:first-child th:nth-child(2)").attr("style","display:none");
+    //$(".htCore").find("thead tr:first-child th:nth-child(3)").attr("style","border-left:1px solid #CCC");
+
+    //console.log("=====3231313132============");
+    //console.log(currentDataObj);
+    let cellChange = {
         'rowIndex': changes[0][0],
         'columnIndex': changes[0][1],
         'oldValue': changes[0][2],
         'newValue': changes[0][3]
     };
     if (cellChange.oldValue != cellChange.newValue) {
-        var _id = objHandsontable.getDataAtCell(cellChange.rowIndex, 0);
-        var column_name = cellChange.columnIndex.split(".").pop();
-        updateData(_id, column_name, cellChange.newValue);
+        let _id = currentDataObj[cellChange.rowIndex]._id ;//objHandsontable.getDataAtCell(cellChange.rowIndex, 0);
+        //console.log(_id);
+        let column_name = cellChange.columnIndex.split(".").pop();
+        console.log(cellChange);
+        console.log(column_name);
+        updateData(_id, column_name, cellChange.newValue,function(msg,error,res){
+            console.log("=====updateProductData=callback=======",msg);
+            //console.log(objHandsontable);
+            //console.log(objHandsontable.propToCol(cellChange.rowIndex));
+            //var errorMsg = $("#errorDiv").find("#errorStr");
+            let strMsg = error.message + ", you can not change data.";
+            //errorMsg.html();
+            delete(secoundTimeValidate[currentValidationName]);
+            toastr.clear();
+            toastr.info(strMsg);
+
+            objHandsontable.setDataAtCell(cellChange.rowIndex,objHandsontable.propToCol(cellChange.columnIndex),cellChange.oldValue);
+        });
     }
 }
 
-function updateData(guid, columnName, newValue) {
+function updateData(guid, columnName, newValue, callback) {
     if (fromValidate == 'mongo') {
-        updateDataMongo(guid, columnName, newValue);
+        updateDataMongo(guid, columnName, newValue, callback);
     } else {
-        updateDataES(guid, columnName, newValue)
+        updateDataES(guid, columnName, newValue, callback);
     }
 }
 
-function updateDataMongo(guid, columnName, newValue) {
+function updateDataMongo(guid, columnName, newValue, callback) {
     let setVal = {};
     var query = {
         "$set": {
             [columnName]: newValue
         }
     };
-    //  console.log(query);
-
+    console.log(query);
     let dataResult = eval("Coll"+currentValidationName).update({
         _id: guid
-    }, query, { validate: false, validationContext: "updateForm" }, function(error, res) {
-        if (error) {
-            //  console.log("======error update====");
-            //  console.error(error.message);
-            //  console.error(error.invalidKeys);
-
+    }, query, { validate: true, validationContext: "updateForm" }, function(error1, res) {
+        if (error1) {
+            console.log("======error update====");
+            //console.log(error1.message);
+            //console.log(res);
+            //objHandsontable.selectCell(row,col);
+            //console.log("======col===",col,"====row=", row);
             // Prepare Simple Schema validation msg
-            let strMsg = error.message + ". Please provide valid value";
-            displayErrorMsg(true, strMsg);
+
+            //displayErrorMsg(true, strMsg);
+            callback(error1.message,error1,res);
         } else {
             console.log("======result update====");
             //console.error(res);
@@ -693,13 +748,13 @@ function setColumnHeader(sheetName, sheetHeaders) {
         {
           arrHeader[sheetName]=[];
         }
-        arrHeader[sheetName].push({ colHeaders: "guid", type: 'text', data: '_id' });
+        //arrHeader[sheetName].push({ colHeaders: "guid", type: 'text', data: '_id','renderer' :hideColumnRenderer });
         $.each(sheetHeaders, function(index, value) {
             if(value.column!=undefined){
                 arrHeader[sheetName].push({ colHeaders: "" + value.column, type: value.type, data: appendString + value.column });
             }
-
         });
+
     }
 }
 
@@ -778,7 +833,7 @@ function setValidationProgress(sheetName,currentRuleIdx, ProductInformationLengt
       elem.innerHTML = width * 1 + '%';
       //alert(width);
       job = Meteor.validatorFunctions.getCurrentRunningUploadJob();
-      console.log(job[sheetName].id);
+      //console.log(job[sheetName].id);
       Csvfiles.update(job[sheetName].id, {
               $set: { 'validationProgress': width }
           },
