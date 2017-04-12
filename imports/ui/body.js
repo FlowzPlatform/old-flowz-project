@@ -418,7 +418,7 @@ Template.readCSV.events({
         $(template.find('#mapping')).find('.spinner').show();
         let oldHeaders = template.headers.get();
         let oldHeadersLength = oldHeaders.length;
-        oldHeaders.push('header_' + oldHeadersLength);
+        oldHeaders.push('header' + oldHeadersLength);
         template.headers.set(oldHeaders);
         //generateMapping(template);
         let _hasHeader = $(template.find('#hasheader')).prop('checked');
@@ -553,7 +553,6 @@ let generateXEditor = function(template, cb) {
     // if (existMapping != undefined) {
     //     activefile = _.union(activefile, _.chain(existMapping).map(function(d) { return d.sysHeader }).value());
     // }
-
     activefile.forEach(function(result, index) {
         let _val = '';
 
