@@ -183,29 +183,29 @@
                                             <table class="table table-bordered table-striped">
                                                 <thead>
                                                     <tr>
-                                                        <th>Column Index</th>
-                                                        <th>CSV header</th>
+                                                        <!--<th>Column Index</th>-->
                                                         <th>System headers</th>
+                                                        <th>CSV header</th>
                                                         <th>Transform</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {{#each csvHeaders}}
+                                                    {{#each headers}}
                                                         <tr>
                                                             {{#let rowIndex=@index}}
-                                                                <td style="width: 12%" class="text-center">{{rowIndex}}</td>
+                                                                <!--<td style="width: 12%" class="text-center">{{rowIndex}}</td>-->
                                                                 <td style="width: 30%">
-                                                                    <span id="dpdcsvheader_{{rowIndex}}"  selected="selected" data-column="{{this}}" style="text-transform:capitalize">{{this}}</span>
+                                                                    <span id="dpdsysheader_{{rowIndex}}"  selected="selected" data-column="{{this}}" style="text-transform:capitalize">{{this}}</span>
                                                                     <!--<a href="#" id="dpdcsvheader_{{rowIndex}}" data-type="text" data-inputclass="form-control">{{this}}</a>-->
                                                                     <!--<span id="dpdsysheader_{{rowIndex}}"  selected="selected" data-column="{{column}}" style="text-transform:capitalize">{{text}}</span>-->
                                                                 </td>
                                                                 <td style="width: 30%">
-                                                                    <a href="#" id="dpdsysheader_{{rowIndex}}" class="dpdsysheader" data-type="select" data-inputclass="form-control"></a>
+                                                                    <a href="#" id="dpdcsvheader_{{rowIndex}}" class="dpdsysheader" data-inputclass="form-control"></a>
                                                                     <!--<a href="#" id="dpdcsvheader_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
                                                                 </td>
                                                                 <td style="width: 30%">
                                                                     <!-- Trigger the modal with a button -->
-                                                                    <a href="#" id="txtCustomJavascript_{{rowIndex}}" data-toggle="modal" data-target="#javascripEditorModal" data-header="{{this}}" data-code="" title="Add custom code." style="float: left;"><i class="fa fa-pencil-square-o"></i></a>
+                                                                    <a href="#" id="txtCustomJavascript_{{rowIndex}}" data-toggle="modal" data-target="#javascripEditorModal" data-header="{{rowIndex}}" data-code="" title="Add custom code." style="float: left;"><i class="fa fa-pencil-square-o"></i></a>
                                                                     <div class="transform-function"></div>
                                                                     <a href="#" class="text-danger remove-custom-javascript" title="Remove"><i class="fa fa-times-circle-o"></i></a>
                                                                     <!--<a href="#" id="dpddatatype_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
@@ -269,7 +269,7 @@
     <div class="col-md-2" >
         <button id="btnDeleteRow" class="progress-button progress-button-danger progress-button-small" disabled="disabled" style="margin: 5px 0 0 0;"><span><i class="fa fa-trash"></i>&nbsp; Delete</span> </button>
     </div>
-    {{> reactiveTable id=id class="table table-bordered table-hover"  collection=collection showNavigation='auto' showFilter=true fields=fields rowsPerPage=7}}
+    {{> reactiveTable id=id class="table table-bordered table-hover"  collection=collection showNavigation='auto' showFilter=true fields=fields rowsPerPage=7 showRowCount=true}}
 </template>
 
 
