@@ -40,8 +40,10 @@ Router.route('/validation', function() {
     this.render('validation');
 });
 
-
-
 Router.route('/import', function() {
     this.render('import');
+});
+
+Router.route('/schema', function() {
+    this.render('schema');
 });
