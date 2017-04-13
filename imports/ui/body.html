@@ -90,10 +90,25 @@
                                 </div>
                             {{/if}}
                             <div id="uploadCsv">
+
                                 <div id="upload-csv-zone">
-
+                                    <div class="">
+                                        <form class="form-horizontal">
+                                            <div class="form-group">
+                                                <label class="control-label col-md-2">Select schema</label>
+                                                <div class="col-md-4">
+                                                    <select class="form-control" id="dpdSchema">
+                                                        <option value="">--select schema--</option>
+                                                        {{#each schema}}
+                                                            <option value="{{_id}}">{{name}}</option>
+                                                        {{/each}}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    
                                     <div class="file-zone">
-
                                         <span class="dz-message">Drop <span style="color: #494e6b">"{{currentSheetName}}"</span> files here<br/>
                                             <small>(only csv files are valid.)</small>
                                         </span>
