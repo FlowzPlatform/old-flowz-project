@@ -12,3 +12,6 @@ import '../imports/ui/validation/validation.css';
 
 import '../imports/ui/import/import.js';
 import '../imports/ui/import/import.css';
+
+// schema
+import '../imports/ui/schema/schema.js';

@@ -44,7 +44,6 @@ cneuro:jquery-bootstrap-dropdown-on-hover
 zimme:bootstrap-hover-dropdown
 
 chrismbeckett:toastr
-perak:codemirror
 kevohagan:sweetalert
 
 
@@ -57,3 +56,4 @@ cfs:standard-packages
 cfs:s3
 edgee:slingshot
 ephemer:reactive-datatables
+perak:codemirror
