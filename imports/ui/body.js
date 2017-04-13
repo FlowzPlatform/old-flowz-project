@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Template } from 'meteor/templating';
 import { ReactiveDict } from 'meteor/reactive-dict';
 import { ReactiveVar } from 'meteor/reactive-var';
+import SimpleSchema from 'simpl-schema';
 // import { UploadedFiles } from '../lib/collections.js';
 // import  Headers
 import { ProductInformationHeaders } from '../../lib/headers/product_information.js'
@@ -19,16 +20,17 @@ import { CollProductInformation, CollProductPrice, CollProductImprintData, CollP
 import { Csvfiles } from '../api/collections.js';
 import { Csvfilemapping } from '../api/collections.js';
 import { CollUploadJobMaster } from '../api/collections.js';
+import { CollUploaderSchema } from '../api/collections.js';
 
 
 // import schema
-import { ProductInformationSchema } from '../../lib/schema/product_information.js';
-import { ProductAdditionalChargeSchemas } from '../../lib/schema/product_additional_charge.js';
-import { ProductImagesSchemas } from '../../lib/schema/product_images.js';
-import { ProductImprintDataSchemas } from '../../lib/schema/product_imprint_data.js';
-import { ProductPriceSchemas } from '../../lib/schema/product_price.js';
-import { ProductShippingSchemas } from '../../lib/schema/product_shipping.js';
-import { ProductVariationPricingSchemas } from '../../lib/schema/product_variation_pricing.js';
+// import { ProductInformationSchema } from '../../lib/schema/product_information.js';
+// import { ProductAdditionalChargeSchemas } from '../../lib/schema/product_additional_charge.js';
+// import { ProductImagesSchemas } from '../../lib/schema/product_images.js';
+// import { ProductImprintDataSchemas } from '../../lib/schema/product_imprint_data.js';
+// import { ProductPriceSchemas } from '../../lib/schema/product_price.js';
+// import { ProductShippingSchemas } from '../../lib/schema/product_shipping.js';
+// import { ProductVariationPricingSchemas } from '../../lib/schema/product_variation_pricing.js';
 
 import './body.html';
 
@@ -300,7 +302,23 @@ Template.readCSV.events({
             editor.refresh();
         }, 200);
     },
+    "click #csv-file": function(event, template) {
+        if (template.find('#dpdSchema').value != '') {
+            return true;
+        } else {
+            toastr.error(" Please select schema.");
+            return false;
+        }
+    },
     "change #csv-file": function(event, template) {
+        if (template.find('#dpdSchema').value == '') {
+            toastr.error(" Please select schema.");
+            $(template.find('#csv-file')).val('');
+            return false;
+        }
+
+        genrateSchema(template);
+
         // Display an error toast, with a title
 
         let _files = [];
@@ -475,6 +493,28 @@ Template.readCSV.events({
     }
 });
 
+let genrateSchema = function(template) {
+    // get current sheet
+    let ft = template.filetypes.get(); // all file type
+    let activeFiletype = _.indexOf(ft, _.find(ft, function(d) { return d.isActive }));
+
+    // add schema
+    let schemaJSON = CollUploaderSchema.findOne({ owner: Meteor.userId(), _id: template.find('#dpdSchema').value }); // get schema json
+    // create new schema
+    schemaJSON.schema = "{" + schemaJSON.schema + ",fileID: {type: String,label: 'file ID'},owner: {type: String,label: 'owner'},username: {type: String,label: 'username'}}";
+    let newSchema = eval("new SimpleSchema(" + schemaJSON.schema + ")");
+    ft[activeFiletype].schema = newSchema;
+
+    // generate header using with new schema
+    let header = _.chain(ft[activeFiletype].schema._schema).reject(function(d, k) { return k == 'fileID' || k == 'owner' || k == 'username' }).map(function(d) { return d.label.toLowerCase() }).value();
+
+    ft[activeFiletype].collection.attachSchema(newSchema, { replace: true });
+
+    // set new headers
+    template.headers.set(header);
+
+}
+
 let setPreviewCollection = function(newFiletypeId, template) {
     let ft = template.filetypes.get(); // all file type
     let activeFiletype = ft[newFiletypeId]; // find active filetype
@@ -491,7 +531,7 @@ let setPreviewCollection = function(newFiletypeId, template) {
 let setMapping = function(template, cb) {
     let _hasHeader = $(template.find('#hasheader')).prop('checked');
 
-    let ft = Template.instance().filetypes.get(); // all file type
+    let ft = template.filetypes.get(); // all file type
     let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
     // let csvmapping = Csvfilemapping.findOne({ owner: Meteor.userId(), fileTypeID: activeFiletype.id, hasHeader: _hasHeader });
     // if (csvmapping != undefined) {
@@ -1110,13 +1150,13 @@ Template.readCSV.onCreated(function() {
     this.previewRec = new ReactiveVar([]);
     this.filetypes = new ReactiveVar(
         [
-            { id: 'ProductInformation', name: 'Product Information', isDone: masterJob.hasOwnProperty('ProductInformation') ? true : false, isActive: false, header: ProductInformationHeaders, collection: CollProductInformation, require: true, schema: ProductInformationSchema },
-            { id: 'ProductPrice', name: 'Product Pricing', isDone: masterJob.hasOwnProperty('ProductPrice') ? true : false, isActive: false, header: ProductPriceHeaders, collection: CollProductPrice, require: false, schema: ProductPriceSchemas },
-            { id: 'ProductImprintData', name: 'Imprint Data', isDone: masterJob.hasOwnProperty('ProductImprintData') ? true : false, isActive: false, header: ProductImprintDataHeaders, collection: CollProductImprintData, require: false, schema: ProductImprintDataSchemas },
-            { id: 'ProductImage', name: 'Images', isDone: masterJob.hasOwnProperty('ProductImage') ? true : false, isActive: false, header: ProductImageHeaders, collection: CollProductImage, require: false, schema: ProductImagesSchemas },
-            { id: 'ProductShipping', name: 'Shipping', isDone: masterJob.hasOwnProperty('ProductShipping') ? true : false, isActive: false, header: ProductShippingHeaders, collection: CollProductShipping, require: false, schema: ProductShippingSchemas },
-            { id: 'ProductAdditionalCharges', name: 'Additional Charges', isDone: masterJob.hasOwnProperty('ProductAdditionalCharges') ? true : false, isActive: false, header: ProductAdditionalChargeHeaders, collection: CollProductAdditionalCharges, require: false, schema: ProductAdditionalChargeSchemas },
-            { id: 'ProductVariationPrice', name: 'Variation Price', isDone: masterJob.hasOwnProperty('ProductVariationPrice') ? true : false, isActive: false, header: ProductVariationPricingHeaders, collection: CollProductVariationPrice, require: false, schema: ProductVariationPricingSchemas }
+            { id: 'ProductInformation', name: 'Product Information', isDone: masterJob.hasOwnProperty('ProductInformation') ? true : false, isActive: false, header: ProductInformationHeaders, collection: CollProductInformation, require: true, schema: "" },
+            { id: 'ProductPrice', name: 'Product Pricing', isDone: masterJob.hasOwnProperty('ProductPrice') ? true : false, isActive: false, header: ProductPriceHeaders, collection: CollProductPrice, require: false, schema: "" },
+            { id: 'ProductImprintData', name: 'Imprint Data', isDone: masterJob.hasOwnProperty('ProductImprintData') ? true : false, isActive: false, header: ProductImprintDataHeaders, collection: CollProductImprintData, require: false, schema: "" },
+            { id: 'ProductImage', name: 'Images', isDone: masterJob.hasOwnProperty('ProductImage') ? true : false, isActive: false, header: ProductImageHeaders, collection: CollProductImage, require: false, schema: "" },
+            { id: 'ProductShipping', name: 'Shipping', isDone: masterJob.hasOwnProperty('ProductShipping') ? true : false, isActive: false, header: ProductShippingHeaders, collection: CollProductShipping, require: false, schema: "" },
+            { id: 'ProductAdditionalCharges', name: 'Additional Charges', isDone: masterJob.hasOwnProperty('ProductAdditionalCharges') ? true : false, isActive: false, header: ProductAdditionalChargeHeaders, collection: CollProductAdditionalCharges, require: false, schema: "" },
+            { id: 'ProductVariationPrice', name: 'Variation Price', isDone: masterJob.hasOwnProperty('ProductVariationPrice') ? true : false, isActive: false, header: ProductVariationPricingHeaders, collection: CollProductVariationPrice, require: false, schema: "" }
         ]
     );
     this.mapping = new ReactiveVar([]);
@@ -1142,6 +1182,9 @@ Template.readCSV.onCreated(function() {
 
 
 Template.readCSV.helpers({
+    schema() {
+        return CollUploaderSchema.find({ owner: Meteor.userId() }).fetch();
+    },
     currentSheetName() {
         let ft = Template.instance().filetypes.get(); // all file type
         let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
@@ -1153,13 +1196,13 @@ Template.readCSV.helpers({
         return Template.instance().files.get();
     },
     headers() {
-        if (Template.instance().headers.get().length == 0) {
-            let ft = Template.instance().filetypes.get(); // all file type
-            let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
-            let header = _.chain(activeFiletype.schema._schema).reject(function(d, k) { return k == 'fileID' || k == 'owner' || k == 'username' }).map(function(d) { return d.label.toLowerCase() }).value();
+        // if (Template.instance().headers.get().length == 0) {
+        //     let ft = Template.instance().filetypes.get(); // all file type
+        //     let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
+        //     let header = _.chain(activeFiletype.schema._schema).reject(function(d, k) { return k == 'fileID' || k == 'owner' || k == 'username' }).map(function(d) { return d.label.toLowerCase() }).value();
 
-            Template.instance().headers.set(header);
-        }
+        //     Template.instance().headers.set(header);
+        // }
         return Template.instance().headers.get();
     },
     csvHeaders() {

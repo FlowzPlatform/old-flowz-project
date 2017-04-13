@@ -19,6 +19,8 @@ export const CollProductShipping = new Mongo.Collection(collectionPrefix + 'Prod
 export const CollProductAdditionalCharges = new Mongo.Collection(collectionPrefix + 'Productadditionalcharges');
 export const CollProductVariationPrice = new Mongo.Collection(collectionPrefix + 'Productvariationprice');
 
+export const CollUploaderSchema = new Mongo.Collection(collectionPrefix + 'Schema');
+
 export const CollUploadJobMaster = new Mongo.Collection(collectionPrefix + 'JobMaster');
 
 export const Csvfiles = new Mongo.Collection(collectionPrefix + 'CSVFiles');
@@ -26,10 +28,11 @@ export const Csvfilemapping = new Mongo.Collection(collectionPrefix + 'CSVFileMa
 
 
 // add schema
-CollProductInformation.attachSchema(ProductInformationSchema);
-CollProductPrice.attachSchema(ProductPriceSchemas);
-CollProductImprintData.attachSchema(ProductImprintDataSchemas);
-CollProductImage.attachSchema(ProductImagesSchemas);
-CollProductShipping.attachSchema(ProductShippingSchemas);
-CollProductAdditionalCharges.attachSchema(ProductAdditionalChargeSchemas);
-CollProductVariationPrice.attachSchema(ProductVariationPricingSchemas);
+
+// CollProductInformation.attachSchema(ProductInformationSchema);
+// CollProductPrice.attachSchema(ProductPriceSchemas);
+// CollProductImprintData.attachSchema(ProductImprintDataSchemas);
+// CollProductImage.attachSchema(ProductImagesSchemas);
+// CollProductShipping.attachSchema(ProductShippingSchemas);
+// CollProductAdditionalCharges.attachSchema(ProductAdditionalChargeSchemas);
+// CollProductVariationPrice.attachSchema(ProductVariationPricingSchemas);
