@@ -380,7 +380,7 @@ Template.readCSV.events({
     'click #btnNext': function(event, template) {
         let ft = template.filetypes.get(); // all file type
         let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
-
+        genrateNewSchema(template);
         let mapping = generateMapping(template); // generate new Mapping
 
         //let activefile = _.map(getActiveHeaders(template), function(d) { return (d.text == undefined) ? '' : d.text });
@@ -389,7 +389,6 @@ Template.readCSV.events({
 
         //let mappedArr = _.chain(mapping).map(function(d) { return d.sysHeader }).filter(function(d) { return d != '' }).value();
         //let diff = _.difference(_.filter(activefile, function(d) { return d != '' }), mappedArr);
-        //console.log('mapping', mapping);
         let diff = _.chain(mapping).filter(function(d) { return d.csvHeader == '' && !d.csvSysHeaderDetail.optional }).map(function(d) { return d.sysHeader }).value();
         if (diff.length > 0) {
             swal({
@@ -515,6 +514,33 @@ let genrateSchema = function(template) {
 
 }
 
+let genrateNewSchema = function(template) {
+
+    let ft = template.filetypes.get(); // all file type
+    let activeFiletype = _.indexOf(ft, _.find(ft, function(d) { return d.isActive }));
+    let header = template.headers.get();
+
+    let schemaLabel = _.map(getActiveHeaders(template), function(d) { return (d.label == undefined) ? '' : d.label.toLowerCase() });
+
+    let newHeaders = _.chain(header).difference(schemaLabel).value();
+    // create new schema
+
+    letNewHeaderSchema = "";
+    _.each(newHeaders, function(d) {
+        letNewHeaderSchema += "\"" + d + "\":{type: String,optional: true,label: \"" + d + "\"},";
+    })
+
+    let schemaJSON = CollUploaderSchema.findOne({ owner: Meteor.userId(), _id: template.find('#dpdSchema').value });
+
+    schemaJSON.schema = "{" + schemaJSON.schema + "," + letNewHeaderSchema + "fileID: {type: String,label: 'file ID'},owner: {type: String,label: 'owner'},username: {type: String,label: 'username'}}";
+
+    let newSchema = eval("new SimpleSchema(" + schemaJSON.schema + ")");
+    ft[activeFiletype].schema = newSchema;
+
+    ft[activeFiletype].collection.attachSchema(newSchema, { replace: true });
+
+}
+
 let setPreviewCollection = function(newFiletypeId, template) {
     let ft = template.filetypes.get(); // all file type
     let activeFiletype = ft[newFiletypeId]; // find active filetype
@@ -620,6 +646,7 @@ let generateXEditor = function(template, cb) {
                     }
                 },
                 success: function(response, newValue) {
+                    activefile[_.indexOf(activefile, result)] = newValue;
                     changeXEditorValue(template);
                 }
             });
@@ -1003,6 +1030,7 @@ let setNextFile = function(template, cb) {
 
 let parseCSV = function(_file, template, cb) {
     let _hasHeader = $(template.find('#hasheader')).prop('checked');
+
     // generateMapping
     generateMapping(template);
     let mapping = template.mapping.get();
