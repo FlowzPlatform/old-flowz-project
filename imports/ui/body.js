@@ -130,6 +130,9 @@ Template.imageUpload.onRendered(function() {
 });
 
 Template.readCSV.events({
+    'change #dpdSchema': function(event, template) {
+        csvFileChange(event, template);
+    },
     'click #ckbSelectAll': function(event, template) {
         var currentEl = event.currentTarget;
         if ($(currentEl).is(':checked')) {
@@ -311,56 +314,7 @@ Template.readCSV.events({
         }
     },
     "change #csv-file": function(event, template) {
-        if (template.find('#dpdSchema').value == '') {
-            toastr.error(" Please select schema.");
-            $(template.find('#csv-file')).val('');
-            return false;
-        }
-
-        genrateSchema(template);
-
-        // Display an error toast, with a title
-
-        let _files = [];
-        abortChecked = false;
-
-        for (let i = 0; i < template.find('#csv-file').files.length; i++) {
-            let regex = new RegExp("(.*?)\.(csv)$");
-            if ((regex.test(template.find('#csv-file').files[i].name))) {
-                // view file progress
-                let existFiles = template.files.get();
-                existFiles.splice(0, 0, { name: template.find('#csv-file').files[i].name, progress: 0, mapping: true });
-                template.files.set(existFiles);
-
-                _files.push(template.find('#csv-file').files[i]);
-            }
-        }
-        Papa.LocalChunkSize = 100000; // 1000kb
-        for (let i = 0; i < _files.length; i++) {
-            template.mappingWithHeader.set([]);
-            template.mappingWithOutHeader.set([]);
-            $(template.find("#upload-csv-zone")).addClass('onprogress');
-
-            //template.find("#mapping").style.display = 'block';
-            setMapping(template, function() {
-                getHeader(_files[i], template, function() {
-                    generateXEditor(template, function() { // generate x-editor
-                        //$(template.find("#mapping")).find('.spinner').hide();
-                        $(template.find("#upload-csv-zone")).hide();
-                        $(template.find("#mapping")).show();
-                        $(template.find("#upload-csv-zone")).removeClass('onprogress');
-
-                        // generate Preview
-                        generatePreview(template.find('#csv-file').files[0], template, function() {
-                            //template.find("#mapping").style.display = 'none';
-                            $(template.find("#preview")).show();
-
-                        });
-                    });
-                });
-            });
-            //parseCSV(_files[i], template); // parse csv to json using papa parse
-        }
+        csvFileChange(event, template);
     },
     "change #hasheader": function(event, template) {
         $(template.find('#mapping')).find('.spinner').show();
@@ -491,6 +445,63 @@ Template.readCSV.events({
         $(template.find('#uploadImage')).hide();
     }
 });
+
+let csvFileChange = function(event, template) {
+    if (template.find('#dpdSchema').value == '') {
+        toastr.error(" Please select schema.");
+        //$(template.find('#csv-file')).val('');
+        return false;
+    }
+
+    $(template.find("#mapping")).find('.spinner').show();
+    $(template.find('#preview')).find('.spinner').show();
+    genrateSchema(template);
+
+    // Display an error toast, with a title
+
+    let _files = [];
+    abortChecked = false;
+
+    for (let i = 0; i < template.find('#csv-file').files.length; i++) {
+        let regex = new RegExp("(.*?)\.(csv)$");
+        if ((regex.test(template.find('#csv-file').files[i].name))) {
+            // view file progress
+            let existFiles = template.files.get();
+            existFiles.splice(0, 0, { name: template.find('#csv-file').files[i].name, progress: 0, mapping: true });
+            template.files.set(existFiles);
+
+            _files.push(template.find('#csv-file').files[i]);
+        }
+    }
+    Papa.LocalChunkSize = 100000; // 1000kb
+    for (let i = 0; i < _files.length; i++) {
+
+        template.mappingWithHeader.set([]);
+        template.mappingWithOutHeader.set([]);
+        $(template.find("#upload-csv-zone")).addClass('onprogress');
+
+        //template.find("#mapping").style.display = 'block';
+        setMapping(template, function() {
+            getHeader(_files[i], template, function() {
+                generateXEditor(template, function() { // generate x-editor
+                    $(template.find("#mapping")).find('.spinner').hide();
+                    $(template.find("#upload-csv-zone")).hide();
+                    $(template.find("#mapping")).show();
+                    $(template.find("#upload-csv-zone")).removeClass('onprogress');
+
+                    // generate Preview
+                    generatePreview(template.find('#csv-file').files[0], template, function() {
+                        //template.find("#mapping").style.display = 'none';
+                        $(template.find('#preview')).find('.spinner').hide();
+                        $(template.find("#preview")).show();
+
+                    });
+                });
+            });
+        });
+        //parseCSV(_files[i], template); // parse csv to json using papa parse
+    }
+}
 
 let genrateSchema = function(template) {
     // get current sheet
@@ -1339,7 +1350,7 @@ Template.readCSV.helpers({
 let updateJobMaster = function(filename, fileID, cb) {
     //return CollUploadJobMaster.findOne({ owner: Meteor.userId(),deleteAt:'',stepStatus:1 });
     let data = {};
-    data[filename] = { id: fileID, validateStatus: 'pending', uploadStatus: 'completed', uplodedAt: new Date() };
+    data[filename] = { id: fileID, schemaId: $("#dpdSchema").val(), validateStatus: 'pending', uploadStatus: 'completed', uplodedAt: new Date() };
     let Obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running', stepStatus: 'upload_pending' });
     CollUploadJobMaster.upsert(Obj._id, { $set: data }, function() {
         cb();
