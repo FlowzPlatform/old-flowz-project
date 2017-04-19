@@ -558,7 +558,7 @@ let generateMapping = function(template) {
     // create mapping
     sysHeaders.forEach(function(result, index) {
         mapping.push({
-            sysHeader: $(template.find('#dpdsysheader_' + index)).text(),
+            sysHeader: $(template.find('#dpdsysheader_' + index)).editable('getValue')['dpdsysheader_' + index], //$(template.find('#dpdsysheader_' + index)).text(),
             csvHeader: $(template.find('#dpdcsvheader_' + index)).editable('getValue')['dpdcsvheader_' + index], //$(template.find('#dpdcsvheader_' + index)).editable('getValue')['dpdcsvheader_' + index]
             transform: $(template.find('#txtCustomJavascript_' + index)).attr('data-code'),
             csvSysHeaderDetail: _.find(activefile, function(d) { return d.label.toLowerCase() == result })
@@ -576,6 +576,9 @@ let generateMapping = function(template) {
 
 let generateXEditor = function(template, cb) {
     let activefile = template.headers.get(); //_.map(getActiveHeaders(template), function(d) { return (d.label == undefined) ? '' : d.label }); // get active file type data
+
+    let schemaLabel = _.map(getActiveHeaders(template), function(d) { return (d.label == undefined) ? '' : d.label.toLowerCase() });
+    //console.log('schemaLabel', schemaLabel);
 
     let _csvHeader = template.csvHeaders.get();
     let _hasHeader = $(template.find('#hasheader')).prop('checked');
@@ -603,6 +606,27 @@ let generateXEditor = function(template, cb) {
 
         if (_val == '' || _val == 'Custom function') {
             _val = getHeaderDistance(result, _csvHeader);
+        }
+
+        //console.log('result', result.toLowerCase());
+        $(template.find('#dpdsysheader_' + index)).editable("destroy");
+        if (_.indexOf(schemaLabel, result) == -1) {
+            $(template.find('#dpdsysheader_' + index)).editable({
+                validate: function(value) {
+                    if (value === null || value === '') {
+                        return 'Empty values not allowed';
+                    } else if (_.chain(activefile).without(result).indexOf(value).value() >= 0) {
+                        return 'This header already exist';
+                    }
+                },
+                success: function(response, newValue) {
+                    changeXEditorValue(template);
+                }
+            });
+        } else {
+            $(template.find('#dpdsysheader_' + index)).editable({
+                disabled: true
+            });
         }
 
         $(template.find('#dpdcsvheader_' + index)).editable("destroy");
