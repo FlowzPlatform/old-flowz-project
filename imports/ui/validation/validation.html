@@ -60,16 +60,16 @@
                                                               <span id="dpdsysheader_{{rowIndex}}"  selected="selected">{{this.createdAt}}</span>
                                                           </td>
                                                           <td>
-                                                             <span id="dpdsysheader_{{rowIndex}}"  selected="selected">{{this.validateStatus}}</span>
+                                                             <span id="dpdsysheader_{{rowIndex}}"  selected="selected" class="txtTransFormCapital">{{this.validateStatus}}</span>
                                                           </td>
-                                                          <td>
-                                                              <span id="dpdsysheader_{{rowIndex}}"  selected="selected">{{this.totalNoOfRecords}}</span>
+                                                          <td style="text-align:right;">
+                                                              <span id="dpdsysheader_{{rowIndex}}"  selected="selected" >{{this.totalNoOfRecords}}</span>
                                                           </td>
                                                           <td>
                                                                   <div id="errorSpinner{{this.fileTypeId}}" class="pull-left" style="display:none;">
                                                                       <i  class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
                                                                   </div>
-                                                                <span id="myBar1">{{this.validationProgress}}%</span><span>&nbsp;completed</span>
+                                                                <span id="myBar1">{{this.validationProgress}}%</span><span>&nbsp;Completed</span>
                                                           </td>
                                                       </tr>
                                                       <div style="display:none">{{this.validateStatus}}==={{isJobQueueStatusRunning this.validateStatus}}===</div>
