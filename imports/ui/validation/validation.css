@@ -22,3 +22,7 @@
   background-color: #f2dede!important;
   color: black!important;
 }
+
+.txtTransFormCapital {
+  text-transform: capitalize;
+}
