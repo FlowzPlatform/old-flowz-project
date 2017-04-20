@@ -203,6 +203,8 @@
                                                         <th>System headers</th>
                                                         <th>CSV header</th>
                                                         <th>Transform</th>
+                                                        <th class="newSchemaProperty">Type</th>
+                                                        <th class="newSchemaProperty">Property</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -210,21 +212,28 @@
                                                         <tr>
                                                             {{#let rowIndex=@index}}
                                                                 <!--<td style="width: 12%" class="text-center">{{rowIndex}}</td>-->
-                                                                <td style="width: 30%">
+                                                                <td style="width: 20%">
                                                                     <!--<span id="dpdsysheader_{{rowIndex}}"  selected="selected" data-column="{{this}}" style="text-transform:capitalize">{{this}}</span>-->
                                                                     <a href="#" id="dpdsysheader_{{rowIndex}}" data-type="text" data-inputclass="form-control">{{this}}</a>
                                                                     <!--<span id="dpdsysheader_{{rowIndex}}"  selected="selected" data-column="{{column}}" style="text-transform:capitalize">{{text}}</span>-->
                                                                 </td>
-                                                                <td style="width: 30%">
+                                                                <td style="width: 20%">
                                                                     <a href="#" id="dpdcsvheader_{{rowIndex}}" class="dpdsysheader" data-inputclass="form-control"></a>
                                                                     <!--<a href="#" id="dpdcsvheader_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
                                                                 </td>
-                                                                <td style="width: 30%">
+                                                                <td style="width: 20%">
                                                                     <!-- Trigger the modal with a button -->
                                                                     <a href="#" id="txtCustomJavascript_{{rowIndex}}" data-toggle="modal" data-target="#javascripEditorModal" data-header="{{rowIndex}}" data-code="" title="Add custom code." style="float: left;"><i class="fa fa-pencil-square-o"></i></a>
                                                                     <div class="transform-function"></div>
                                                                     <a href="#" class="text-danger remove-custom-javascript" title="Remove"><i class="fa fa-times-circle-o"></i></a>
                                                                     <!--<a href="#" id="dpddatatype_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
+                                                                </td>
+                                                                <td  style="width:20%;" class="newSchemaProperty">
+                                                                    <a href="#" id="dpdSchemaType_{{rowIndex}}" data-inputclass="form-control"></a>
+                                                                </td>
+                                                                <td style="width:20%;" class="newSchemaProperty">
+                                                                    <a data-placement="top" data-toggle="popover" data-title="Property" data-container="body" type="button" data-html="true" href="#" id="property_{{rowIndex}}"><i class="fa fa-edit"></i></a>
+                                                                    
                                                                 </td>
                                                             {{/let}}
                                                         </tr>
@@ -251,7 +260,45 @@
             </div>
         {{/if}}
      </div>
+
+    <script id="property_content" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Min</div>
+                            <input id="txtMin" type="number" class="form-control" placeholder="0"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Max</div>
+                            <input id="txtMax" type="number"  class="form-control" placeholder="100"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">RegEx</div>
+                            <input id="txtRegEx" type="string"  class="form-control" placeholder="/^[a-z0-9A-Z_]{3,15}$/" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
 </template>
+
 
 <template name="tblPreview">
     <div class="col-md-2" >

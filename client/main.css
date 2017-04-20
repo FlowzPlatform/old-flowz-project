@@ -1247,3 +1247,11 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
     color: #b7b7b7 !important;
     font-size: 1em !important;
 }
+
+.newSchemaProperty {
+    display: none;
+}
+
+#mapping.add-schema-show .newSchemaProperty {
+    display: table-cell;
+}
