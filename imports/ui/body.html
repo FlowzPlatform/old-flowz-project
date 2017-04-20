@@ -91,18 +91,17 @@
                                 </div>
                             {{/if}}
                             <div id="uploadCsv">
-                                <div class="">
-                                    <form class="form-horizontal">
+                                <div style="margin-bottom:5px;">
+                                    <form class="form-inline">
                                         <div class="form-group">
-                                            <label class="control-label col-md-2">Select schema</label>
-                                            <div class="col-md-4">
-                                                <select class="form-control" id="dpdSchema">
-                                                    <option value="">--select schema--</option>
-                                                    {{#each schema}}
-                                                        <option value="{{_id}}">{{name}}</option>
-                                                    {{/each}}
-                                                </select>
-                                            </div>
+                                            <label>Select schema</label>
+                                            <select class="form-control" id="dpdSchema">
+                                                {{#each schema}}
+                                                    <option value="{{_id}}">{{name}}</option>
+                                                {{/each}}
+                                                
+                                            </select>
+                                            <a href="#" id="txtNewSchemaName" type="text" style="display:none;">Untitled schema</a>
                                         </div>
                                     </form>
                                 </div>
@@ -245,35 +244,7 @@
                                     {{> imageUpload}}
                                 </div>
                             {{/if}}
-                            <!--<table  class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            File name
-                                        </th>
-                                        <th style="width: 150px;">
-                                            Progress
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {{#each files}}
-                                        <tr>
-                                            <td>
-                                                {{name}}
-                                            </td>
-                                            <td >
-                                                <div class="progress">
-                                                    <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar"
-                                                    aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{progress}}%">
-                                                        {{progress}}%
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    {{/each}}
-                                </tbody>
-                            </table>-->
+                            
                         {{/if}}
                     </div>
                 </div>
