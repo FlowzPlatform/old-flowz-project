@@ -131,7 +131,16 @@ Template.imageUpload.onRendered(function() {
 
 Template.readCSV.onRendered(function() {
     let $self = this;
-    $($self.find("#txtNewSchemaName")).editable();
+    let schema = CollUploaderSchema.find({ owner: Meteor.userId() }).fetch();
+    $($self.find("#txtNewSchemaName")).editable({
+        validate: function(value) {
+            if (value === null || value === '') {
+                return 'Empty values not allowed';
+            } else if (_.chain(schema).map(function(d) { return d.name.toLowerCase() }).indexOf(value.toLowerCase()).value() >= 0) {
+                return 'This name already exist';
+            }
+        }
+    });
 });
 
 Template.readCSV.events({
@@ -139,19 +148,33 @@ Template.readCSV.events({
         var currentEl = event.currentTarget;
         if ($(currentEl).val() == '') {
             $(template.find("#txtNewSchemaName")).show();
+            $(template.find('#mapping')).addClass('add-schema-show');
+            //$(".newSchemaProperty").show();
             $(template.find("#mapping")).find('.spinner').show();
             $(template.find('#preview')).find('.spinner').show();
             generateAddSchema(template);
 
             csvFileChange(event, template);
+            let schema = CollUploaderSchema.find({ owner: Meteor.userId() }).fetch();
+
+            $(template.find("#txtNewSchemaName")).editable({
+                validate: function(value) {
+                    if (value === null || value === '') {
+                        return 'Empty values not allowed';
+                    } else if (_.chain(schema).map(function(d) { return d.name.toLowerCase() }).indexOf(value.toLowerCase()).value() >= 0) {
+                        return 'This name already exist';
+                    }
+                }
+            });
         } else {
             $(template.find("#txtNewSchemaName")).hide();
-            if (template.find('#dpdSchema').value == '') {
-                toastr.error(" Please select schema.");
-                //$(template.find('#csv-file')).val('');
-                return false;
-            }
-
+            // if (template.find('#dpdSchema').value == '') {
+            //     toastr.error(" Please select schema.");
+            //     //$(template.find('#csv-file')).val('');
+            //     return false;
+            // }
+            //$(".newSchemaProperty").hide();
+            $(template.find('#mapping')).removeClass('add-schema-show');
             $(template.find("#mapping")).find('.spinner').show();
             $(template.find('#preview')).find('.spinner').show();
             genrateSchema(template);
@@ -248,7 +271,6 @@ Template.readCSV.events({
                         resetAll(template);
                         setPreviewCollection(newFiletypeId, template);
                         Router.go('/upload/' + _href);
-
                     }
                 });
         } else {
@@ -370,7 +392,7 @@ Template.readCSV.events({
         });
     },
     'click #btnNext': function(event, template) {
-        if ($(template.find('#txtNewSchemaName')).editable('getValue')['txtNewSchemaName'] == 'Untitled schema') {
+        if ($(template.find("#dpdSchema")).val() == '' && $(template.find('#txtNewSchemaName')).editable('getValue')['txtNewSchemaName'] == 'Untitled schema') {
             swal({
                 title: "Error!",
                 text: "Please write new schema name",
@@ -398,9 +420,8 @@ Template.readCSV.events({
             });
         } else {
             if ($(template.find("#dpdSchema")).val() == '') {
+                $(template.find('#btnNext')).addClass('inProgress');
                 insertSchema(template, function() {
-                    $(template.find('#btnNext')).addClass('inProgress');
-
                     $(template.find('#mapping')).hide();
                     insertCSVMapping(activeFiletypeId, template, function(e, res) {
                         // upload csv file in db
@@ -505,15 +526,35 @@ Template.readCSV.events({
     }
 });
 
-
 let insertSchema = function(template, cb) {
+    // get current sheet
+    let ft = template.filetypes.get(); // all file type
+    let activeFiletype = _.indexOf(ft, _.find(ft, function(d) { return d.isActive }));
+
     let header = template.headers.get();
 
     // create new schema
 
     let NewHeaderSchema = "";
-    _.each(header, function(d) {
-        NewHeaderSchema += "\"" + d + "\":{type: String,optional: true,label: \"" + d + "\"},";
+    _.each(header, function(d, index) {
+        let propertyData = $("#property_" + index).data();
+
+        if (propertyData != undefined) {
+            let _type = $(template.find("#dpdSchemaType_" + index)).editable('getValue')["dpdSchemaType_" + index];
+            let property = {
+                type: _type,
+                min: (propertyData.min == '') ? undefined : propertyData.min,
+                max: (propertyData.max == '') ? undefined : propertyData.max,
+                //allowedValues: (propertyData.allowedValues != undefined) ? "[" + propertyData.allowedValues + "]" : undefined,
+                regEx: (propertyData.regEx == '') ? undefined : propertyData.regEx,
+                optional: (propertyData.optional == undefined) ? true : propertyData.optional,
+                label: d
+            };
+            NewHeaderSchema += "\"" + d + "\":{type:" + property.type + ",regEx:" + property.regEx + ",min:" + property.min + ",max:" + property.max + ",optional: " + property.optional + ",label:\"" + property.label + "\"},";
+        } else {
+            NewHeaderSchema += "\"" + d + "\":{type: String,optional: true,label: \"" + d + "\"},";
+        }
+        //NewHeaderSchema += "\"" + d + "\":{type: String,optional: true,label: \"" + d + "\"},";
     });
     NewHeaderSchema = NewHeaderSchema.slice(0, -1);
 
@@ -526,6 +567,13 @@ let insertSchema = function(template, cb) {
         "username": Meteor.user().username
     };
     CollUploaderSchema.insert(data, function() {
+        NewHeaderSchema = "{" + NewHeaderSchema + ",fileID: {type: String,label: 'file ID'},owner: {type: String,label: 'owner'},username: {type: String,label: 'username'}}";
+
+        let newSchema = eval("new SimpleSchema(" + NewHeaderSchema + ")");
+
+        ft[activeFiletype].schema = newSchema;
+
+        ft[activeFiletype].collection.attachSchema(newSchema, { replace: true });
         cb();
     });
 }
@@ -646,6 +694,7 @@ let genrateNewSchema = function(template) {
     schemaJSON.schema = "{" + schemaJSON.schema + "," + NewHeaderSchema + "fileID: {type: String,label: 'file ID'},owner: {type: String,label: 'owner'},username: {type: String,label: 'username'}}";
 
     let newSchema = eval("new SimpleSchema(" + schemaJSON.schema + ")");
+
     ft[activeFiletype].schema = newSchema;
 
     ft[activeFiletype].collection.attachSchema(newSchema, { replace: true });
@@ -711,6 +760,8 @@ let generateMapping = function(template) {
     return mapping;
 }
 
+const schemaTypes = ['String', 'Number', 'Boolean', 'Date'];
+
 let generateXEditor = function(template, cb) {
     let activefile = template.headers.get(); //_.map(getActiveHeaders(template), function(d) { return (d.label == undefined) ? '' : d.label }); // get active file type data
 
@@ -764,6 +815,60 @@ let generateXEditor = function(template, cb) {
         } else {
             $(template.find('#dpdsysheader_' + index)).editable({
                 disabled: true
+            });
+        }
+
+        if ($(template.find("#dpdSchema")).val() == '') {
+            $(template.find('#dpdSchemaType_' + index)).editable({
+                type: 'select',
+                value: 'String',
+                source: schemaTypes
+            });
+
+            $(template.find("#property_" + index)).popover({
+                //trigger: "click",
+                //trigger: 'manual',
+                html: true,
+                content: $('#property_content').html(),
+            }).on('click', function() {
+
+                //$(this).popover('show');
+
+                $('[data-toggle=popover]').not(this).popover('hide');
+
+                // put old value
+                let propertyData = $("#property_" + index).data();
+                if (propertyData != undefined) {
+                    $("#txtMin").val(propertyData.min);
+                    $("#txtMax").val(propertyData.max);
+                    //$("#txtAllowedValues").val(propertyData.allowedValues);
+                    $("#txtRegEx").val(propertyData.regEx);
+                    $("#ckbSchemaOptional").prop('checked', propertyData.optional);
+                }
+
+
+                //$('[data-toggle=popover]').popover('show');
+                //$(template.find("button[data-popoverdismiss='true']")).unbind('click');
+                $("button[data-popoverdismiss='true']").unbind('click');
+                $("button[data-popoverdismiss='true']").click(function() {
+                    $('[data-toggle=popover]').popover('hide');
+                });
+                $("#saveProperty").unbind('click');
+                $("#saveProperty").click(function() {
+                    $("#property_" + index).data({
+                        min: $("#txtMin").val(),
+                        max: $("#txtMax").val(),
+                        //allowedValues: $("#txtAllowedValues").val(),
+                        regEx: $("#txtRegEx").val(),
+                        optional: $("#ckbSchemaOptional").prop('checked')
+                    });
+                    $('[data-toggle=popover]').popover('hide');
+                });
+
+                // let type = $(template.find('#dpdSchemaType_' + index)).editable('getValue')['dpdSchemaType_' + index].toLowerCase();
+                // if (type == 'number') {
+
+                // }
             });
         }
 
