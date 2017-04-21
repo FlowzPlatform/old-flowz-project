@@ -40,13 +40,15 @@ input#btn { margin: 8px 18px; padding: 8px; }
 }
 
 
-.right {position: absolute;
-    left: 14%;
-    padding: 12px;
-    top: 14%;
+.right {
+    position: absolute;
+    /*left: 24%;*/
+    top: 24%;
     text-align: -webkit-center;
     border: 2px #7c7e86 dashed;
   }
+
+
 
   #myform{
     text-align: center;
@@ -72,6 +74,13 @@ input#btn { margin: 8px 18px; padding: 8px; }
   color: black;
   text-align: center;
   padding-top: 4px;
+}
+
+@media(max-width: 480px){
+  #dv{
+    margin-left: 5px;
+    width: 100%;
+  }
 }
 
 
@@ -159,4 +168,8 @@ input[type=text] {text-align: center;}
   padding-right: 35px;
     font-weight: 500;
     color : #888383;
+}
+
+.landing_progress{
+  padding-bottom: 10px;
 }

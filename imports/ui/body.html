@@ -47,7 +47,7 @@
                 </div>
 
                 <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" style="margin-bottom:20px; ">
+                    <div role="tabpanel" class="tab-pane active">
                         {{#if $and previewCollection.length abortData}}
                             <div class="panel panel-default">
                                 <div class="panel-heading">
@@ -85,10 +85,18 @@
                             </div>
                         {{else}}
                             {{#if isImagesTab}}
-                                <div class="imageOrFileDiv">
+                                <!-- <div class="imageOrFileDiv">
                                         <button class="imageOrFileButton" type="button" id="btnUploadCsv">Upload File</button>
                                         <button class="imageOrFileButton" type="button" id="btnUploadImage">Upload Image</button>
-                                </div>
+                                </div> -->
+
+                                <ul class="nav nav-tabs nav-tabs1" role="tablist">
+                                    <li role="presentation" class="active">
+                                        <a href="#home" aria-controls="home" role="tab" id="btnUploadCsv" data-toggle="tab">Upload File</a>
+                                    </li>
+                                    <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" id="btnUploadImage" data-toggle="tab">Upload Image</a></li>
+                                </ul>
+
                             {{/if}}
                             <div id="uploadCsv">
                                 <div style="margin-bottom:5px;">
