@@ -213,14 +213,26 @@ Template.readCSV.events({
         });
     },
     'click #btnDeleteRow': function(event, template) {
-        let ft = template.filetypes.get(); // all file type
-        let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
-        $(template.find('table')).find('tr td .chk').each(function() {
-            if ($(this).is(':checked')) {
-                activeFiletype.collection.remove($(this).val());
-                $(template.find(' #ckbSelectAll')).prop('checked', false);
-            }
-        });
+        swal({
+                title: "Are you sure?",
+                text: "Are you sure you want to delete selected records?",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Yes, Delete it!",
+                closeOnConfirm: true
+            },
+            function() {
+                let ft = template.filetypes.get(); // all file type
+                let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
+                $(template.find('table')).find('tr td .chk').each(function() {
+                    if ($(this).is(':checked')) {
+                        activeFiletype.collection.remove($(this).val());
+                        $(template.find(' #ckbSelectAll')).prop('checked', false);
+                    }
+                });
+            });
+
     },
     "click #btngostep2": function(event, template) {
         let Id = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running', stepStatus: 'upload_pending' })._id;
@@ -355,26 +367,35 @@ Template.readCSV.events({
         }, 200);
     },
     "click #csv-file": function(event, template) {
-        if (template.find('#dpdSchema').value != '') {
-            return true;
-        } else {
-            toastr.error(" Please select schema.");
-            return false;
-        }
+        // if (template.find('#dpdSchema').value != '') {
+        //     return true;
+        // } else {
+        //     toastr.error(" Please select schema.");
+        //     return false;
+        // }
     },
     "change #csv-file": function(event, template) {
-        if (template.find('#dpdSchema').value == '') {
-            toastr.error(" Please select schema.");
-            //$(template.find('#csv-file')).val('');
-            return false;
-        }
+        // if (template.find('#dpdSchema').value == '') {
+        //     toastr.error(" Please select schema.");
+        //     //$(template.find('#csv-file')).val('');
+        //     return false;
+        // }
 
-        $(template.find("#dpdSchema")).append('<option value="">--Add new--</option>');
+        //$(template.find("#dpdSchema")).append('<option value="">--Add new--</option>');
         $(template.find("#mapping")).find('.spinner').show();
         $(template.find('#preview')).find('.spinner').show();
-        genrateSchema(template);
 
-        csvFileChange(event, template);
+        if ($(template.find("#dpdSchema")).val() == '') {
+            getHeader(template.find('#csv-file').files[0], template, function() {
+                generateAddSchema(template);
+                csvFileChange(event, template);
+            });
+        } else {
+            genrateSchema(template);
+            csvFileChange(event, template);
+        }
+
+
     },
     "change #hasheader": function(event, template) {
         $(template.find('#mapping')).find('.spinner').show();
@@ -566,7 +587,9 @@ let insertSchema = function(template, cb) {
         "owner": Meteor.userId(),
         "username": Meteor.user().username
     };
-    CollUploaderSchema.insert(data, function() {
+    CollUploaderSchema.insert(data, function(e, res) {
+        console.log('res', res);
+        $(template.find("#dpdSchema")).children('option[value=' + res + ']').prop('selected', true);
         NewHeaderSchema = "{" + NewHeaderSchema + ",fileID: {type: String,label: 'file ID'},owner: {type: String,label: 'owner'},username: {type: String,label: 'username'}}";
 
         let newSchema = eval("new SimpleSchema(" + NewHeaderSchema + ")");
@@ -630,24 +653,24 @@ let csvFileChange = function(event, template) {
         $(template.find("#upload-csv-zone")).addClass('onprogress');
 
         //template.find("#mapping").style.display = 'block';
-        setMapping(template, function() {
-            getHeader(_files[i], template, function() {
-                generateXEditor(template, function() { // generate x-editor
-                    $(template.find("#mapping")).find('.spinner').hide();
-                    $(template.find("#upload-csv-zone")).hide();
-                    $(template.find("#mapping")).show();
-                    $(template.find("#upload-csv-zone")).removeClass('onprogress');
 
-                    // generate Preview
-                    generatePreview(template.find('#csv-file').files[0], template, function() {
-                        //template.find("#mapping").style.display = 'none';
-                        $(template.find('#preview')).find('.spinner').hide();
-                        $(template.find("#preview")).show();
+        getHeader(_files[i], template, function() {
+            generateXEditor(template, function() { // generate x-editor
+                $(template.find("#mapping")).find('.spinner').hide();
+                $(template.find("#upload-csv-zone")).hide();
+                $(template.find("#mapping")).show();
+                $(template.find("#upload-csv-zone")).removeClass('onprogress');
 
-                    });
+                // generate Preview
+                generatePreview(template.find('#csv-file').files[0], template, function() {
+                    //template.find("#mapping").style.display = 'none';
+                    $(template.find('#preview')).find('.spinner').hide();
+                    $(template.find("#preview")).show();
+
                 });
             });
         });
+
         //parseCSV(_files[i], template); // parse csv to json using papa parse
     }
 }
@@ -712,26 +735,6 @@ let setPreviewCollection = function(newFiletypeId, template) {
         }
     }
     template.previewCollection.set(data);
-}
-
-let setMapping = function(template, cb) {
-    let _hasHeader = $(template.find('#hasheader')).prop('checked');
-
-    let ft = template.filetypes.get(); // all file type
-    let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
-    // let csvmapping = Csvfilemapping.findOne({ owner: Meteor.userId(), fileTypeID: activeFiletype.id, hasHeader: _hasHeader });
-    // if (csvmapping != undefined) {
-    //     if (_hasHeader) {
-    //         if (template.mappingWithHeader.get().length == 0) {
-    //             template.mappingWithHeader.set(csvmapping.mapping);
-    //         }
-    //     } else {
-    //         if (template.mappingWithOutHeader.get().length == 0) {
-    //             template.mappingWithOutHeader.set(csvmapping.mapping);
-    //         }
-    //     }
-    // }
-    cb();
 }
 
 let generateMapping = function(template) {
@@ -965,7 +968,7 @@ let changeXEditorValue = function(template) {
 
 let resetAll = function(template) {
     $(template.find('#csv-file')).val('');
-    $(template.find("#dpdSchema option[value='']")).remove();
+    //$(template.find("#dpdSchema option[value='']")).remove();
     $(template.find("#txtNewSchemaName")).hide();
     $(template.find("#mapping")).hide();
     $(template.find("#preview")).hide();
