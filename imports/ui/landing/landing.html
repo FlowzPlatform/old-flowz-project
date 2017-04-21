@@ -82,45 +82,50 @@
           </div>
           {{/each}}
         {{else}}
-        <div class="right">
+        <div class="right col-md-6 col-sm-12 col-xs-12 col-md-offset-3">
         <h3>Choose a method for upload the data</h3>
         <form id="myform">
            <ul class="mySection">
-              <li class="btn" data-something="replace">
-                 <input type="radio" class="show_infoDiv" id="r1" name="myOptions"  value="replace"  />
-                 <img src="tick.png" class="selected_tick1" alt="">
-                 <label  class="dropbtn" for="r1">
-                 REPLACE
-                 </label>
-              </li>
-              <li class="btn" data-something="append">
-                 <input type="radio" class="show_infoDiv" id="r2" name="myOptions" value="append" />
-                 <img src="tick.png" class="selected_tick2" alt="">
-                 <label class="dropbtn" for="r2">
-                 APPEND
-                 </label>
-              </li>
-              <li class="btn" data-something="upsert">
-                 <input type="radio" class="show_infoDiv" id="r3" name="myOptions"  value="upsert" />
-                 <img src="tick.png" class="selected_tick3" alt="">
-                 <label class="dropbtn" for="r3">
-                 UPSERT
-                 </label>
-              </li>
-              <li class="btn" data-something="update">
-                 <input type="radio" class="show_infoDiv" id="r4" name="myOptions"  value="update" />
-                 <img src="tick.png" class="selected_tick4" alt="">
-                 <label class="dropbtn" for="r4">
-                 UPDATE
-                 </label>
-              </li>
+              <div class="row">
+                <li class="btn col-md-3" data-something="replace">
+                   <input type="radio" class="show_infoDiv" id="r1" name="myOptions"  value="replace"  />
+                   <img src="tick.png" class="selected_tick1" alt="">
+                   <label  class="dropbtn" for="r1">
+                   REPLACE
+                   </label>
+                </li>
+                <li class="btn col-md-3" data-something="append">
+                   <input type="radio" class="show_infoDiv" id="r2" name="myOptions" value="append" />
+                   <img src="tick.png" class="selected_tick2" alt="">
+                   <label class="dropbtn" for="r2">
+                   APPEND
+                   </label>
+                </li>
+                <li class="btn col-md-3" data-something="upsert">
+                   <input type="radio" class="show_infoDiv" id="r3" name="myOptions"  value="upsert" />
+                   <img src="tick.png" class="selected_tick3" alt="">
+                   <label class="dropbtn" for="r3">
+                   UPSERT
+                   </label>
+                </li>
+                <li class="btn col-md-3" data-something="update">
+                   <input type="radio" class="show_infoDiv" id="r4" name="myOptions"  value="update" />
+                   <img src="tick.png" class="selected_tick4" alt="">
+                   <label class="dropbtn" for="r4">
+                   UPDATE
+                   </label>
+                </li>
+              </div>
+              
            </ul>
-           <div id="dv" class="clearfix" style="display:none">
+           <div id="dv" class="clearfix col-md-10 col-md-offset-1 col-sm-12 col-xs-12" style="display:none">
               <button type="button" class="close" id ="close_info_div">×</button>
               <img class="bulb" src="idea.png" />
               <p id="get"></p>
            </div>
-           <button class="progress-button" type="button" id="getOptions" data-style="top-line" data-horizontal="">Proceed</button>
+           <div class="landing_progress">
+              <button class="progress-button" type="button" id="getOptions" data-style="top-line" data-horizontal="">Proceed</button>
+           </div>
            <div id="display-error">Please choose a method of your choice.</div>
         </form>
         </div>

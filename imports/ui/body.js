@@ -141,6 +141,12 @@ Template.readCSV.onRendered(function() {
             }
         }
     });
+
+    if($($self.find("#dpdSchema")).val() == ''){
+        $($self.find("#txtNewSchemaName")).show();
+    }else{
+        $($self.find("#txtNewSchemaName")).hide();
+    }
 });
 
 Template.readCSV.events({
@@ -269,7 +275,6 @@ Template.readCSV.events({
                 },
                 function(isConfirm) {
                     if (isConfirm) {
-
                         var _href = $(currentEl).attr('href').split('#')[1];
                         let ft = template.filetypes.get(); // all file type
                         let activeFiletypeId = _.indexOf(ft, _.find(ft, function(d) { return d.isActive }));
