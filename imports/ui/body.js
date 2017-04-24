@@ -1235,15 +1235,22 @@ let setNextFile = function(template, cb) {
         },
         function(isConfirm) {
             if (isConfirm) {
-                //                console.log(template);
-                ft[activeFiletypeId].isActive = false;
-                ft[activeFiletypeId].isDone = true;
-                ft[activeFiletypeId + 1].isActive = true;
-                template.filetypes.set(ft);
-                template.abortData.set(true);
-                resetAll(template);
-                Router.go('/upload/' + ft[activeFiletypeId + 1].id);
-                cb();
+                if (ft[activeFiletypeId].id == "ProductVariationPrice"){
+                    ft[activeFiletypeId].isActive = true;
+                    ft[activeFiletypeId].isDone = true;
+                    template.filetypes.set(ft);
+                    template.abortData.set(true);
+                    cb();
+                }else{
+                    ft[activeFiletypeId].isActive = false;
+                    ft[activeFiletypeId].isDone = true;
+                    ft[activeFiletypeId + 1].isActive = true;
+                    template.filetypes.set(ft);
+                    template.abortData.set(true);
+                    resetAll(template);
+                    Router.go('/upload/' + ft[activeFiletypeId + 1].id);
+                    cb();
+                }     
             } else {
                 ft[activeFiletypeId].isActive = true;
                 ft[activeFiletypeId].isDone = true;
