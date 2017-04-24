@@ -304,6 +304,10 @@ Template.readCSV.events({
             resetAll(template);
             setPreviewCollection(newFiletypeId, template);
             Router.go('/upload/' + _href);
+        
+            if($('#dpdSchema :selected').text() == '--Add new--'){
+                document.getElementById("txtNewSchemaName").style.display="inline";
+            }
         }
         return
     },
@@ -1627,6 +1631,7 @@ let insertCSVData = function(data, fileID, collection, cb) {
 let errorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     td.style.border = "2px solid red";
+
 };
 
 let getHandsonHeader = function(headers, invalidKeys) {
@@ -1686,3 +1691,9 @@ Template.EditorPage.helpers({
         return "function(row){\n return row; \n};\n";
     }
 });
+
+
+
+// if($self.find("#dpdSchema").val() == 'Untitled schema'){
+//         $('#txtNewSchemaName').css('display': 'inline');
+//     }
