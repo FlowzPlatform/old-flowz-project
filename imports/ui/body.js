@@ -556,6 +556,36 @@ Template.readCSV.events({
     }
 });
 
+// get schemaType
+
+let getschemaType = function(schemaType){
+    let regEx = undefined;
+        switch(schemaType.toLowerCase())
+        {
+            case 'email' : 
+                regEx  = 'SimpleSchema.RegEx.Email';
+                 break;
+
+            case 'url' : 
+                regEx  = 'SimpleSchema.RegEx.Url';
+                break;
+
+            case 'time' : 
+                regEx  = '^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$';
+                break;
+
+            case 'phone' : 
+                regEx  = 'SimpleSchema.RegEx.Phone';
+                break;
+            case 'pin code' : 
+                regEx  = 'SimpleSchema.RegEx.ZipCode';
+                break;
+        }
+    return regEx;
+}
+
+
+
 let insertSchema = function(template, cb) {
     // get current sheet
     let ft = template.filetypes.get(); // all file type
@@ -568,9 +598,8 @@ let insertSchema = function(template, cb) {
     let NewHeaderSchema = "";
     _.each(header, function(d, index) {
         let propertyData = $("#property_" + index).data();
-
+        let _type = $(template.find("#dpdSchemaType_" + index)).editable('getValue')["dpdSchemaType_" + index];
         if (propertyData != undefined) {
-            let _type = $(template.find("#dpdSchemaType_" + index)).editable('getValue')["dpdSchemaType_" + index];
             let property = {
                 type: _type,
                 min: (propertyData.min == '') ? undefined : propertyData.min,
@@ -580,9 +609,16 @@ let insertSchema = function(template, cb) {
                 optional: (propertyData.optional == undefined) ? true : propertyData.optional,
                 label: d
             };
+
+
+            if((getschemaType(_type)) != undefined){
+                property.type = 'String';
+                property.regEx = getschemaType(_type);
+            }
+
             NewHeaderSchema += "\"" + d + "\":{type:" + property.type + ",regEx:" + property.regEx + ",min:" + property.min + ",max:" + property.max + ",optional: " + property.optional + ",label:\"" + property.label + "\"},";
         } else {
-            NewHeaderSchema += "\"" + d + "\":{type: String,optional: true,label: \"" + d + "\"},";
+            NewHeaderSchema += "\"" + d + "\":{type:" + _type + ",optional: true,label: \"" + d + "\"},";
         }
         //NewHeaderSchema += "\"" + d + "\":{type: String,optional: true,label: \"" + d + "\"},";
     });
@@ -772,7 +808,7 @@ let generateMapping = function(template) {
     return mapping;
 }
 
-const schemaTypes = ['String', 'Number', 'Boolean', 'Date'];
+const schemaTypes = ['String', 'Number', 'Boolean', 'Date' , 'Email' , 'URL' , 'Time' , 'Phone' , 'Pin code'];
 
 let generateXEditor = function(template, cb) {
     let activefile = template.headers.get(); //_.map(getActiveHeaders(template), function(d) { return (d.label == undefined) ? '' : d.label }); // get active file type data
@@ -1693,7 +1729,3 @@ Template.EditorPage.helpers({
 });
 
 
-
-// if($self.find("#dpdSchema").val() == 'Untitled schema'){
-//         $('#txtNewSchemaName').css('display': 'inline');
-//     }
