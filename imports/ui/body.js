@@ -577,7 +577,7 @@ let getschemaType = function(schemaType){
             case 'phone' : 
                 regEx  = 'SimpleSchema.RegEx.Phone';
                 break;
-            case 'pin code' : 
+            case 'pin-code' : 
                 regEx  = 'SimpleSchema.RegEx.ZipCode';
                 break;
         }
@@ -604,10 +604,15 @@ let insertSchema = function(template, cb) {
                 type: _type,
                 min: (propertyData.min == '') ? undefined : propertyData.min,
                 max: (propertyData.max == '') ? undefined : propertyData.max,
-                //allowedValues: (propertyData.allowedValues != undefined) ? "[" + propertyData.allowedValues + "]" : undefined,
                 regEx: (propertyData.regEx == '') ? undefined : propertyData.regEx,
                 optional: (propertyData.optional == undefined) ? true : propertyData.optional,
-                label: d
+                // sDate: (propertyData.sDate == '') ? undefined : propertyData.sDate,
+                // eDate: (propertyData.eDate == '') ? undefined : propertyData.eDate,
+                // sTime: (propertyData.sTime == '') ? undefined : propertyData.sTime,
+                // eTime: (propertyData.eTime == '') ? undefined : propertyData.eTime,
+                defaultValue: (propertyData.defaultValue == '') ? undefined : propertyData.defaultValue,
+                label: (propertyData.label == '') ? d : propertyData.label,
+                allowedValues: (propertyData.allowedValues == '') ? undefined : propertyData.allowedValues
             };
 
 
@@ -615,10 +620,10 @@ let insertSchema = function(template, cb) {
                 property.type = 'String';
                 property.regEx = getschemaType(_type);
             }
+            NewHeaderSchema += "\"" + d + "\":{type:" + property.type + ",defaultValue:" + property.defaultValue + ",allowedValues:" + property.allowedValues + ",regEx:" + property.regEx + ",min:" + property.min + ",max:" + property.max + ",optional: " + property.optional + ",label:\"" + property.label + "\"},";
 
-            NewHeaderSchema += "\"" + d + "\":{type:" + property.type + ",regEx:" + property.regEx + ",min:" + property.min + ",max:" + property.max + ",optional: " + property.optional + ",label:\"" + property.label + "\"},";
         } else {
-            NewHeaderSchema += "\"" + d + "\":{type:" + _type + ",optional: true,label: \"" + d + "\"},";
+            NewHeaderSchema += "\"" + d + "\":{type:" + _type + ",optional: true,setLabel: \"" + d + "\"},";
         }
         //NewHeaderSchema += "\"" + d + "\":{type: String,optional: true,label: \"" + d + "\"},";
     });
@@ -808,7 +813,7 @@ let generateMapping = function(template) {
     return mapping;
 }
 
-const schemaTypes = ['String', 'Number', 'Boolean', 'Date' , 'Email' , 'URL' , 'Time' , 'Phone' , 'Pin code'];
+const schemaTypes = ['String', 'Number', 'Boolean', 'Date' , 'Email' , 'URL' , 'Time' , 'Phone' , 'Pin-code'];
 
 let generateXEditor = function(template, cb) {
     let activefile = template.headers.get(); //_.map(getActiveHeaders(template), function(d) { return (d.label == undefined) ? '' : d.label }); // get active file type data
@@ -870,14 +875,21 @@ let generateXEditor = function(template, cb) {
             $(template.find('#dpdSchemaType_' + index)).editable({
                 type: 'select',
                 value: 'String',
-                source: schemaTypes
+                source: schemaTypes,
+                success: function(response,newValue){
+                    console.log(newValue);
+                     var content_type = '#property_content_' + newValue;
+                    $("#property_" + index).data('bs.popover').options.content = $(content_type).html();
+                }
             });
+
+            var content_type = '#property_content_' + $(template.find('#dpdSchemaType_' + index)).text();
 
             $(template.find("#property_" + index)).popover({
                 //trigger: "click",
                 //trigger: 'manual',
                 html: true,
-                content: $('#property_content').html(),
+                content: $(content_type).html(),
             }).on('click', function() {
 
                 //$(this).popover('show');
@@ -889,8 +901,14 @@ let generateXEditor = function(template, cb) {
                 if (propertyData != undefined) {
                     $("#txtMin").val(propertyData.min);
                     $("#txtMax").val(propertyData.max);
-                    //$("#txtAllowedValues").val(propertyData.allowedValues);
                     $("#txtRegEx").val(propertyData.regEx);
+                    // $("#sDate").val(propertyData.sDate);
+                    // $("#eDate").val(propertyData.eDate);
+                    // $("#sTime").val(propertyData.sTime);
+                    // $("#eTime").val(propertyData.eTime);
+                    $("#default").val(propertyData.defaultValue);
+                    $("#setLabel").val(propertyData.label);
+                    $("#allowedValue").val(propertyData.allowedValues);
                     $("#ckbSchemaOptional").prop('checked', propertyData.optional);
                 }
 
@@ -904,9 +922,15 @@ let generateXEditor = function(template, cb) {
                 $("#saveProperty").unbind('click');
                 $("#saveProperty").click(function() {
                     $("#property_" + index).data({
-                        min: $("#txtMin").val(),
+                        min: $("#txtMin").val(),    
                         max: $("#txtMax").val(),
-                        //allowedValues: $("#txtAllowedValues").val(),
+                        // sDate: $("#sDate").val(),
+                        // eDate: $("#eDate").val(),
+                        // sTime: $("#sTime").val(),
+                        // eTime: $("#eTime").val(),
+                        defaultValue: $("#default").val(),
+                        label: $("#setLabel").val(),
+                        allowedValues: $("#allowedValue").val(),
                         regEx: $("#txtRegEx").val(),
                         optional: $("#ckbSchemaOptional").prop('checked')
                     });
@@ -1727,5 +1751,3 @@ Template.EditorPage.helpers({
         return "function(row){\n return row; \n};\n";
     }
 });
-
-
