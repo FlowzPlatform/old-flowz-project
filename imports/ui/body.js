@@ -304,7 +304,7 @@ Template.readCSV.events({
             resetAll(template);
             setPreviewCollection(newFiletypeId, template);
             Router.go('/upload/' + _href);
-        
+
             if($('#dpdSchema :selected').text() == '--Add new--'){
                 document.getElementById("txtNewSchemaName").style.display="inline";
             }
@@ -562,22 +562,22 @@ let getschemaType = function(schemaType){
     let regEx = undefined;
         switch(schemaType.toLowerCase())
         {
-            case 'email' : 
+            case 'email' :
                 regEx  = 'SimpleSchema.RegEx.Email';
                  break;
 
-            case 'url' : 
+            case 'url' :
                 regEx  = 'SimpleSchema.RegEx.Url';
                 break;
 
-            case 'time' : 
+            case 'time' :
                 regEx  = '^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$';
                 break;
 
-            case 'phone' : 
+            case 'phone' :
                 regEx  = 'SimpleSchema.RegEx.Phone';
                 break;
-            case 'pin-code' : 
+            case 'pin-code' :
                 regEx  = 'SimpleSchema.RegEx.ZipCode';
                 break;
         }
@@ -922,7 +922,7 @@ let generateXEditor = function(template, cb) {
                 $("#saveProperty").unbind('click');
                 $("#saveProperty").click(function() {
                     $("#property_" + index).data({
-                        min: $("#txtMin").val(),    
+                        min: $("#txtMin").val(),
                         max: $("#txtMax").val(),
                         // sDate: $("#sDate").val(),
                         // eDate: $("#eDate").val(),
@@ -1314,7 +1314,7 @@ let setNextFile = function(template, cb) {
                     resetAll(template);
                     Router.go('/upload/' + ft[activeFiletypeId + 1].id);
                     cb();
-                }     
+                }
             } else {
                 ft[activeFiletypeId].isActive = true;
                 ft[activeFiletypeId].isDone = true;
@@ -1691,11 +1691,7 @@ let insertCSVData = function(data, fileID, collection, cb) {
 let errorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     td.style.border = "2px solid red";
-<<<<<<< ce7fe790c901d1e205f8f76a7c738f8238bb18d0
-
-=======
     $(td).focus();
->>>>>>> jobQueue related changes
 };
 
 let getHandsonHeader = function(headers, invalidKeys) {
