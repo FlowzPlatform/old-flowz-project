@@ -36,6 +36,8 @@ if (Meteor.isServer) {
                 if (action == "completed") {
                     updateData['stepStatus'] = 'import_completed'
                 }
+                //temporary set
+                return true;
                 CollUploadJobMaster.update({ _id: documentId }, {
                     $set: updateData
                 }, function(e, res) {
