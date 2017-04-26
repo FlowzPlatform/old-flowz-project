@@ -1254,7 +1254,7 @@ let generatePreview = function(_file, template, cb) {
     generateMapping(template);
     mapping = template.mapping.get();
 
-    //Papa.LocalChunkSize = _file.size; 
+    //Papa.LocalChunkSize = _file.size;
     Papa.parse(_file, {
         header: true,
         dynamicTyping: true,
@@ -1691,7 +1691,11 @@ let insertCSVData = function(data, fileID, collection, cb) {
 let errorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     td.style.border = "2px solid red";
+<<<<<<< ce7fe790c901d1e205f8f76a7c738f8238bb18d0
 
+=======
+    $(td).focus();
+>>>>>>> jobQueue related changes
 };
 
 let getHandsonHeader = function(headers, invalidKeys) {
