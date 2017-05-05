@@ -1352,7 +1352,7 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 }
 
 .rfq-view .rfq-discussion .rfq-messages {
-    height: 450px;
+    height: calc(100vh - 215px);
     overflow-y: auto;
 }
 
