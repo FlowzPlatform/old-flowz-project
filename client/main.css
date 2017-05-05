@@ -1340,19 +1340,22 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 }
 
 .rfq-view .rfq-discussion .reply-form {
-    padding: 20px 20px 20px 0px;
+    padding: 20px 0px 20px 0px;
     border-top: 1px solid #ccc;
     margin-top: 10px;
+    margin-right: 20px;
 }
 
+
+/*
 .rfq-view .rfq-discussion .reply-form textarea {
     float: left;
     width: 88%;
     height: 85px;
-}
+}*/
 
-.rfq-view .rfq-discussion .rfq-messages {
-    height: calc(100vh - 215px);
+.rfq-view .rfq-discussion {
+    height: calc(100vh - 75px);
     overflow-y: auto;
 }
 
