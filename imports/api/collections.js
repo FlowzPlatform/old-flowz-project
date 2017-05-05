@@ -26,7 +26,7 @@ export const CollUploadJobMaster = new Mongo.Collection(collectionPrefix + 'JobM
 export const Csvfiles = new Mongo.Collection(collectionPrefix + 'CSVFiles');
 export const Csvfilemapping = new Mongo.Collection(collectionPrefix + 'CSVFileMapping');
 
-
+export const CollCloseOutPromoRFQSent = new Mongo.Collection('closeOutPromoRFQSent');
 // add schema
 
 // CollProductInformation.attachSchema(ProductInformationSchema);

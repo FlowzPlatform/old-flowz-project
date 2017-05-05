@@ -1,14 +1,21 @@
 {
-  "AWSAccessKeyId" : "AKIAJQW2JIUUGYHJMCJA",
-  "AWSSecretAccessKey" : "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",
-  "AWSBucket" : "airflowbucket1",
-  "AWSRegion" : "us-west-2",
-  "AWSCfdomain" : "https://dp6ct51vh4t01.cloudfront.net",
-  "DRKeyId" : "pezn0cba8ecmkci",
-  "DRSecretAccessKey" : "ydxskaq9gkva7x7",
-  "DRToken" : "rbSOQdVIP5AAAAAAAAAACUnkZubR-NmK8n_Jte1SldixlKK8kQtkt4PdUMVRuv_a",
-  "FTHost" : "ftp3.officebeacon.com",
-  "FTPort" : 21,
-  "FTUser" : "prozoom",
-  "FTPass" : "e6354wdfgbnm"
+    "AWSAccessKeyId": "AKIAJQW2JIUUGYHJMCJA",
+    "AWSSecretAccessKey": "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",
+    "AWSBucket": "airflowbucket1",
+    "AWSRegion": "us-west-2",
+    "AWSCfdomain": "https://dp6ct51vh4t01.cloudfront.net",
+    "DRKeyId": "pezn0cba8ecmkci",
+    "DRSecretAccessKey": "ydxskaq9gkva7x7",
+    "DRToken": "rbSOQdVIP5AAAAAAAAAACUnkZubR-NmK8n_Jte1SldixlKK8kQtkt4PdUMVRuv_a",
+    "FTHost": "ftp3.officebeacon.com",
+    "FTPort": 21,
+    "FTUser": "prozoom",
+    "FTPass": "e6354wdfgbnm",
+    "public": {
+        "elasticsearch": {
+            "host": "https://7e94c6196993fd6c3d570a3d40e100d1.us-east-1.aws.found.io:9243",
+            "username": "elastic",
+            "password": "SwmLSQli9PvtUNsm63Ce7dpr"
+        }
+    }
 }

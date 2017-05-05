@@ -1,0 +1,35 @@
+<template name="rfq">
+    {{> header}}
+    <div class="">
+        {{#if currentUser}}
+            <div class="rfq-view">
+                <ul class="nav">
+                    {{#each rfq}}
+                         
+                        <li class="rfq_id {{#if $eq @index 0}} active {{/if}}" data-id={{_id}}> <span> {{_id}} </span> </li>
+                    {{/each}}
+                </ul>
+                <div class="rfq-discussion">
+                    {{#if rfqdiscussion._source.discussion}}
+                        <div>
+                            {{#each rfqdiscussion._source.discussion}}
+                                <div class="media">
+                                    <div class="media-left">
+                                        <img src="https://www.w3schools.com/bootstrap/img_avatar1.png" class="media-object" style="width:60px">
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="media-heading">{{from}}</h4>
+                                        <div>{{{message}}}</div>
+                                    </div>
+                                </div>
+                            {{/each}}
+                        </div>
+                    {{/if}}
+                    <div>
+                        <input type="text" class="form-control" />
+                    </div>
+                </div>
+            </div>
+        {{/if}}
+    </div>
+</template>

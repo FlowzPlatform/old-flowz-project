@@ -44,6 +44,6 @@ Router.route('/import', function() {
     this.render('import');
 });
 
-Router.route('/schema', function() {
-    this.render('schema');
+Router.route('/rfq', function() {
+    this.render('rfq');
 });

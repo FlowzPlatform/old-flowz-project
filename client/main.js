@@ -15,3 +15,5 @@ import '../imports/ui/import/import.css';
 
 // schema
 import '../imports/ui/schema/schema.js';
+
+import '../imports/ui/rfq/rfq.js';

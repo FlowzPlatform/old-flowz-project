@@ -1255,3 +1255,86 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 #mapping.add-schema-show .newSchemaProperty {
     display: table-cell;
 }
+
+
+/***************************  rfq-view ********************************/
+
+.rfq-view {
+    position: relative;
+}
+
+.rfq-view .nav {
+    border-right: 1px solid #ccc;
+    position: absolute;
+    top: -20px;
+    left: 0;
+    height: calc(100vh - 50px);
+    background: rgba(221, 221, 221, 0.2);
+    width: 300px;
+}
+
+.rfq-view .nav li:first-child {
+    border-top: 1px solid #ccc;
+}
+
+.rfq-view .nav li {
+    border-bottom: 1px solid #ccc;
+    padding: 7px;
+    cursor: pointer;
+}
+
+.rfq-view .nav li.active {
+    background: #ccc;
+}
+
+.rfq-view .rfq-discussion {
+    margin-left: 320px;
+}
+
+.rfq-view .rfq-discussion .media {
+    padding: 20px 20px 20px 0px;
+}
+
+.rfq-view .rfq-discussion .media .media-body {
+    border: 1px solid #d1d5da;
+    position: relative;
+    overflow: visible;
+}
+
+.rfq-view .rfq-discussion .media .media-body .media-heading {
+    background: #f6f8fa;
+    padding: 8px;
+    font-size: 15px;
+    border-bottom: 1px solid #d1d5da;
+}
+
+.rfq-view .rfq-discussion .media .media-body>div {
+    padding: 10px;
+}
+
+.rfq-view .rfq-discussion .media .media-body::before,
+.rfq-view .rfq-discussion .media .media-body::after {
+    position: absolute;
+    top: 11px;
+    right: 100%;
+    left: -16px;
+    display: block;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    content: " ";
+    border-color: transparent;
+    border-style: solid solid outset;
+}
+
+.rfq-view .rfq-discussion .media .media-body::after {
+    margin-top: 1px;
+    margin-left: 2px;
+    border-width: 7px;
+    border-right-color: #f6f8fa;
+}
+
+.rfq-view .rfq-discussion .media .media-body::before {
+    border-width: 8px;
+    border-right-color: #d1d5da;
+}
