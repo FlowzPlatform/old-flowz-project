@@ -11,11 +11,11 @@
                 </ul>
                 <div class="rfq-discussion">
                     {{#if rfqdiscussion._source.discussion}}
-                        <div>
+                        <div class="rfq-messages">
                             {{#each rfqdiscussion._source.discussion}}
                                 <div class="media">
                                     <div class="media-left">
-                                        <img src="https://www.w3schools.com/bootstrap/img_avatar1.png" class="media-object" style="width:60px">
+                                        <img src="https://www.w3schools.com/bootstrap/img_avatar1.png" class="media-object" style="width:32px">
                                     </div>
                                     <div class="media-body">
                                         <h4 class="media-heading">{{from}}</h4>
@@ -25,8 +25,18 @@
                             {{/each}}
                         </div>
                     {{/if}}
-                    <div>
-                        <input type="text" class="form-control" />
+                    <div class="reply-form">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <textarea id="txtReply" class="form-control" ></textarea>
+                                <button id="btnReply" style="margin-left:5px;" class="progress-button progress-button-small pull-right" data-style="top-line" data-horizontal="">
+                                    <span class="content"><i class="fa fa-reply"></i>&nbsp;Reply</span>
+                                    <span class="progress">
+                                        <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

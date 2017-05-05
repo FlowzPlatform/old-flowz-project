@@ -1292,7 +1292,7 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 }
 
 .rfq-view .rfq-discussion .media {
-    padding: 20px 20px 20px 0px;
+    padding: 0px 20px 0px 0px;
 }
 
 .rfq-view .rfq-discussion .media .media-body {
@@ -1337,6 +1337,23 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 .rfq-view .rfq-discussion .media .media-body::before {
     border-width: 8px;
     border-right-color: #d1d5da;
+}
+
+.rfq-view .rfq-discussion .reply-form {
+    padding: 20px 20px 20px 0px;
+    border-top: 1px solid #ccc;
+    margin-top: 10px;
+}
+
+.rfq-view .rfq-discussion .reply-form textarea {
+    float: left;
+    width: 88%;
+    height: 85px;
+}
+
+.rfq-view .rfq-discussion .rfq-messages {
+    height: 450px;
+    overflow-y: auto;
 }
 
 #tblPreview {
