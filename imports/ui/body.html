@@ -1,4 +1,4 @@
-<body>
+ <body>
 
 </body>
 <template name="header">
@@ -47,7 +47,7 @@
                 </div>
 
                 <div class="tab-content">
-                    <div role="tabpanel" class="tab-pane active" style="margin-bottom:20px; ">
+                    <div role="tabpanel" class="tab-pane active">
                         {{#if $and previewCollection.length abortData}}
                             <div class="panel panel-default">
                                 <div class="panel-heading">
@@ -58,7 +58,7 @@
                                 </div>
                                 <div class="panel-body">
                                     
-                                    <div class="table-responsive preview">
+                                    <div class="preview">
                                         <!--<table class="table table-bordered table-hover">
                                             <thead>
                                                 <tr>
@@ -85,10 +85,18 @@
                             </div>
                         {{else}}
                             {{#if isImagesTab}}
-                                <div class="imageOrFileDiv">
+                                <!-- <div class="imageOrFileDiv">
                                         <button class="imageOrFileButton" type="button" id="btnUploadCsv">Upload File</button>
                                         <button class="imageOrFileButton" type="button" id="btnUploadImage">Upload Image</button>
-                                </div>
+                                </div> -->
+
+                                <ul class="nav nav-tabs nav-tabs1" role="tablist">
+                                    <li role="presentation" class="active">
+                                        <a href="#home" aria-controls="home" role="tab" id="btnUploadCsv" data-toggle="tab">Upload File</a>
+                                    </li>
+                                    <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" id="btnUploadImage" data-toggle="tab">Upload Image</a></li>
+                                </ul>
+
                             {{/if}}
                             <div id="uploadCsv">
                                 <div style="margin-bottom:5px;">
@@ -261,7 +269,55 @@
         {{/if}}
      </div>
 
-    <script id="property_content" type="html">
+    <script id="property_content_String" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Max Length</div>
+                            <input id="txtMax" type="number"  class="form-control" placeholder="Ex:100"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control" placeholder='e.g. ["A","B"]'/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Default</div>
+                            <input id="default" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">RegEx</div>
+                            <input id="txtRegEx" type="string"  class="form-control" placeholder="Ex: /^[a-z0-9A-Z_]{3,15}$/" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="property_content_Number" type="html">
         <form>
             <div class="row">
                 <div class="col-md-12">
@@ -279,8 +335,298 @@
                     </div>
                     <div class="form-group">
                         <div class="input-group">
-                            <div class="input-group-addon">RegEx</div>
-                            <input id="txtRegEx" type="string"  class="form-control" placeholder="Ex: /^[a-z0-9A-Z_]{3,15}$/" />
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Default</div>
+                            <input id="default" type="number"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="property_content_Boolean" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">Default
+                            <select id="default" class="form-control">
+                            <option selected value="true">True</option>
+                            <option value="false">False</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="property_content_Date" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Start</div>
+                            <input id="sDate" type="date" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">End</div>
+                            <input id="eDATE" type="date"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Default</div>
+                            <input id="default" type="date"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="property_content_Email" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Default</div>
+                            <input id="default" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="property_content_URL" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Default</div>
+                            <input id="default" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="property_content_Time" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Start Time</div>
+                            <input id="sTime" type="time" class="form-control" placeholder="Ex: 0"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">End Time</div>
+                            <input id="eTime" type="time"  class="form-control" placeholder="Ex:100"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Default</div>
+                            <input id="default" type="time"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="property_content_Phone" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Default</div>
+                            <input id="default" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="property_content_Pin-code" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Default</div>
+                            <input id="default" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
                         </div>
                     </div>
                     <div class="form-group">
@@ -365,12 +711,12 @@
 
 <template name="imageUpload">
   <div class="" id="content">
-		<div class="row" id="title_row">
-			<div class="col-md-12">
-				<!--<div  id="page_menu" class="pull-right">
-				</div>-->
+        <div class="row" id="title_row">
+            <div class="col-md-12">
+                <!--<div  id="page_menu" class="pull-right">
+                </div>-->
                 <form action="/" class="dropzone" id="my-awesome-dropzone"></form>
-			</div>
-		</div>
-	</div>
-</template>
+            </div>
+        </div>
+    </div>
+</template> 

@@ -1338,3 +1338,66 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
     border-width: 8px;
     border-right-color: #d1d5da;
 }
+
+#tblPreview {
+    max-height: 43vh;
+    display: block;
+    overflow: auto;
+}
+
+#tblPreview thead {
+    display: table-header-group;
+}
+
+#tblPreview tbody {
+    display: table-row-group;
+}
+
+
+/*Nav Tabs*/
+
+.nav-tabs1 {
+    border-bottom: 2px solid #DDD;
+    margin-bottom: 15px;
+}
+
+.nav-tabs1>li.active>a,
+.nav-tabs1>li.active>a:focus,
+.nav-tabs1>li.active>a:hover {
+    border-width: 0;
+    background-color: #eee;
+}
+
+.nav-tabs1>li>a {
+    border: none;
+    color: #666;
+}
+
+.nav-tabs1>li.active>a,
+.nav-tabs1>li>a:hover {
+    border: none;
+    color: #4285F4 !important;
+    background: transparent;
+}
+
+.nav-tabs1>li>a::after {
+    content: "";
+    background: #4285F4;
+    height: 2px;
+    position: absolute;
+    width: 100%;
+    left: 0px;
+    bottom: -1px;
+    transition: all 250ms ease 0s;
+    transform: scale(0);
+}
+
+.nav-tabs1>li.active>a::after,
+.nav-tabs1>li:hover>a::after {
+    transform: scale(1);
+}
+
+.tab-nav>li>a::after {
+    background: #21527d none repeat scroll 0% 0%;
+    color: #fff;
+}

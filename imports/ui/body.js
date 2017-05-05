@@ -141,6 +141,12 @@ Template.readCSV.onRendered(function() {
             }
         }
     });
+
+    if($($self.find("#dpdSchema")).val() == ''){
+        $($self.find("#txtNewSchemaName")).show();
+    }else{
+        $($self.find("#txtNewSchemaName")).hide();
+    }
 });
 
 Template.readCSV.events({
@@ -269,7 +275,6 @@ Template.readCSV.events({
                 },
                 function(isConfirm) {
                     if (isConfirm) {
-
                         var _href = $(currentEl).attr('href').split('#')[1];
                         let ft = template.filetypes.get(); // all file type
                         let activeFiletypeId = _.indexOf(ft, _.find(ft, function(d) { return d.isActive }));
@@ -299,6 +304,10 @@ Template.readCSV.events({
             resetAll(template);
             setPreviewCollection(newFiletypeId, template);
             Router.go('/upload/' + _href);
+
+            if($('#dpdSchema :selected').text() == '--Add new--'){
+                document.getElementById("txtNewSchemaName").style.display="inline";
+            }
         }
         return
     },
@@ -547,6 +556,36 @@ Template.readCSV.events({
     }
 });
 
+// get schemaType
+
+let getschemaType = function(schemaType){
+    let regEx = undefined;
+        switch(schemaType.toLowerCase())
+        {
+            case 'email' :
+                regEx  = 'SimpleSchema.RegEx.Email';
+                 break;
+
+            case 'url' :
+                regEx  = 'SimpleSchema.RegEx.Url';
+                break;
+
+            case 'time' :
+                regEx  = '^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$';
+                break;
+
+            case 'phone' :
+                regEx  = 'SimpleSchema.RegEx.Phone';
+                break;
+            case 'pin-code' :
+                regEx  = 'SimpleSchema.RegEx.ZipCode';
+                break;
+        }
+    return regEx;
+}
+
+
+
 let insertSchema = function(template, cb) {
     // get current sheet
     let ft = template.filetypes.get(); // all file type
@@ -559,21 +598,32 @@ let insertSchema = function(template, cb) {
     let NewHeaderSchema = "";
     _.each(header, function(d, index) {
         let propertyData = $("#property_" + index).data();
-
+        let _type = $(template.find("#dpdSchemaType_" + index)).editable('getValue')["dpdSchemaType_" + index];
         if (propertyData != undefined) {
-            let _type = $(template.find("#dpdSchemaType_" + index)).editable('getValue')["dpdSchemaType_" + index];
             let property = {
                 type: _type,
                 min: (propertyData.min == '') ? undefined : propertyData.min,
                 max: (propertyData.max == '') ? undefined : propertyData.max,
-                //allowedValues: (propertyData.allowedValues != undefined) ? "[" + propertyData.allowedValues + "]" : undefined,
                 regEx: (propertyData.regEx == '') ? undefined : propertyData.regEx,
                 optional: (propertyData.optional == undefined) ? true : propertyData.optional,
-                label: d
+                // sDate: (propertyData.sDate == '') ? undefined : propertyData.sDate,
+                // eDate: (propertyData.eDate == '') ? undefined : propertyData.eDate,
+                // sTime: (propertyData.sTime == '') ? undefined : propertyData.sTime,
+                // eTime: (propertyData.eTime == '') ? undefined : propertyData.eTime,
+                defaultValue: (propertyData.defaultValue == '') ? undefined : propertyData.defaultValue,
+                label: (propertyData.label == '') ? d : propertyData.label,
+                allowedValues: (propertyData.allowedValues == '') ? undefined : propertyData.allowedValues
             };
-            NewHeaderSchema += "\"" + d + "\":{type:" + property.type + ",regEx:" + property.regEx + ",min:" + property.min + ",max:" + property.max + ",optional: " + property.optional + ",label:\"" + property.label + "\"},";
+
+
+            if((getschemaType(_type)) != undefined){
+                property.type = 'String';
+                property.regEx = getschemaType(_type);
+            }
+            NewHeaderSchema += "\"" + d + "\":{type:" + property.type + ",defaultValue:" + property.defaultValue + ",allowedValues:" + property.allowedValues + ",regEx:" + property.regEx + ",min:" + property.min + ",max:" + property.max + ",optional: " + property.optional + ",label:\"" + property.label + "\"},";
+
         } else {
-            NewHeaderSchema += "\"" + d + "\":{type: String,optional: true,label: \"" + d + "\"},";
+            NewHeaderSchema += "\"" + d + "\":{type:" + _type + ",optional: true,setLabel: \"" + d + "\"},";
         }
         //NewHeaderSchema += "\"" + d + "\":{type: String,optional: true,label: \"" + d + "\"},";
     });
@@ -763,7 +813,7 @@ let generateMapping = function(template) {
     return mapping;
 }
 
-const schemaTypes = ['String', 'Number', 'Boolean', 'Date'];
+const schemaTypes = ['String', 'Number', 'Boolean', 'Date' , 'Email' , 'URL' , 'Time' , 'Phone' , 'Pin-code'];
 
 let generateXEditor = function(template, cb) {
     let activefile = template.headers.get(); //_.map(getActiveHeaders(template), function(d) { return (d.label == undefined) ? '' : d.label }); // get active file type data
@@ -825,14 +875,21 @@ let generateXEditor = function(template, cb) {
             $(template.find('#dpdSchemaType_' + index)).editable({
                 type: 'select',
                 value: 'String',
-                source: schemaTypes
+                source: schemaTypes,
+                success: function(response,newValue){
+                    console.log(newValue);
+                     var content_type = '#property_content_' + newValue;
+                    $("#property_" + index).data('bs.popover').options.content = $(content_type).html();
+                }
             });
+
+            var content_type = '#property_content_' + $(template.find('#dpdSchemaType_' + index)).text();
 
             $(template.find("#property_" + index)).popover({
                 //trigger: "click",
                 //trigger: 'manual',
                 html: true,
-                content: $('#property_content').html(),
+                content: $(content_type).html(),
             }).on('click', function() {
 
                 //$(this).popover('show');
@@ -844,8 +901,14 @@ let generateXEditor = function(template, cb) {
                 if (propertyData != undefined) {
                     $("#txtMin").val(propertyData.min);
                     $("#txtMax").val(propertyData.max);
-                    //$("#txtAllowedValues").val(propertyData.allowedValues);
                     $("#txtRegEx").val(propertyData.regEx);
+                    // $("#sDate").val(propertyData.sDate);
+                    // $("#eDate").val(propertyData.eDate);
+                    // $("#sTime").val(propertyData.sTime);
+                    // $("#eTime").val(propertyData.eTime);
+                    $("#default").val(propertyData.defaultValue);
+                    $("#setLabel").val(propertyData.label);
+                    $("#allowedValue").val(propertyData.allowedValues);
                     $("#ckbSchemaOptional").prop('checked', propertyData.optional);
                 }
 
@@ -861,7 +924,13 @@ let generateXEditor = function(template, cb) {
                     $("#property_" + index).data({
                         min: $("#txtMin").val(),
                         max: $("#txtMax").val(),
-                        //allowedValues: $("#txtAllowedValues").val(),
+                        // sDate: $("#sDate").val(),
+                        // eDate: $("#eDate").val(),
+                        // sTime: $("#sTime").val(),
+                        // eTime: $("#eTime").val(),
+                        defaultValue: $("#default").val(),
+                        label: $("#setLabel").val(),
+                        allowedValues: $("#allowedValue").val(),
                         regEx: $("#txtRegEx").val(),
                         optional: $("#ckbSchemaOptional").prop('checked')
                     });
@@ -1185,7 +1254,7 @@ let generatePreview = function(_file, template, cb) {
     generateMapping(template);
     mapping = template.mapping.get();
 
-    //Papa.LocalChunkSize = _file.size; 
+    //Papa.LocalChunkSize = _file.size;
     Papa.parse(_file, {
         header: true,
         dynamicTyping: true,
@@ -1230,15 +1299,22 @@ let setNextFile = function(template, cb) {
         },
         function(isConfirm) {
             if (isConfirm) {
-                //                console.log(template);
-                ft[activeFiletypeId].isActive = false;
-                ft[activeFiletypeId].isDone = true;
-                ft[activeFiletypeId + 1].isActive = true;
-                template.filetypes.set(ft);
-                template.abortData.set(true);
-                resetAll(template);
-                Router.go('/upload/' + ft[activeFiletypeId + 1].id);
-                cb();
+                if (ft[activeFiletypeId].id == "ProductVariationPrice"){
+                    ft[activeFiletypeId].isActive = true;
+                    ft[activeFiletypeId].isDone = true;
+                    template.filetypes.set(ft);
+                    template.abortData.set(true);
+                    cb();
+                }else{
+                    ft[activeFiletypeId].isActive = false;
+                    ft[activeFiletypeId].isDone = true;
+                    ft[activeFiletypeId + 1].isActive = true;
+                    template.filetypes.set(ft);
+                    template.abortData.set(true);
+                    resetAll(template);
+                    Router.go('/upload/' + ft[activeFiletypeId + 1].id);
+                    cb();
+                }
             } else {
                 ft[activeFiletypeId].isActive = true;
                 ft[activeFiletypeId].isDone = true;
@@ -1615,6 +1691,7 @@ let insertCSVData = function(data, fileID, collection, cb) {
 let errorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     td.style.border = "2px solid red";
+    $(td).focus();
 };
 
 let getHandsonHeader = function(headers, invalidKeys) {

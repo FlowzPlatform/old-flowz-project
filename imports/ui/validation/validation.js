@@ -100,6 +100,7 @@ Template.validation.events({
                   let updResult = CollUploadJobMaster.update({_id: guid}, query,function(err,result){
                     if(!err)
                     {
+
                         Router.go("/");
                     }
                   });
@@ -305,8 +306,17 @@ Meteor.UploadJob = {
 
 
 
-
 Meteor.validatorFunctions = {
+    instantiateJobQueue:function(){
+      // fetch owner job which import is running status
+      let qry={owner:Meteor.userId(),"masterJobStatus":"running","stepStatus":ImportRunning};
+      jobQueue = CollUploadJobMaster.find(qry).fetch();
+      console.log("instantiateJobQueue");
+      jobQueue=jobQueue[0];
+      if(jobQueue) {
+        setImportJobQueue(jobQueue);
+      }
+    },
     importStart:function()
     {
       let qry={owner:Meteor.userId(),"masterJobStatus":"running","stepStatus":ValidationCompleted};
@@ -319,7 +329,11 @@ Meteor.validatorFunctions = {
               stepStatus: ImportRunning
           }
       };
-      let updResult = CollUploadJobMaster.update({_id: guid}, query);
+      let updResult = CollUploadJobMaster.update({_id: guid}, query,{},function(error,result){
+        if(!error) {
+          Meteor.validatorFunctions.instantiateJobQueue();
+        }
+      });
       Router.go("/import");
     },
     onClickFindInValidData: function(sheetName) {
@@ -516,6 +530,44 @@ Meteor.validatorFunctions = {
     }
 }
 
+function setImportJobQueue(jobData)
+{
+  if (Meteor.isClient) {
+
+    var myJobs = JobCollection('OBImportJobQueue');
+
+    Meteor.startup(function () {
+      Meteor.subscribe('allJobs');
+      // Create a job:
+      var job = new Job(myJobs, 'ImportToPDM', // type of job
+        jobData
+      );
+
+      // Set some properties of the job and then submit it
+      job.priority('normal')
+        .retry({ retries: 5,
+          wait: 15*60*1000 })  // 15 minutes between attempts
+        .delay(30*1000)     // Wait an 30 second before first try
+        .save();               // Commit it to the server
+
+      // Any job document from myJobs can be turned into a Job object
+      job = new Job(myJobs, myJobs.findOne({}));
+
+      // Or a job can be fetched from the server by _id
+      myJobs.getJob(_id, function (err, job) {
+        // If successful, job is a Job object corresponding to _id
+        // With a job object, you can remotely control the
+        // job's status (subject to server allow/deny rules)
+        // Here are some examples:
+        job.pause();
+        job.cancel();
+        job.remove();
+        // etc...
+      });
+    });
+  }
+}
+
 function findjobQueueData() {
     //console.log(currentRuleIdx,"===========",arrRules.length);
     let query = {sku:""};
@@ -550,6 +602,7 @@ let errorRenderer = function(instance, td, row, col, prop, value, cellProperties
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     //console.log($(row:first-child));
     $(td).attr("style","border:1px solid "+invalidColumnColor);
+    $(td).focus();
 };
 
 let hideColumnRenderer = function(instance, td, row, col, prop, value, cellProperties) {
