@@ -17,32 +17,24 @@
       },
       'click #btnReply': function(event, template) {
           replay(template);
-      },
-      'keypress  #txtReply': function(event, template) {
-          if (event.which === 13) {
-              event.stopPropagation();
-              replay(template);
-              return false;
-          }
       }
   });
 
   let replay = function(template) {
       let txtReply = tinyMCE.get('txtReply').getContent();
-      let activeRfq = template.rfqdiscussion.get();
-      let replyMessage = {
-          from: Meteor.userId(),
-          message: '<p>' + txtReply + '</p>',
-          to: CollCloseOutPromoRFQSent.find({ _id: activeRfq._id }).OwnerId
+      if (txtReply.trim() != '') {
+          let activeRfq = template.rfqdiscussion.get();
+          let replyMessage = {
+              from: Meteor.userId(),
+              message: '<p>' + txtReply + '</p>',
+              to: CollCloseOutPromoRFQSent.find({ _id: activeRfq._id }).OwnerId
+          }
+          activeRfq._source.discussion.push(replyMessage);
+          saveReply(activeRfq, template, function() {
+              template.rfqdiscussion.set(activeRfq);
+              tinyMCE.get('txtReply').setContent('');
+          })
       }
-      activeRfq._source.discussion.push(replyMessage);
-      saveReply(activeRfq, template, function() {
-          template.rfqdiscussion.set(activeRfq);
-          tinyMCE.get('txtReply').setContent('');
-          setTimeout(function() {
-              $('.rfq-discussion').scrollTop($('.rfq-discussion')[0].scrollHeight);
-          }, 100);
-      })
   }
 
 
