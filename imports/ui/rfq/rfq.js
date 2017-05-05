@@ -28,7 +28,7 @@
   });
 
   let replay = function(template) {
-      let txtReply = $('#txtReply').val();
+      let txtReply = tinyMCE.get('txtReply').getContent();
       let activeRfq = template.rfqdiscussion.get();
       let replyMessage = {
           from: Meteor.userId(),
@@ -38,9 +38,9 @@
       activeRfq._source.discussion.push(replyMessage);
       saveReply(activeRfq, template, function() {
           template.rfqdiscussion.set(activeRfq);
-          $('#txtReply').val('');
+          tinyMCE.get('txtReply').setContent('');
           setTimeout(function() {
-              $('.rfq-messages').scrollTop($('.rfq-messages')[0].scrollHeight);
+              $('.rfq-discussion').scrollTop($('.rfq-discussion')[0].scrollHeight);
           }, 100);
       })
   }
@@ -75,6 +75,22 @@
       //console.log('selecteddata', data);
       template.rfqdiscussion.set(data);
   }
+
+  Template.tinymce.onRendered(function() {
+      tinymce.init({
+          selector: '.tinymce',
+          skin_url: '/packages/teamon_tinymce/skins/lightgray',
+          height: 200,
+          menubar: false,
+          plugins: [
+              'advlist autolink lists link image charmap print preview anchor',
+              'searchreplace visualblocks code fullscreen',
+              'insertdatetime media table contextmenu paste code'
+          ],
+          toolbar: 'undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+          content_css: '//www.tinymce.com/css/codepen.min.css'
+      });
+  })
 
   Template.rfq.onCreated(function() {
       let rfqData = [];
