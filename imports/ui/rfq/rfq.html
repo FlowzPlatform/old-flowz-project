@@ -5,7 +5,7 @@
             <div class="rfq-view">
                 <ul class="nav">
                     {{#each rfq}}
-                        <li class="rfq_id" data-id={{formatId _id}}> <i class="{{rfqStatus _source.rfqId}}"></i>  <span> {{formatId _id}} </span> </li>
+                        <li class="rfq_id" data-id={{formatId _id}}> <i class="{{rfqStatus rfqId}}"></i>  <span> {{formatId _id}} </span> </li>
                     {{/each}}
                 </ul>
                 <div class="rfq-discussion">
@@ -24,23 +24,38 @@
                                     </div>
                                 {{/each}}
                             </div>
+                            {{#if discussion}}
+                                <div class="reply-form">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            {{> tinymce id="txtReply"}}
+                                            <button id="btnReply" style="margin-top:5px;" class="progress-button progress-button-small pull-right" data-style="top-line" data-horizontal="">
+                                                <span class="content"><i class="fa fa-reply"></i>&nbsp;Reply</span>
+                                                <span class="progress">
+                                                    <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                                </span>
+                                            </button>
+                                            {{#if isCustomer}}
+                                                <button id="btnApprove" style="margin-top:5px;" class="progress-button progress-button-small pull-right" data-style="top-line" data-horizontal="">
+                                                    <span class="content"><i class="fa fa-check"></i>&nbsp;Approve</span>
+                                                    <span class="progress">
+                                                        <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                                    </span>
+                                                </button>
+                                                <button id="btnReject" style="margin-top:5px;" class="progress-button progress-button-small progress-button-danger pull-right" data-style="top-line" data-horizontal="">
+                                                    <span class="content"><i class="fa fa-ban"></i>&nbsp;Reject</span>
+                                                    <span class="progress">
+                                                        <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                                    </span>
+                                                </button>
+                                            {{/if}}
+                                        </div>
+                                    </div>
+                                </div>
+                            {{/if}}
                         {{/if}}
                     {{/each}}
-                    {{#if rfqdiscussion.discussion}}
-                        <div class="reply-form">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    {{> tinymce id="txtReply"}}
-                                    <button id="btnReply" style="margin-top:5px;" class="progress-button progress-button-small pull-right" data-style="top-line" data-horizontal="">
-                                        <span class="content"><i class="fa fa-reply"></i>&nbsp;Reply</span>
-                                        <span class="progress">
-                                            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
-                                        </span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    {{/if}}
+                    
                 </div>
             </div>
         {{/if}}
