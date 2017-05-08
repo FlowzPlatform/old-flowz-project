@@ -46,7 +46,7 @@
 									    white-space: nowrap;
 									    text-overflow: ellipsis;
 									    padding-left: 5px;
-									    width: 100%;
+									    width: 90%;
 									"
 								>
 									{{title}}
@@ -102,7 +102,7 @@
 														<div class="circle-text" style="left:125%">
 															<p id="totalBid{{_id._str}}" style="top: 7px; position: inherit;"></p>
 														</div>
-														<div class= "row" style="margin: 16px 17px;">
+														<div class= "row" style="margin: 16px 17px;display:none">
 															<div  class="col-sm-6" style="margin: 4px -1px;text-align: center;font-size: 16px;font-style: italic;">
 																Set AutoBid On
 															</div>
@@ -114,13 +114,13 @@
 																</div>
 															</div>
 														</div>
-														<div class="modalBody">
+														<div class="modalBody" style="display:none">
 														  	<div>
 																	<span>Set upper limit</span>
 															    <input id="upperLimit{{_id._str}}" placeHolder="Amount i.e 5000 or 10000" type="Number" disabled="true">
 																</div>
 														</div>
-														<div class="modalBody">
+														<div class="modalBody" style="display:none">
 														  	<div>
 																	<span>Number of Automatic Bids </span>
 															    <input id="incrementedBy{{_id._str}}" placeHolder="i.e 2 or 5 or 10" type="Number" disabled="true">
