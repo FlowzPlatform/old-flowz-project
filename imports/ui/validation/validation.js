@@ -204,7 +204,6 @@ Template.validation.helpers({
           Meteor.validatorFunctions.startValidation();
           job = Meteor.validatorFunctions.getCurrentRunningUploadJob();
         }
-
         else {
             //console.log(job);
             let arrFileObj = [];
@@ -322,7 +321,7 @@ Meteor.validatorFunctions = {
       let qry={owner:Meteor.userId(),"masterJobStatus":"running","stepStatus":ValidationCompleted};
       job = CollUploadJobMaster.find(qry).fetch();
       job = job[0];
-      console.log(job);
+      //console.log(job);
       let guid=job._id;
       var query = {
           "$set": {
@@ -330,6 +329,7 @@ Meteor.validatorFunctions = {
           }
       };
       let updResult = CollUploadJobMaster.update({_id: guid}, query,{},function(error,result){
+        console.log("==========instantiateJobQueue====error===========")
         if(!error) {
           Meteor.validatorFunctions.instantiateJobQueue();
         }
@@ -547,7 +547,7 @@ function setImportJobQueue(jobData)
       job.priority('normal')
         .retry({ retries: 5,
           wait: 15*60*1000 })  // 15 minutes between attempts
-        .delay(30*1000)     // Wait an 30 second before first try
+        .delay(10*1000)     // Wait an 30 second before first try
         .save();               // Commit it to the server
 
       // Any job document from myJobs can be turned into a Job object

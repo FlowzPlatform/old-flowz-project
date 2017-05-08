@@ -61,6 +61,7 @@ vsivsi:job-collection
 teamon:tinymce
 
 
+
 dburles:collection-helpers
 matb33:collection-hooks
 alanning:roles
@@ -134,3 +135,5 @@ percolate:momentum
 natestrauser:animate-css
 meteorhacks:subs-manager
 fastclick
+
+http

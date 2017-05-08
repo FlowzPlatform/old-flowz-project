@@ -21,7 +21,10 @@ import '../imports/ui/schema/schema.js';
 
 import '../imports/ui/rfq/rfq.js';
 
+
 import '../imports/ui/bidding/bidding.js';
 
 import '../imports/ui/allBids/allBids.js';
 import '../imports/ui/viewBidsDetail/viewBidsDetail.js';
+
+import '../imports/ui/dashboard/dashboard.js';
