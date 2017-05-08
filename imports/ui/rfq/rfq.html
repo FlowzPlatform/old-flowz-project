@@ -5,25 +5,28 @@
             <div class="rfq-view">
                 <ul class="nav">
                     {{#each rfq}}
-                         
-                        <li class="rfq_id {{#if $eq @index 0}} active {{/if}}" data-id={{_id}}> <span> {{_id}} </span> </li>
+                        <li class="rfq_id" data-id={{formatId _id}}> <i class="{{rfqStatus _source.rfqId}}"></i>  <span> {{formatId _id}} </span> </li>
                     {{/each}}
                 </ul>
                 <div class="rfq-discussion">
-                    {{#if rfqdiscussion._source.discussion}}
-                        <div class="rfq-messages">
-                            {{#each rfqdiscussion._source.discussion}}
-                                <div class="media">
-                                    <div class="media-left">
-                                        <img src="https://www.w3schools.com/bootstrap/img_avatar1.png" class="media-object" style="width:32px">
+                    {{#each rfq}}
+                        {{#if StatusCheck _id rfqdiscussion._id}}
+                            <div class="rfq-messages">
+                                {{#each discussion}}
+                                    <div class="media">
+                                        <div class="media-left">
+                                            <img src="https://www.w3schools.com/bootstrap/img_avatar1.png" class="media-object" style="width:32px">
+                                        </div>
+                                        <div class="media-body">
+                                            <h4 class="media-heading">{{getUsername from}}</h4>
+                                            <div>{{{message}}}</div>
+                                        </div>
                                     </div>
-                                    <div class="media-body">
-                                        <h4 class="media-heading">{{from}}</h4>
-                                        <div>{{{message}}}</div>
-                                    </div>
-                                </div>
-                            {{/each}}
-                        </div>
+                                {{/each}}
+                            </div>
+                        {{/if}}
+                    {{/each}}
+                    {{#if rfqdiscussion.discussion}}
                         <div class="reply-form">
                             <div class="row">
                                 <div class="col-lg-12">

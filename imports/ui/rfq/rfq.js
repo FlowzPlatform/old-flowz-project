@@ -3,9 +3,15 @@
   import { ReactiveDict } from 'meteor/reactive-dict';
   import { ReactiveVar } from 'meteor/reactive-var';
 
+
   import './rfq.html';
 
   import { CollCloseOutPromoRFQSent } from '../../api/collections.js';
+  import { CollCloseOutPromoRFQDiscussion } from '../../api/collections.js';
+
+  Template.registerHelper('formatId', function(data) {
+      return (data && data._str) || data;
+  });
 
   Template.rfq.events({
       'click .rfq_id': function(event, template) {
@@ -26,17 +32,28 @@
           let activeRfq = template.rfqdiscussion.get();
           let replyMessage = {
               from: Meteor.userId(),
-              message: '<p>' + txtReply + '</p>',
-              to: CollCloseOutPromoRFQSent.find({ _id: activeRfq._id }).OwnerId
+              message: txtReply,
+              to: CollCloseOutPromoRFQSent.find({ _id: activeRfq._id }).OwnerId,
+              created: new Date()
           }
-          activeRfq._source.discussion.push(replyMessage);
-          saveReply(activeRfq, template, function() {
-              template.rfqdiscussion.set(activeRfq);
+          activeRfq.discussion.push(replyMessage);
+          CollCloseOutPromoRFQDiscussion.update({ _id: activeRfq._id }, { $push: { discussion: replyMessage } }, function(error, response) {
+              let data = CollCloseOutPromoRFQDiscussion.findOne(activeRfq._id);
+              console.log('inner', data);
+              template.rfqdiscussion.set(data);
               tinyMCE.get('txtReply').setContent('');
-          })
+          });
+          console.log('outer')
+              //var oid = new Meteor.Collection.ObjectID(activeRfq._id);
+              //let data = CollCloseOutPromoRFQDiscussion.findOne(oid);
+
+
+          //   saveReply(activeRfq, template, function() {
+          //       template.rfqdiscussion.set(activeRfq);
+          //       tinyMCE.get('txtReply').setContent('');
+          //   })
       }
   }
-
 
   let saveReply = function(updatedRfq, template, cb) {
       let bulkRows = [{ "update": { "_id": updatedRfq._id, "_type": "discussions", "_index": "rfq" } }, { "doc": { "discussion": updatedRfq._source.discussion } }];
@@ -61,14 +78,19 @@
   }
 
   let getDiscussion = function(rfqId, template) {
-      let _rfq = template.rfq.get();
-      //console.log('rfqId', rfqId);
-      let data = _.find(_rfq, function(d) { return d._id == rfqId });
-      //console.log('selecteddata', data);
+      var oid = new Meteor.Collection.ObjectID(rfqId);
+      let data = CollCloseOutPromoRFQDiscussion.findOne(oid);
+      console.log('discussion', data)
       template.rfqdiscussion.set(data);
   }
 
   Template.tinymce.onRendered(function() {
+      console.log($(".tinymce"));
+      for (var i = tinymce.editors.length - 1; i > -1; i--) {
+          var ed_id = tinymce.editors[i].id;
+          tinyMCE.execCommand("mceRemoveEditor", true, ed_id);
+      }
+
       tinymce.init({
           selector: '.tinymce',
           skin_url: '/packages/teamon_tinymce/skins/lightgray',
@@ -85,42 +107,39 @@
   })
 
   Template.rfq.onCreated(function() {
-      let rfqData = [];
-      let rfqdiscussionData = {}
-      $.ajax({
-          //url: "https://7e94c6196993fd6c3d570a3d40e100d1.us-east-1.aws.found.io:9243/rfq/discussions/_search?q=sid:" + Meteor.userId(),
-          url: Meteor.settings.public.elasticsearch.host + "/rfq/discussions/_search?q=sid:" + Meteor.userId(),
-          type: "GET",
-          xhrFields: {
-              withCredentials: true
-          },
-          async: false,
-          dataType: "application/json; charset=utf-8",
-          username: Meteor.settings.public.elasticsearch.username, // Most SAP web services require credentials
-          password: Meteor.settings.public.elasticsearch.password,
-          //processData: false,
-          //contentType: "application/json",
-          //data: JSON.stringify(data),
-          success: function(response) {},
-          error: function(xhr, ajaxOptions, thrownError) { //Add these parameters to display the required response
-              //alert(xhr.status);
-              //alert(xhr.responseText);
-              rfqData = (JSON.parse(xhr.responseText)).hits.hits;
-              if (rfqData.length > 0) {
-                  rfqdiscussionData = _.find(rfqData, function(d) { return d._id == rfqData[0]._id });
-              }
-          },
-      });
-
-      this.rfq = new ReactiveVar(rfqData);
-      this.rfqdiscussion = new ReactiveVar(rfqdiscussionData);
+      this.rfqdiscussion = new ReactiveVar({});
   })
 
   Template.rfq.helpers({
       rfq() {
-          return Template.instance().rfq.get();
+          return CollCloseOutPromoRFQDiscussion.find({ sid: Meteor.userId() }).fetch();
       },
       rfqdiscussion() {
+          //   let data = CollCloseOutPromoRFQDiscussion.find({ sid: Meteor.userId() }).fetch()
+          //   Template.instance().rfqdiscussion.set(data[0]);
           return Template.instance().rfqdiscussion.get();
+      },
+      rfqStatus(rfqId) {
+          let data = CollCloseOutPromoRFQSent.findOne({ _id: rfqId });
+          let icon = "";
+          if (data != undefined) {
+              switch (data.Status) {
+                  case "Approved":
+                      icon = "text-suucess fa fa-check"
+                      break;
+                  case "Rejected":
+                      icon = "text-danger fa fa-ban"
+                      break;
+              }
+          }
+          return icon;
+      },
+      getUsername(userid) {
+          //console.log('id', CollCloseOutPromoRFQDiscussion.find(id));
+          return Meteor.users.findOne(userid).username;
+      },
+      StatusCheck(id, activeid) {
+          return ((id && id._str) || id) == ((activeid && activeid._str) || activeid);
       }
+
   });
