@@ -56,6 +56,7 @@
    <div class="template-post ">
       <div class="panel panel-default jump-response">
          <div class="panel-heading">
+
             <h3 class="panel-title header_footer_font" style="
 									    font-size: 18px;
 									    color: rgb(66, 58, 58);
@@ -106,8 +107,8 @@
                   <!-- {{#afModal title="Update post" omitFields="createdAt,updatedAt,owner" class="text-primary" collection="Posts" operation="update" doc=_id}}
                      <i class="fa fa-pencil" buttonContent="Edit post"></i> {{_ "edit_bid"}}
                      {{/afModal}} -->
-                  <div id="endBidManually" class="col-md-4 header_footer_font">
-                     <i class="fa fa-ban" buttonContent="Edit post"></i> <a href="" target="_blank">End Auction</a>
+                  <div id="endBidManually" class="col-md-4 header_footer_font" style="cursor: pointer;">
+                     <i class="fa fa-ban" buttonContent="Edit post"></i> End Auction
                   </div>
                   {{/if}}
                   {{#afModal title="Delete Auction" class="text-danger" collection="Posts" operation="remove" doc=_id}}
@@ -115,8 +116,8 @@
                      <i class="fa fa-trash-o" buttonContent="Edit post"></i> Delete Auction
                   </div>
                   {{/afModal}}
-                  <div class="col-md-4 header_footer_font" id="viewBidsDetail">
-                     <i class="fa fa-eye" buttonContent="Edit post"></i> <a href="" target="_blank">View Details</a>
+                  <div class="col-md-4 header_footer_font" id="viewBidsDetail" style="cursor: pointer;">
+                     <i class="fa fa-eye" buttonContent="Edit post"></i> View Details
                   </div>
                </div>
             </small>
