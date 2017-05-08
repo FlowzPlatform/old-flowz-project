@@ -9,7 +9,7 @@ import { CollCloseOutPromoRFQSent } from '../../api/collections.js';
 
 Template.dashboard.helpers({
     rfqPending() {
-        return CollCloseOutPromoRFQSent.find({ Status: "" }).count();
+        return CollCloseOutPromoRFQSent.find({ Status: "Pending" }).count();
     },
     rfqApproved() {
         return CollCloseOutPromoRFQSent.find({ Status: "Approved" }).count();

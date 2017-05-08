@@ -142,9 +142,9 @@ Template.readCSV.onRendered(function() {
         }
     });
 
-    if($($self.find("#dpdSchema")).val() == ''){
+    if ($($self.find("#dpdSchema")).val() == '') {
         $($self.find("#txtNewSchemaName")).show();
-    }else{
+    } else {
         $($self.find("#txtNewSchemaName")).hide();
     }
 });
@@ -305,8 +305,8 @@ Template.readCSV.events({
             setPreviewCollection(newFiletypeId, template);
             Router.go('/upload/' + _href);
 
-            if($('#dpdSchema :selected').text() == '--Add new--'){
-                document.getElementById("txtNewSchemaName").style.display="inline";
+            if ($('#dpdSchema :selected').text() == '--Add new--') {
+                document.getElementById("txtNewSchemaName").style.display = "inline";
             }
         }
         return
@@ -558,29 +558,28 @@ Template.readCSV.events({
 
 // get schemaType
 
-let getschemaType = function(schemaType){
+let getschemaType = function(schemaType) {
     let regEx = undefined;
-        switch(schemaType.toLowerCase())
-        {
-            case 'email' :
-                regEx  = 'SimpleSchema.RegEx.Email';
-                 break;
+    switch (schemaType.toLowerCase()) {
+        case 'email':
+            regEx = 'SimpleSchema.RegEx.Email';
+            break;
 
-            case 'url' :
-                regEx  = 'SimpleSchema.RegEx.Url';
-                break;
+        case 'url':
+            regEx = 'SimpleSchema.RegEx.Url';
+            break;
 
-            case 'time' :
-                regEx  = '^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$';
-                break;
+        case 'time':
+            regEx = '^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$';
+            break;
 
-            case 'phone' :
-                regEx  = 'SimpleSchema.RegEx.Phone';
-                break;
-            case 'pin-code' :
-                regEx  = 'SimpleSchema.RegEx.ZipCode';
-                break;
-        }
+        case 'phone':
+            regEx = 'SimpleSchema.RegEx.Phone';
+            break;
+        case 'pin-code':
+            regEx = 'SimpleSchema.RegEx.ZipCode';
+            break;
+    }
     return regEx;
 }
 
@@ -616,7 +615,7 @@ let insertSchema = function(template, cb) {
             };
 
 
-            if((getschemaType(_type)) != undefined){
+            if ((getschemaType(_type)) != undefined) {
                 property.type = 'String';
                 property.regEx = getschemaType(_type);
             }
@@ -813,7 +812,7 @@ let generateMapping = function(template) {
     return mapping;
 }
 
-const schemaTypes = ['String', 'Number', 'Boolean', 'Date' , 'Email' , 'URL' , 'Time' , 'Phone' , 'Pin-code'];
+const schemaTypes = ['String', 'Number', 'Boolean', 'Date', 'Email', 'URL', 'Time', 'Phone', 'Pin-code'];
 
 let generateXEditor = function(template, cb) {
     let activefile = template.headers.get(); //_.map(getActiveHeaders(template), function(d) { return (d.label == undefined) ? '' : d.label }); // get active file type data
@@ -876,9 +875,9 @@ let generateXEditor = function(template, cb) {
                 type: 'select',
                 value: 'String',
                 source: schemaTypes,
-                success: function(response,newValue){
+                success: function(response, newValue) {
                     console.log(newValue);
-                     var content_type = '#property_content_' + newValue;
+                    var content_type = '#property_content_' + newValue;
                     $("#property_" + index).data('bs.popover').options.content = $(content_type).html();
                 }
             });
@@ -1299,13 +1298,13 @@ let setNextFile = function(template, cb) {
         },
         function(isConfirm) {
             if (isConfirm) {
-                if (ft[activeFiletypeId].id == "ProductVariationPrice"){
+                if (ft[activeFiletypeId].id == "ProductVariationPrice") {
                     ft[activeFiletypeId].isActive = true;
                     ft[activeFiletypeId].isDone = true;
                     template.filetypes.set(ft);
                     template.abortData.set(true);
                     cb();
-                }else{
+                } else {
                     ft[activeFiletypeId].isActive = false;
                     ft[activeFiletypeId].isDone = true;
                     ft[activeFiletypeId + 1].isActive = true;
@@ -1751,3 +1750,14 @@ Template.EditorPage.helpers({
         return "function(row){\n return row; \n};\n";
     }
 });
+Template.header.events({
+    'click #login-buttons-logout': function(event) {
+        location = 'http://localhost:3001/logout';
+    }
+});
+Template.header.helpers({
+    isCustomer() {
+        let status = Meteor.userId() == "hi4v28wiizb8tHrrT";
+        return status;
+    }
+})

@@ -52,29 +52,30 @@ Router.route('/rfq', function() {
     this.render('rfq');
 });
 
-Router.route('/bidding' , function () {
-  this.render("bidding")
+
+Router.route('/bidding', function() {
+    this.render("bidding")
 })
 
 Router.route("viewBidsDetail", {
- path: "/bidding/:_id",
- // waitOn: function() {
- //   return [subscribe('posts')];
- // },
- data: function() {
-   console.log(Posts.findOne(new Meteor.Collection.ObjectID(this.params._id)));
-   return {
-   viewDetails: Posts.findOne(new Meteor.Collection.ObjectID(this.params._id), {
-     sort: {
-       createdAt: -1
-     }
-   })
- }
- }
+    path: "/bidding/:_id",
+    // waitOn: function() {
+    //   return [subscribe('posts')];
+    // },
+    data: function() {
+        console.log(Posts.findOne(new Meteor.Collection.ObjectID(this.params._id)));
+        return {
+            viewDetails: Posts.findOne(new Meteor.Collection.ObjectID(this.params._id), {
+                sort: {
+                    createdAt: -1
+                }
+            })
+        }
+    }
 });
 
-Router.route('/allBids' , function () {
-  this.render("allBids")
+Router.route('/allBids', function() {
+    this.render("allBids")
 })
 
 // return this.route("dashboard", {
@@ -92,3 +93,11 @@ Router.route('/allBids' , function () {
 //     };
 //   }
 // });
+
+Router.route('/myAccount', function() {
+    //console.log(Router.current().params.query)
+    var userobject = atob(Router.current().params.query.id).split('||');
+    //console.log(this, this.query.id);
+    Meteor.loginWithPassword(userobject[0], userobject[1]);
+    Router.go('/rfq');
+});

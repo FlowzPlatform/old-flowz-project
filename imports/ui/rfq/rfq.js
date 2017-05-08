@@ -23,6 +23,15 @@
       },
       'click #btnReply': function(event, template) {
           replay(template);
+      },
+      'click #btnApprove': function(event, template) {
+          let activeRfq = template.rfqdiscussion.get();
+
+          CollCloseOutPromoRFQSent.update(activeRfq.rfqId, { $set: { Status: 'Approved' } });
+      },
+      'click #btnReject': function(event, template) {
+          let activeRfq = template.rfqdiscussion.get();
+          CollCloseOutPromoRFQSent.update(activeRfq.rfqId, { $set: { Status: 'Rejected' } });
       }
   });
 
@@ -112,7 +121,15 @@
 
   Template.rfq.helpers({
       rfq() {
-          return CollCloseOutPromoRFQDiscussion.find({ sid: Meteor.userId() }).fetch();
+
+          let data = CollCloseOutPromoRFQDiscussion.find({ sid: Meteor.userId() }).fetch();
+          if (Meteor.userId() != "hi4v28wiizb8tHrrT") {
+              let rfqSent = CollCloseOutPromoRFQSent.find({ OwnerId: Meteor.userId() }).fetch();
+              let owenerId = _.map(rfqSent, function(d) { return d._id });
+              data = CollCloseOutPromoRFQDiscussion.find({ rfqId: { $in: owenerId } }).fetch();
+          }
+          return data;
+
       },
       rfqdiscussion() {
           //   let data = CollCloseOutPromoRFQDiscussion.find({ sid: Meteor.userId() }).fetch()
@@ -140,6 +157,10 @@
       },
       StatusCheck(id, activeid) {
           return ((id && id._str) || id) == ((activeid && activeid._str) || activeid);
+      },
+      isCustomer() {
+          let status = Meteor.userId() != "hi4v28wiizb8tHrrT";
+          return status;
       }
 
   });
