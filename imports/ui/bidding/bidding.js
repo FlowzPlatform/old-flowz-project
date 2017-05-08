@@ -26,7 +26,8 @@ if (Meteor.isClient) {
     Template.posts.helpers({
 
       posts: function () {
-        return Posts.find({'owner' : Meteor.userId()}, { sort: { createdAt: -1 } });
+        // return Posts.find({'owner' : Meteor.userId()}, { sort: { createdAt: -1 } );
+        return Posts.find({'owner' : Meteor.userId()} );
       }
     })
 

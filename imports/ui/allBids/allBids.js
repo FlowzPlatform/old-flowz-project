@@ -180,6 +180,7 @@ Template.feeds.events({
         console.log(currentAuction.BidIncrementedBy);
         var total = (currentAuction.currentBid) + (currentAuction.BidIncrementedBy);
         console.log(total);
+        console.log(currentAuction);
         console.log('bidder ' + Meteor.userId());
         console.log("owner " + currentAuction._id);
 
