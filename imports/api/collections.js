@@ -27,6 +27,9 @@ export const Csvfiles = new Mongo.Collection(collectionPrefix + 'CSVFiles');
 export const Csvfilemapping = new Mongo.Collection(collectionPrefix + 'CSVFileMapping');
 
 export const CollCloseOutPromoRFQSent = new Mongo.Collection('closeOutPromoRFQSent');
+export const CollCloseOutPromoRFQDiscussion = new Mongo.Collection('closeOutPromoRFQDiscussion');
+//export const CollUsers = new Mongo.Collection('users');
+
 // add schema
 
 // CollProductInformation.attachSchema(ProductInformationSchema);

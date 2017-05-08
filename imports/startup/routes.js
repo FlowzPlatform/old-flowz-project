@@ -7,6 +7,10 @@ import { CollUploadJobMaster } from '../api/collections.js';
 
 
 Router.route('/', function() {
+    this.render('dashboard');
+});
+
+Router.route('/uploaderdashboard', function() {
     this.render('landing');
 });
 
@@ -23,7 +27,7 @@ Router.route('/upload', {
         if (obj != undefined) {
             this.next();
         } else {
-            Router.go('/');
+            Router.go('/uploaderdashboard');
         }
     }
 });

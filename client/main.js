@@ -17,3 +17,5 @@ import '../imports/ui/import/import.css';
 import '../imports/ui/schema/schema.js';
 
 import '../imports/ui/rfq/rfq.js';
+
+import '../imports/ui/dashboard/dashboard.js';
