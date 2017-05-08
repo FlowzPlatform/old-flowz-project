@@ -1,3 +1,4 @@
+<!--
 <template name="import">
     {{> header}}
     <div class="container">
@@ -13,6 +14,115 @@
 
       </div>
 
+        {{/if}}
+    </div>
+</template>
+-->
+
+<template name="import">
+  {{> header}}
+    <div class="container">
+        {{#if currentUser}}
+            <div id="steps-block" class="step-progress">
+                <ol class="progress">
+                    <li data-step="1"> Upload </li>
+                    <li class="" data-step="2"> Validate </li>
+                    <li data-step="3" class="is-active progress__last"> Import </li>
+                </ol>
+            </div>
+            <div class="product-file-upload-tab-block">
+                <!-- <ul class="nav nav-tabs nav-tabs-vertical" role="tablist">
+                    {{#each filetypes}}
+                        <li role="presentation" class="{{#if isActive}}active{{/if}} {{#if isDone}}done{{/if}}"><a href="#"><i class="fa fa-check-circle-o"></i>{{name}}</a></li>
+                    {{/each}}
+                </ul> -->
+                <div class="">
+                    <div role="tabpanel" class="tab-pane active">
+                      <div class="clearfix"></div>
+                      <div class="row">
+                          <div id="mapping" class="col-md-12" style="display: block;">
+                              <div style="display:none">{{jobQueue}}</div>
+                              {{#if isImportToConfirm jobQueue.stepStatus}}
+                                <div class="pull-left">
+                                    <h3>Import Completed</h3>
+                                </div>
+                                <div class="pull-left">
+                                    <div class="sk-wave spinner">
+                                        <div class="sk-rect sk-rect1"></div>
+                                        <div class="sk-rect sk-rect2"></div>
+                                        <div class="sk-rect sk-rect3"></div>
+                                        <div class="sk-rect sk-rect4"></div>
+                                        <div class="sk-rect sk-rect5"></div>
+                                    </div>
+                                </div>
+                                  <div class="view-mapping">
+                                    <div id="validation_successful" style="display:block" class="success_div text-success">
+                                        <span><i class="fa fa-check-circle-o"></i></span>
+                                        <span>
+                                            Product data has been successfully imported into PDM. Please confirm to go for Live.
+                                        </span>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12" >
+                                            <button style="display:block" class="progress-button progress-button-small pull-right" id="import_confirm" data-style="top-line" data-horizontal="">
+                                                <span class="content">Confirm &nbsp;<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i></span>
+                                                <span class="progress">
+                                                    <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                                </span>
+                                            </button>
+                                            <button class="progress-button progress-button-small pull-right landingAbortBtn" id="importCompletedAbortBtnId" data-style="top-line" data-horizontal="">
+                                                <span class="content">Abort</span>
+                                                <span class="progress">
+                                                    <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                                </span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                  </div>
+                              {{else}}
+                              <div class="pull-left">
+                                  <h3>Import Started</h3>
+                              </div>
+                              <div class="pull-left">
+                                  <div class="sk-wave spinner">
+                                      <div class="sk-rect sk-rect1"></div>
+                                      <div class="sk-rect sk-rect2"></div>
+                                      <div class="sk-rect sk-rect3"></div>
+                                      <div class="sk-rect sk-rect4"></div>
+                                      <div class="sk-rect sk-rect5"></div>
+                                  </div>
+                              </div>
+                                <div class="view-mapping">
+                                  <div id="validation_successful" style="display:block" class="success_div text-success">
+                                      <span><i class="fa fa-check-circle-o"></i></span>
+                                      <span>
+                                          Your Product data has been successfully importing into PDM. Please wait for sometime.
+                                      </span>
+                                  </div>
+                                  <div class="row">
+                                      <div class="col-md-12" >
+                                          <!--button style="display:block" class="progress-button progress-button-small pull-right" id="import_confirm" data-style="top-line" data-horizontal="">
+                                              <span class="content">Confirm &nbsp;<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i></span>
+                                              <span class="progress">
+                                                  <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                              </span>
+                                          </button-->
+                                          <!--button class="progress-button progress-button-small pull-right landingAbortBtn" id="validationCompletedAbortBtnId" data-style="top-line" data-horizontal="">
+                                              <span class="content">Abort</span>
+                                              <span class="progress">
+                                                  <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                              </span>
+                                          </button-->
+                                      </div>
+                                  </div>
+                                </div>
+                              {{/if}}
+                          </div>
+                      </div>
+
+                    </div>
+                </div>
+            </div>
         {{/if}}
     </div>
 </template>
