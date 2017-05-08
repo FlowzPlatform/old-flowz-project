@@ -45,11 +45,6 @@
                   {{#if $eq viewDetails.isBidEnds 'no'}}
                   <p>Bid Will End On - {{viewDetails.EndBidDate}}</p>
                   <!-- <div id={{_id}}></div> -->
-                  {{#if $eq viewDetails.owner User._id._str}}
-                  <!-- {{> editOwnBids}} -->
-                  {{else}}
-                  {{> allbids}}
-                  {{/if}}
                   {{else}}
                   <!--  {{> bidEnded}} -->
                   {{/if}}
