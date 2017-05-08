@@ -1,0 +1,92 @@
+<template name="viewBidsDetail">
+  {{> header}}
+   <div class="template-post">
+      <div class="panel panel-default viewDetail_font">
+
+         <div class="panel-heading">
+            <div class= "row">
+               <div  class="col-sm-6" style="
+                  white-space: nowrap;
+                  overflow: hidden;">
+                  {{title}}
+               </div>
+               <div class="col-sm-6" style="text-align : right">
+                  <!-- <div id={{_id}}></div> -->
+                  {{#if $eq viewDetails.isBidEnds 'yes'}}
+                  <h4>Auction Ended</h4>
+                  {{else}}
+                  <!-- {{> countdown}} -->
+                  {{/if}}
+               </div>
+            </div>
+         </div>
+         <div class="panel-body">
+            <!-- <p class="text-center">
+               {{#with getDoc picture 'Attachments'}}
+                 <img src="{{url}}" class="img-thumbnail img-rounded">
+               {{/with}}
+               </p> -->
+            <div class="media">
+               <a class="pull-left" href="#">
+               {{> avatar userId=owner shape="circle"}}
+               </a>
+               <div class="media-body">
+                  <p>Starting bids from - {{viewDetails.currency}} {{viewDetails.StartingBid}}</p>
+                  <p>Current Bid is - {{viewDetails.currency}} {{viewDetails.currentBid}}</p>
+                  <p>Bid Increments:  - {{viewDetails.currency}} {{viewDetails.BidIncrementedBy}}</p>
+                  <p>In the end of Auction - {{ #if $eq viewDetails.endOfAuctionMethod '1'}}
+                     The Highest bidder will autometically Win.{{else}}The both Party will receive Notification Email{{/if}}
+                  </p>
+                  <p>Description - {{viewDetails.content}}</p>
+                  {{#each viewDetails.bids}}
+                  <!-- {{> allBid}} -->
+                  {{viewDetails.bids.isHighest}}
+                  {{/each}}
+                  {{#if $eq viewDetails.isBidEnds 'no'}}
+                  <p>Bid Will End On - {{viewDetails.EndBidDate}}</p>
+                  <!-- <div id={{_id}}></div> -->
+                  {{#if $eq viewDetails.owner User._id._str}}
+                  <!-- {{> editOwnBids}} -->
+                  {{else}}
+                  {{> allbids}}
+                  {{/if}}
+                  {{else}}
+                  <!--  {{> bidEnded}} -->
+                  {{/if}}
+                  {{> allbids}}
+               </div>
+            </div>
+         </div>
+         <!-- <div class="panel-footer">
+            {{> favoriteButton _id=_id}}
+            {{> commentFormToggle }}
+            {{> comments}}
+            </div> -->
+      </div>
+   </div>
+</template>
+<template name="allbids">
+
+   {{#if viewDetails.bids.length}}
+   {{#each viewDetails.bids}}
+   <div class="wrapper">
+      <ul>
+         <li>
+            <input type="checkbox" id="list-item-{{ incremented @index}}">
+            <label for="list-item-{{ incremented @index}}">#Bid No -{{ incremented @index}}  {{#if $eq isHighest "yes"}} > Current Highest Bidder{{/if}}<i style="float:right" class="fa fa-angle-down" buttonContent="Edit post"></i></label>
+            <ul>
+               <li>Bidder Id is - {{bidderId}}</li>
+               <li>Bid Placed on - {{biddingTime}}</li>
+               <li>Bid placed of - {{currency}} {{currentBid}}</li>
+               <li>isHighest - {{isHighest}}</li>
+            </ul>
+         </li>
+      </ul>
+   </div>
+   {{/each}}
+   {{else}}
+   <div style="text-align:Center">
+      <h4>There is no bids placed for this product yet.</h4>
+   </div>
+   {{/if}}
+</template>

@@ -9,6 +9,9 @@ import '../imports/ui/body.js';
 import '../imports/ui/history/history.js';
 import '../imports/ui/validation/validation.js';
 import '../imports/ui/validation/validation.css';
+import '../imports/ui/bidding/bidding.css';
+import '../imports/ui/allBids/allBids.css';
+import '../imports/ui/viewBidsDetail/viewBidsDetail.css';
 
 import '../imports/ui/import/import.js';
 import '../imports/ui/import/import.css';
@@ -17,3 +20,8 @@ import '../imports/ui/import/import.css';
 import '../imports/ui/schema/schema.js';
 
 import '../imports/ui/rfq/rfq.js';
+
+import '../imports/ui/bidding/bidding.js';
+
+import '../imports/ui/allBids/allBids.js';
+import '../imports/ui/viewBidsDetail/viewBidsDetail.js';

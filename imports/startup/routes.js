@@ -47,3 +47,44 @@ Router.route('/import', function() {
 Router.route('/rfq', function() {
     this.render('rfq');
 });
+
+Router.route('/bidding' , function () {
+  this.render("bidding")
+})
+
+Router.route("viewBidsDetail", {
+ path: "/bidding/:_id",
+ // waitOn: function() {
+ //   return [subscribe('posts')];
+ // },
+ data: function() {
+   console.log(Posts.findOne(new Meteor.Collection.ObjectID(this.params._id)));
+   return {
+   viewDetails: Posts.findOne(new Meteor.Collection.ObjectID(this.params._id), {
+     sort: {
+       createdAt: -1
+     }
+   })
+ }
+ }
+});
+
+Router.route('/allBids' , function () {
+  this.render("allBids")
+})
+
+// return this.route("dashboard", {
+//   path: "/dashboard",
+//   waitOn: function() {
+//     return [subs.subscribe('posts'), subs.subscribe('comments'), subs.subscribe('attachments')];
+//   },
+//   data: function() {
+//     return {
+//       posts: Posts.find({'owner' : Meteor.userId()}, {
+//         sort: {
+//           createdAt: -1
+//         }
+//       }).fetch()
+//     };
+//   }
+// });

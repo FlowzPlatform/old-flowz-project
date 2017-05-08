@@ -1,0 +1,125 @@
+<template name="bidding">
+    {{> header}}
+   <div class="template-dashboard">
+      <div class="container">
+         <div class="row">
+            <!-- <div class="col-md-3">
+               {{> addPost}}
+            </div> -->
+            <div class="col-md-12">
+               {{> posts}}
+            </div>
+         </div>
+      </div>
+   </div>
+</template>
+<template name="addPost">
+   <div class="template-add-post">
+      <div class="panel panel-default">
+         <div class="panel-heading">
+            <h3 class="panel-title">{{_ "add_bid"}}</h3>
+         </div>
+         <div class="panel-body">
+            {{#autoForm id="add" collection="Posts" type="insert"}}
+            {{> afQuickField name="title"}}
+            {{> afQuickField name="content"}}
+            <!-- {{> afQuickField name="bidMode"}} -->
+            {{> afQuickField name="currency"}}
+            {{> afQuickField name="StartingBid"}}
+            {{> afQuickField name="UpperLimitBid"}}
+            {{> afQuickField name="BidIncrementedBy"}}
+            {{> afQuickField name="EndBidDate"}}
+            {{> afQuickField name="endOfAuctionMethod"}}
+            {{> afQuickField name="picture"}}
+            <!-- <input type="button" id='savetoRethink' class="btn btn-primary" value="Submit form"> -->
+            <button type="submit" id='savetoRethink' class="btn btn-primary">{{_ "add_bid_btn"}}</button>
+            {{/autoForm}}
+         </div>
+      </div>
+   </div>
+</template>
+<template name="posts">
+   <div class="template-posts" id="myId">
+
+       {{#each  posts}}
+
+      <div class="col-md-4">
+         {{> post}}
+      </div>
+      {{else}}
+      <p>No Data found</p>
+      {{/each}}
+   </div>
+</template>
+
+<template name="post">
+   <div class="template-post ">
+      <div class="panel panel-default jump-response">
+         <div class="panel-heading">
+            <h3 class="panel-title header_footer_font">
+               {{title}}
+            </h3>
+         </div>
+         <div class="panel-body alignPanelBody">
+            <div class="media">
+               <div class="media-body">
+                  <div class="col-md-3 dashboard_data">
+                     <span class="numberOfBids">{{#if bids }} {{bids.length}} {{else}}  0 {{/if}}</span>
+                     <p>Total Bids</p>
+                  </div>
+                  <div class="col-md-3 dashboard_data">
+                     <span class="numberOfBids">{{currency}}{{StartingBid}}</span>
+                     <p>Starting Bid</p>
+                  </div>
+                  <div class="col-md-3 dashboard_data">
+                     <span class="numberOfBids">{{currency}}{{currentBid}}</span>
+                     <p>Current Bid</p>
+                  </div>
+                  <div class="col-md-3 dashboard_data">
+                     <span class="numberOfBids">{{currency}} {{BidIncrementedBy}}</span>
+                     <p> Increment </p>
+                  </div>
+               </div>
+               <div class="dashboard_data">
+                  {{#if $eq isBidEnds 'no'}}
+                  Ends at - {{EndBidDate}}
+                  {{else}}
+                  {{>bidEnded}}
+                  {{/if}}
+               </div>
+            </div>
+         </div>
+         <div class="panel-footer">
+            {{#if $eq owner User._id}}
+            <small style="font-size: 1.2em;">
+               <div class="row">
+                  {{#if $eq isBidEnds 'no'}}
+                  <!-- {{#afModal title="Update post" omitFields="createdAt,updatedAt,owner" class="text-primary" collection="Posts" operation="update" doc=_id}}
+                     <i class="fa fa-pencil" buttonContent="Edit post"></i> {{_ "edit_bid"}}
+                     {{/afModal}} -->
+                  <div id="endBidManually" class="col-md-4 header_footer_font">
+                     <i class="fa fa-ban" buttonContent="Edit post"></i> End Auction
+                  </div>
+                  {{/if}}
+                  {{#afModal title="Delete Auction" class="text-danger" collection="Posts" operation="remove" doc=_id}}
+                  <div class="col-md-4 header_footer_font">
+                     <i class="fa fa-trash-o" buttonContent="Edit post"></i> Delete Auction
+                  </div>
+                  {{/afModal}}
+                  <div class="col-md-4 header_footer_font" id="viewBidsDetail">
+                     <i class="fa fa-eye" buttonContent="Edit post"></i> View Details
+                  </div>
+               </div>
+            </small>
+            {{/if}}
+         </div>
+      </div>
+   </div>
+</template>
+
+<template name="bidEnded">
+	<div class="template-posts dashboard_data">
+
+		<p>The Bidding ended on {{EndBidDate}}</p>
+	</div>
+</template>

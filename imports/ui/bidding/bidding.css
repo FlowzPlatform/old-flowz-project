@@ -1,0 +1,39 @@
+.numberOfBids
+{
+  display: block;
+    height: 60px;
+    width: 60px;
+    line-height: 60px;
+    -moz-border-radius: 30px;
+    border-radius: 30px;
+    background-color: #bfd8d2;
+    color: #ab6767;
+    text-align: center;
+    font-size: 1.1em;
+}
+
+.alignPanelBody
+{
+  text-align: center;
+}
+
+.dashboard_data
+{
+    text-align: center;
+    color: #fff;
+    font-weight: lighter;
+    font-style: italic;
+    display: inline-block;
+  }
+
+.header_footer_font
+{
+    text-align: center;
+    color: #503a3a;
+    font-style: italic;
+}
+
+  .panel-footer
+  {
+    background-color : rgb(191, 216, 210)
+  }

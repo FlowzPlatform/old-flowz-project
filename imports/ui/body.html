@@ -12,6 +12,8 @@
                     <li class=""><a href="/upload">Upload</a></li>
                     <li><a href="/history">History</a></li>
                     <li><a href="/rfq">RFQ</a></li>
+                    <li><a href="/bidding">My Auctions</a></li>
+                    <li><a href="/allBids">All Bids</a></li>
                     <li>{{> loginButtons}}</li>
                 </ul>
             </div>
@@ -57,7 +59,7 @@
                                     <h3 style="text-transform: capitalize;"> Uploaded records of {{currentSheetName}}  </h3>
                                 </div>
                                 <div class="panel-body">
-                                    
+
                                     <div class="preview">
                                         <!--<table class="table table-bordered table-hover">
                                             <thead>
@@ -114,8 +116,8 @@
                                     </form>
                                 </div>
                                 <div id="upload-csv-zone">
-                                    
-                                    
+
+
                                     <div class="file-zone">
                                         <span class="dz-message">Drop <span style="color: #494e6b">"{{currentSheetName}}"</span> files here<br/>
                                             <small>(only csv files are valid.)</small>
@@ -241,7 +243,7 @@
                                                                 </td>
                                                                 <td style="width:20%;" class="newSchemaProperty">
                                                                     <a data-placement="top" data-toggle="popover" data-title="Property" data-container="body" type="button" data-html="true" href="#" id="property_{{rowIndex}}"><i class="fa fa-edit"></i></a>
-                                                                    
+
                                                                 </td>
                                                             {{/let}}
                                                         </tr>
@@ -261,7 +263,7 @@
                                     {{> imageUpload}}
                                 </div>
                             {{/if}}
-                            
+
                         {{/if}}
                     </div>
                 </div>
