@@ -5,7 +5,7 @@
             <div class="rfq-view">
                 <ul class="nav">
                     {{#each rfq}}
-                        <li class="rfq_id" data-id={{formatId _id}}> <i class="{{rfqStatus rfqId}}"></i>  <span> {{formatId _id}} </span> </li>
+                        <li class="rfq_id {{#if $eq _id rfqdiscussion._id}} active {{/if}}" data-id={{formatId _id}}> <i class="{{rfqStatusIcon rfqId}}"></i>  <span> {{formatId _id}} </span> </li>
                     {{/each}}
                 </ul>
                 <div class="rfq-discussion">
@@ -36,18 +36,20 @@
                                                 </span>
                                             </button>
                                             {{#if isCustomer}}
-                                                <button id="btnApprove" style="margin-top:5px;" class="progress-button progress-button-small pull-right" data-style="top-line" data-horizontal="">
-                                                    <span class="content"><i class="fa fa-check"></i>&nbsp;Approve</span>
-                                                    <span class="progress">
-                                                        <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
-                                                    </span>
-                                                </button>
-                                                <button id="btnReject" style="margin-top:5px;" class="progress-button progress-button-small progress-button-danger pull-right" data-style="top-line" data-horizontal="">
-                                                    <span class="content"><i class="fa fa-ban"></i>&nbsp;Reject</span>
-                                                    <span class="progress">
-                                                        <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
-                                                    </span>
-                                                </button>
+                                                {{#if isPending rfqId}}
+                                                    <button id="btnApprove" style="margin-top:5px;" class="progress-button progress-button-small pull-right" data-style="top-line" data-horizontal="">
+                                                        <span class="content"><i class="fa fa-check"></i>&nbsp;Approve</span>
+                                                        <span class="progress">
+                                                            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                                        </span>
+                                                    </button>
+                                                    <button id="btnReject" style="margin-top:5px;" class="progress-button progress-button-small progress-button-danger pull-right" data-style="top-line" data-horizontal="">
+                                                        <span class="content"><i class="fa fa-ban"></i>&nbsp;Reject</span>
+                                                        <span class="progress">
+                                                            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                                        </span>
+                                                    </button>
+                                                {{/if}}
                                             {{/if}}
                                         </div>
                                     </div>
@@ -56,6 +58,9 @@
                         {{/if}}
                     {{/each}}
                     
+                    {{#if $not rfqdiscussion._id}}
+                        <h1 class="text-center">No conversion</h1>
+                    {{/if}}
                 </div>
             </div>
         {{/if}}
