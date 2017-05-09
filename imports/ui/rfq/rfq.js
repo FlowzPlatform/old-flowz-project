@@ -26,12 +26,25 @@
       },
       'click #btnApprove': function(event, template) {
           let activeRfq = template.rfqdiscussion.get();
-
           CollCloseOutPromoRFQSent.update(activeRfq.rfqId, { $set: { Status: 'Approved' } });
+          toastr.success("Successfully Approved.");
       },
       'click #btnReject': function(event, template) {
-          let activeRfq = template.rfqdiscussion.get();
-          CollCloseOutPromoRFQSent.update(activeRfq.rfqId, { $set: { Status: 'Rejected' } });
+          swal({
+                  title: "Are you sure?",
+                  text: "Are you sure you want to reject this RFQ?",
+                  type: "warning",
+                  showCancelButton: true,
+                  confirmButtonColor: "#DD6B55",
+                  confirmButtonText: "Yes",
+                  closeOnConfirm: true
+              },
+              function() {
+                  let activeRfq = template.rfqdiscussion.get();
+                  CollCloseOutPromoRFQSent.update(activeRfq.rfqId, { $set: { Status: 'Rejected' } });
+                  toastr.success("Successfully Rejected.");
+              });
+
       }
   });
 
@@ -116,12 +129,22 @@
   })
 
   Template.rfq.onCreated(function() {
-      this.rfqdiscussion = new ReactiveVar({});
+      let rfqdiscussionData = {}
+          //   let data = CollCloseOutPromoRFQDiscussion.find({ sid: Meteor.userId() }).fetch();
+          //   if (Meteor.userId() != "hi4v28wiizb8tHrrT") {
+          //       let rfqSent = CollCloseOutPromoRFQSent.find({ OwnerId: Meteor.userId() }).fetch();
+          //       let owenerId = _.map(rfqSent, function(d) { return d._id });
+          //       data = CollCloseOutPromoRFQDiscussion.find({ rfqId: { $in: owenerId } }).fetch();
+          //   }
+          //   if (data.length > 0) {
+          //       rfqdiscussionData = data[0];
+          //   }
+
+      this.rfqdiscussion = new ReactiveVar(rfqdiscussionData);
   })
 
   Template.rfq.helpers({
       rfq() {
-
           let data = CollCloseOutPromoRFQDiscussion.find({ sid: Meteor.userId() }).fetch();
           if (Meteor.userId() != "hi4v28wiizb8tHrrT") {
               let rfqSent = CollCloseOutPromoRFQSent.find({ OwnerId: Meteor.userId() }).fetch();
@@ -129,14 +152,11 @@
               data = CollCloseOutPromoRFQDiscussion.find({ rfqId: { $in: owenerId } }).fetch();
           }
           return data;
-
       },
       rfqdiscussion() {
-          //   let data = CollCloseOutPromoRFQDiscussion.find({ sid: Meteor.userId() }).fetch()
-          //   Template.instance().rfqdiscussion.set(data[0]);
           return Template.instance().rfqdiscussion.get();
       },
-      rfqStatus(rfqId) {
+      rfqStatusIcon(rfqId) {
           let data = CollCloseOutPromoRFQSent.findOne({ _id: rfqId });
           let icon = "";
           if (data != undefined) {
@@ -161,6 +181,15 @@
       isCustomer() {
           let status = Meteor.userId() != "hi4v28wiizb8tHrrT";
           return status;
-      }
+      },
+      isPending(rfqId) {
+          let data = CollCloseOutPromoRFQSent.findOne({ _id: rfqId });
+          let status = "";
+          if (data != undefined) {
+              status = (data.Status == "Pending");
+              return status;
+          }
+          return false;
+      },
 
   });
