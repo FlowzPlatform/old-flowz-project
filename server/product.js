@@ -26,10 +26,10 @@ if (Meteor.isServer) {
         'abortInLanding': function(userId, documentId, action) {
             //action == abort / completed
 
-
+            console.log('hello',action);
             if (CollUploadJobMaster.findOne().owner == this.userId) {
                 //return  CollUploadJobMaster.remove({_id: documentId});
-
+                console.log('hello',action);
                 let updateData = {
                     masterJobStatus: action
                 }
@@ -37,7 +37,9 @@ if (Meteor.isServer) {
                     updateData['stepStatus'] = 'import_completed'
                 }
                 //temporary set
-                return true;
+
+
+                //return true;  // commented By Kavi ... "9th may"
                 CollUploadJobMaster.update({ _id: documentId }, {
                     $set: updateData
                 }, function(e, res) {

@@ -169,7 +169,7 @@ Template.landing.events({
               }else
               {
                 //swal("Aborted!", "Your files has been deleted.", "success");
-
+                console.log(success)
                 toastr.error('Your files has been deleted');
               }
             });
