@@ -42,7 +42,7 @@ if (Meteor.isServer) {
 
       let versionNo = ESUser.metadata.user_version_history.length + 1
       let NewVersionNo = 'sup'+ ESUser.metadata.id + '_' + versionNo
-
+      
       //return res
     }
   })
