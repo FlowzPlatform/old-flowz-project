@@ -95,8 +95,6 @@ check
 
 
 aldeed:autoform@5.1.2
-aldeed:collection2
-aldeed:simple-schema
 aldeed:template-extension
 
 
@@ -137,3 +135,4 @@ meteorhacks:subs-manager
 fastclick
 
 http
+aldeed:collection2-core@2.0.0
