@@ -1499,3 +1499,11 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
     color: #fff !important;
     background-color: #00a65a !important;
 }
+
+#dv{
+    margin: 2% 15%;
+}
+
+ul.mySection label{
+    width: 310px;
+}
