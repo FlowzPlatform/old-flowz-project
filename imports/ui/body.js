@@ -1037,7 +1037,7 @@ let changeXEditorValue = function(template) {
 let resetAll = function(template) {
     $(template.find('#csv-file')).val('');
     //$(template.find("#dpdSchema option[value='']")).remove();
-    $(template.find("#txtNewSchemaName")).hide();
+    $(template.find("#txtNewSchemaName")).html("Untitled schema");
     $(template.find("#mapping")).hide();
     $(template.find("#preview")).hide();
     $(template.find('#btnNext')).find('.progress-inner').css({ 'width': '0%' });

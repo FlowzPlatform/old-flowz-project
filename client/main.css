@@ -1248,10 +1248,6 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
     font-size: 1em !important;
 }
 
-.newSchemaProperty {
-    display: none;
-}
-
 #mapping.add-schema-show .newSchemaProperty {
     display: table-cell;
 }
@@ -1502,4 +1498,12 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 .bg-green {
     color: #fff !important;
     background-color: #00a65a !important;
+}
+
+#dv{
+    margin: 2% 15%;
+}
+
+ul.mySection label{
+    width: 310px;
 }
