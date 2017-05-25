@@ -830,10 +830,14 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 
 /*****************  login button *********************/
 
-#login-buttons #login-name-link {
+#login-buttons .login-link-text {
     color: #fff;
     text-decoration: none;
-    padding: 15px 15px;
+}
+
+#login-buttons #login-name-link {
+    text-decoration: none;
+    /*padding: 15px 15px;*/
     line-height: 20px;
     position: relative;
     display: block;
@@ -1500,10 +1504,10 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
     background-color: #00a65a !important;
 }
 
-#dv{
+#dv {
     margin: 2% 15%;
 }
 
-ul.mySection label{
+ul.mySection label {
     width: 310px;
 }
