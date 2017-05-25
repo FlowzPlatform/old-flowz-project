@@ -1759,5 +1759,8 @@ Template.header.helpers({
     isCustomer() {
         let status = Meteor.userId() == "hi4v28wiizb8tHrrT";
         return status;
+    },
+    getCurrentRouter() {
+        return Router.current().route.getName().toLowerCase();
     }
 })

@@ -68,7 +68,7 @@
       <ul>
          <li>
             <input type="checkbox" id="list-item-{{ incremented @index}}">
-            <label for="list-item-{{ incremented @index}}">#Bid No -{{ incremented @index}}  {{#if $eq isHighest "yes"}} > Current Highest Bidder{{/if}}<i style="float:right" class="fa fa-angle-down" buttonContent="Edit post"></i></label>
+            <label class="bidDetailLabel" for="list-item-{{ incremented @index}}">#Bid No -{{ incremented @index}}  {{#if $eq isHighest "yes"}} > Current Highest Bidder{{/if}}<i style="float:right" class="fa fa-angle-down" buttonContent="Edit post"></i></label>
             <ul>
                <li>Bidder Id is - {{bidderId}}</li>
                <li>Bid Placed on - {{biddingTime}}</li>
