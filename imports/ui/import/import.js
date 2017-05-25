@@ -36,6 +36,23 @@ Template.import.helpers({
           return false
         }
     },
+    isImportStart(status)
+    {
+        if (status == ImportRunning) {
+          return true
+        } else {
+          return false
+        }
+    },
+    isImportCompleted(status)
+    {
+        if (status == ImportCompleted) {
+          Router.go("/uploaderdashboard");
+          return true
+        } else {
+          return false
+        }
+    },
     importStart:function()
     {
       let qry={owner:Meteor.userId(),"masterJobStatus":masterJobStatusRunning,"stepStatus":ImportToConfirm};
@@ -123,6 +140,17 @@ Template.import.onCreated( function () {
   //  let id = setInterval(frame, 100);
 })
 
+Template.import.onRendered(function() {
+  /*
+  let qry={owner:Meteor.userId(),"masterJobStatus":masterJobStatusRunning};
+  job = CollUploadJobMaster.find(qry).fetch();
+  console.log("=======hello 111============",job)
+  if(job.length>0)
+  {
+      Router.go("/");
+  }
+  */
+});
 
 let updateMasterJobQueueStatus = function (job) {
   let jobQueue = job
@@ -146,7 +174,7 @@ function updateESUserUpdateVersion (job, ESUser) {
 function getESUser (jobQueue) {
   Meteor.call('getESUser', jobQueue, function (err, res) {
     if (err) throw err
-    Session.set("ESUserData", res)
-    //updateESUserUpdateVersion(jobQueue, JSON.parse(res))
+    // Session.set("ESUserData", res)
+    // updateESUserUpdateVersion(jobQueue, JSON.parse(res))
   })
 }

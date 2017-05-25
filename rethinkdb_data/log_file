@@ -1,0 +1,17 @@
+2017-05-18T10:09:48.125450308 0.051405s notice: Recursively removing directory /var/www/html/node/OBProduct/rethinkdb_data/tmp
+2017-05-18T10:09:48.139309498 0.065264s notice: Initializing directory /var/www/html/node/OBProduct/rethinkdb_data
+2017-05-18T10:09:48.139584872 0.065538s info: Creating a default database for your convenience. (This is because you ran 'rethinkdb' without 'create', 'serve', or '--join', and the directory '/var/www/html/node/OBProduct/rethinkdb_data' did not already exist or is empty.)
+2017-05-18T10:09:48.139814217 0.065768s notice: Running rethinkdb 2.3.5~0xenial (GCC 5.3.1)...
+2017-05-18T10:09:48.147810312 0.073768s notice: Running on Linux 4.4.0-72-generic x86_64
+2017-05-18T10:09:48.147935598 0.073889s notice: Loading data from directory /var/www/html/node/OBProduct/rethinkdb_data
+2017-05-18T10:09:48.181222837 0.107176s info: Automatically using cache size of 3802 MB
+2017-05-18T10:09:48.182003307 0.107956s notice: Listening for intracluster connections on port 29015
+2017-05-18T10:09:48.186994472 0.112947s notice: Listening for client driver connections on port 28015
+2017-05-18T10:09:48.191380674 0.117334s error: Could not bind to http port: The address at localhost:8080 is reserved or already in use.
+2017-05-18T10:13:26.026408799 0.121515s notice: Running rethinkdb 2.3.5~0xenial (GCC 5.3.1)...
+2017-05-18T10:13:26.034504267 0.129617s notice: Running on Linux 4.4.0-72-generic x86_64
+2017-05-18T10:13:26.034674451 0.129780s notice: Loading data from directory /var/www/html/node/OBProduct/rethinkdb_data
+2017-05-18T10:13:26.065832833 0.160938s info: Automatically using cache size of 3717 MB
+2017-05-18T10:13:26.066459403 0.161564s notice: Listening for intracluster connections on port 29015
+2017-05-18T10:13:26.067399049 0.162504s notice: Listening for client driver connections on port 28015
+2017-05-18T10:13:26.071426990 0.166532s error: Could not bind to http port: The address at localhost:8080 is reserved or already in use.

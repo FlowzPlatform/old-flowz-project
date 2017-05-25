@@ -131,11 +131,12 @@ Template.landing.events({
     'click #landingContinuetBtnId' (event) {
 
         let getStepStatus = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: "running" }).stepStatus;
+
         if (getStepStatus == "upload_pending") {
             Router.go("upload")
         } else if (getStepStatus == "validation_running" || getStepStatus == "validation_completed") {
             Router.go("validation")
-        } else if (getStepStatus == "import_in_proress") {
+        } else if (getStepStatus == "import_in_progress") {
             Router.go("import");
         } else {
             Router.go("/");
