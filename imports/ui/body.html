@@ -8,15 +8,16 @@
                     <a class="navbar-brand" href="#">Closeout-Promo</a>
                 </div>
                 <ul class="nav navbar-nav pull-right">
-                    <li class="active"><a href="/">Dashboard</a></li>
+                    <li><a href="http://localhost:3001/">Home</a></li>
+                    <li class="{{#if $eq getCurrentRouter "dashboard"}} active {{/if}}"><a href="/">Dashboard</a></li>
                     {{#if isCustomer}}
-                        <li><a href="/uploaderdashboard">Upload</a></li>
+                        <li class="{{#if $or ($eq getCurrentRouter "landing") ($eq getCurrentRouter "upload") ($eq getCurrentRouter "import") ($eq getCurrentRouter "validation")}} active {{/if}}"><a href="/uploaderdashboard">Upload</a></li>
                         <!--<li class=""><a href="/upload">Upload</a></li>-->
-                        <li><a href="/history">History</a></li>
+                        <li class="{{#if $eq getCurrentRouter "history"}} active {{/if}}"><a href="/history">History</a></li>
                     {{/if}}
-                    <li><a href="/rfq">RFQ</a></li>
-                    <li><a href="/bidding">My Auctions</a></li>
-                    <li><a href="/allBids">All Bids</a></li>
+                    <li class="{{#if $eq getCurrentRouter "rfq"}} active {{/if}}"><a href="/rfq">RFQ</a></li>
+                    <li class="{{#if $eq getCurrentRouter "bidding"}} active {{/if}}"><a href="/bidding">My Auctions</a></li>
+                    <li class="{{#if $eq getCurrentRouter "allbids"}} active {{/if}}"><a href="/allBids">All Bids</a></li>
                     <li><a>{{> loginButtons}}</a></li>
                 </ul>
             </div>

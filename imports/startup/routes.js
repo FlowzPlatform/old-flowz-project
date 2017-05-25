@@ -6,12 +6,15 @@
 import { CollUploadJobMaster } from '../api/collections.js';
 
 
-Router.route('/', function() {
-    this.render('dashboard');
+Router.route('/', {
+    name: 'dashboard',
+    template: 'dashboard'
 });
 
-Router.route('/uploaderdashboard', function() {
-    this.render('landing');
+Router.route('/uploaderdashboard', {
+    name: 'landing',
+    template: 'landing'
+        //    this.render('landing');
 });
 
 Router.route('/upload', {
@@ -36,25 +39,32 @@ Router.route('/upload', {
 //     this.render('readCSV');
 // });
 
-Router.route('/history', function() {
-    this.render('history');
+Router.route('/history', {
+    name: 'history',
+    template: 'history'
 });
 
-Router.route('/validation', function() {
-    this.render('validation');
+Router.route('/validation', {
+    name: 'validation',
+    template: 'validation'
+        //this.render('validation');
 });
 
-Router.route('/import', function() {
-    this.render('import');
+Router.route('/import', {
+    name: 'import',
+    template: 'import'
+
 });
 
-Router.route('/rfq', function() {
-    this.render('rfq');
+Router.route('/rfq', {
+    name: 'rfq',
+    template: 'rfq'
 });
 
 
-Router.route('/bidding', function() {
-    this.render("bidding")
+Router.route('/bidding', {
+    name: 'bidding',
+    template: 'bidding'
 })
 
 Router.route("viewBidsDetail", {
@@ -74,8 +84,9 @@ Router.route("viewBidsDetail", {
     }
 });
 
-Router.route('/allBids', function() {
-    this.render("allBids")
+Router.route('/allBids', {
+    name: 'allBids',
+    template: 'allBids'
 })
 
 // return this.route("dashboard", {
