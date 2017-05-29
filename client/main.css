@@ -1256,6 +1256,10 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
     display: table-cell;
 }
 
+#mapping .newSchemaProperty {
+    display: none;
+}
+
 
 /***************************  rfq-view ********************************/
 

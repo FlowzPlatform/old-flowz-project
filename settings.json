@@ -13,9 +13,9 @@
     "FTPass": "e6354wdfgbnm",
     "public": {
         "elasticsearch": {
-            "host": "https://7e94c6196993fd6c3d570a3d40e100d1.us-east-1.aws.found.io:9243",
+            "host": "https://e128e59136400347637da727965922e5.us-east-1.aws.found.io:9243",
             "username": "elastic",
-            "password": "SwmLSQli9PvtUNsm63Ce7dpr"
+            "password": "OHQ0CzscklU0ttV59JicgNyH"
         }
     }
 }
