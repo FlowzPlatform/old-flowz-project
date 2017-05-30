@@ -65,6 +65,7 @@
                                 <div class="panel-body">
 
                                     <div class="preview">
+                                        
                                         <!--<table class="table table-bordered table-hover">
                                             <thead>
                                                 <tr>
@@ -135,7 +136,7 @@
                                 </div>
                                 <div class="clearfix"></div>
                                 <!--<button type="submit" class="btn btn-primary btnReadCsv">Read</button>-->
-                                <div id="preview"  class="row" style="display: none;">
+                                <div id="preview"  class="row" style="display: none;position: relative;">
                                     <div class="col-md-12">
                                         <div class="pull-left">
                                             <h3 style="margin-top: 0px;text-transform: capitalize;">Preview of {{currentSheetName}}</h3>
@@ -145,6 +146,7 @@
                                         </div>
                                     </div>
                                     <div class="col-md-12">
+                                        <div class="makeBlur" align="center"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
                                         <div class="table-responsive" style="margin-bottom: 10px;border-right: 1px solid #ccc;">
                                             {{#if previewRec.length}}
                                                 <table class="table table-bordered table-hover">
@@ -185,8 +187,9 @@
                                     </div>
                                 </div>
                                 <div class="clearfix"></div>
-                                <div id="handson-Zone-during-upload">
-                                    <div class="handson-table">
+                                <div id="handson-Zone-during-upload" >
+                                    <div class="handson-table" style="position: relative;">
+                                        <div class="makeBlur" style="z-index: 99" align="center"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
                                         <div id="hotErrorDataDuringUpload"></div>
                                     </div>
                                     <div id="errMessageFromSchema" class="bg-danger" style="font-weight: 600;padding: 8px;margin-bottom: 10px;"></div>

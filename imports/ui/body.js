@@ -451,6 +451,7 @@ Template.readCSV.events({
         } else {
             if ($(template.find("#dpdSchema")).val() == '') {
                 $(template.find('#btnNext')).addClass('inProgress');
+                $('.makeBlur').css("display","block");
                 insertSchema(template, function() {
                     $(template.find('#mapping')).hide();
                     insertCSVMapping(activeFiletypeId, template, function(e, res) {
@@ -462,7 +463,7 @@ Template.readCSV.events({
                 })
             } else {
                 $(template.find('#btnNext')).addClass('inProgress');
-
+                $('.makeBlur').css("display","block");
                 $(template.find('#mapping')).hide();
                 insertCSVMapping(activeFiletypeId, template, function(e, res) {
                     // upload csv file in db
@@ -1042,6 +1043,7 @@ let resetAll = function(template) {
     $(template.find("#preview")).hide();
     $(template.find('#btnNext')).find('.progress-inner').css({ 'width': '0%' });
     $(template.find('#btnNext')).removeClass('inProgress');
+    $('.makeBlur').css('display','none');
     $(template.find("#upload-csv-zone")).show();
     $(template.find('#btnNext')).find('.content').text('Proceed');
     $(template.find('#btnNext')).show();
@@ -1368,6 +1370,7 @@ let parseCSV = function(_file, template, cb) {
             complete: function(results) {
                 if (!abortChecked && progress == 100) {
                     updateJobMaster(activeFiletype.id, fileID, function() {
+                        $('.makeBlur').css("display","none");
                         setNextFile(template, function() {
                             cb();
                         });
@@ -1397,7 +1400,7 @@ let parseCSV = function(_file, template, cb) {
                     } else {
                         $(template.find('#btnNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
                         $(template.find('#btnNext')).find('.content').text(newProgress + '% completed');
-
+                        
                         $(template.find('#buttonProceedNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
                         $(template.find('#buttonProceedNext')).find('.content').text(newProgress + '% completed');
                         Csvfiles.update(fileID, { $set: { progress: newProgress, uploadedRecords: uploadedRecords } }, function(e, res) {
@@ -1657,7 +1660,7 @@ let insertCSVData = function(data, fileID, collection, cb) {
             //console.log(err);
             //console.log('errmessage', err.message);
             //console.log('err', err.invalidKeys[0].name);
-
+            
             //console.log(typeObj);
             let allowedValuesObj = '';
             try {
@@ -1673,7 +1676,7 @@ let insertCSVData = function(data, fileID, collection, cb) {
             //console.log('data', data);
             $("#upload-csv-zone,#preview").hide();
             $("#handson-Zone-during-upload").show();
-
+            $('.makeBlur').css("display","none");
             $('#buttonProceedNext').show().find('.content').text('Proceed To Next');
             $('#btnNext').hide();
             //toastr.error(err.message);
@@ -1729,6 +1732,7 @@ let renderHandsonTable = function(dataObject, headers, eleName, error, fileID, c
             //updateErrorData(changes, source, dataObject, fileID);
             $("#buttonProceedNext").unbind('click').click(function() {
                 //console.log('afterchange', dataObject);
+                $('.makeBlur').css("display","block");
                 insertCSVData(dataObject, fileID, collection, cb);
             });
         }
