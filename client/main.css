@@ -1515,3 +1515,19 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 ul.mySection label {
     width: 310px;
 }
+
+.makeBlur{
+    height: 100%;
+    width: 100%;
+    background-color: #fff;
+    position: absolute;
+    opacity: 0.7;
+    display: none ;
+}
+
+.makeBlur i{
+   margin-top: 75px;
+}
+#preview .makeBlur{
+    width: calc(100% - 30px);
+}
