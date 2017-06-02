@@ -39,6 +39,8 @@ Template.import.helpers({
     isImportStart(status)
     {
         if (status == ImportRunning) {
+          //console.log($('#preview').find('.spinner'))
+          //$('#preview').find('.spinner').show()
           return true
         } else {
           return false
