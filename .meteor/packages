@@ -117,7 +117,6 @@ spiderable
 
 jparker:gravatar
 tap:i18n
-useraccounts:bootstrap
 service-configuration
 yogiben:mixpanel
 juliancwirko:s-alert
@@ -136,3 +135,5 @@ fastclick
 
 http
 aldeed:collection2-core@2.0.0
+useraccounts:bootstrap
+useraccounts:materialize
