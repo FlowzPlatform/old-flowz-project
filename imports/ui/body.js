@@ -3,8 +3,8 @@ import { Template } from 'meteor/templating';
 import { ReactiveDict } from 'meteor/reactive-dict';
 import { ReactiveVar } from 'meteor/reactive-var';
 import SimpleSchema from 'simpl-schema';
-// import { UploadedFiles } from '../lib/collections.js';
-// import  Headers
+
+//-------------------------------- import  Headers -------------------------------------
 import { ProductInformationHeaders } from '../../lib/headers/product_information.js'
 import { ProductPriceHeaders } from '../../lib/headers/product_price.js'
 import { ProductImprintDataHeaders } from '../../lib/headers/product_imprint_data.js'
@@ -13,25 +13,14 @@ import { ProductShippingHeaders } from '../../lib/headers/product_shipping.js'
 import { ProductAdditionalChargeHeaders } from '../../lib/headers/product_additional_charge.js'
 import { ProductVariationPricingHeaders } from '../../lib/headers/product_variation_pricing.js'
 
-
-// import  collections
-
+//-------------------------------- import  collections-------------------------------------
 import { CollProductInformation, CollProductPrice, CollProductImprintData, CollProductImage, CollProductShipping, CollProductAdditionalCharges, CollProductVariationPrice } from '../api/collections.js';
 import { Csvfiles } from '../api/collections.js';
 import { Csvfilemapping } from '../api/collections.js';
 import { CollUploadJobMaster } from '../api/collections.js';
 import { CollUploaderSchema } from '../api/collections.js';
 
-
-// import schema
-// import { ProductInformationSchema } from '../../lib/schema/product_information.js';
-// import { ProductAdditionalChargeSchemas } from '../../lib/schema/product_additional_charge.js';
-// import { ProductImagesSchemas } from '../../lib/schema/product_images.js';
-// import { ProductImprintDataSchemas } from '../../lib/schema/product_imprint_data.js';
-// import { ProductPriceSchemas } from '../../lib/schema/product_price.js';
-// import { ProductShippingSchemas } from '../../lib/schema/product_shipping.js';
-// import { ProductVariationPricingSchemas } from '../../lib/schema/product_variation_pricing.js';
-
+//-------------------------------- import body html -------------------------------------
 import './body.html';
 
 
@@ -48,18 +37,10 @@ Template.imageUpload.onRendered(function() {
         $('.imageOrFileButton').removeClass('active');
         $(this).addClass('active');
     });
-    //this.csv_files = new ReactiveArray();
-
-    // Meteor.Dropzone.options.maxFiles = 1;
-    //  Meteor.Dropzone.options.previewTemplate = '<div id="preview-template" >';
     Meteor.Dropzone.options.dictDefaultMessage = '<p class="first">Drag and drop images here to upload</p>   <p class="second">(only .jpg , .png and .gif files are allowed)</p>';
-    //Meteor.Dropzone.options.addRemoveLinks = true;
-    //Meteor.Dropzone.options.dictRemoveFile = "Remove File"; // Remove button text
-
-    //Meteor.Dropzone.options.acceptedFiles = 'image/jpeg,image/png,image/gif';
     Meteor.Dropzone.options.acceptedFiles = '.jpg';
     Meteor.Dropzone.options.autoProcessQueue = true;
-    Meteor.Dropzone.options.parallelUploads = 5; // Number of parallel upload file
+    Meteor.Dropzone.options.parallelUploads = 5;
     Meteor.Dropzone.options.processingmultiple = false;
     Meteor.Dropzone.options.uploadMultiple = false;
 
@@ -71,15 +52,8 @@ Template.imageUpload.onRendered(function() {
     // this is how you get the response from the ajax call.
     this.dropzone.on('addedfile', function(file) {
         console.log("fileName:", file);
-        //  UploadedFiles.insert(file.name, function(e, res) {
-        //    if (e) {
-        //      log(e);
-        //    }
-        //    console.log("inserted into mongo collection");
-        //  })
     });
     this.dropzone.on('complete', function(file) {
-
         var uploader = new Slingshot.Upload("myFileUploads");
 
         uploader.send(file, function(error, downloadUrl) {
@@ -89,22 +63,9 @@ Template.imageUpload.onRendered(function() {
                 console.log(error);
             } else {
                 console.log("success");
-                //  Meteor.users.update(Meteor.userId(), {$push: {"profile.files": downloadUrl}});
             }
         });
-
-
-        //FS.Utility.eachFile(e, function(file) {
-        //  var newFile = new FS.File(file);
         console.log(file);
-        //   Images.insert(file, function (error, fileObj) {
-        //     if (error) {
-        //       toastr.error("Upload failed... please try again.");
-        //     } else {
-        //       toastr.success('Upload succeeded!');
-        //     }
-        // });
-        // });
     });
 
     this.dropzone.on("uploadprogress", function(file, progress) {
@@ -174,12 +135,6 @@ Template.readCSV.events({
             });
         } else {
             $(template.find("#txtNewSchemaName")).hide();
-            // if (template.find('#dpdSchema').value == '') {
-            //     toastr.error(" Please select schema.");
-            //     //$(template.find('#csv-file')).val('');
-            //     return false;
-            // }
-            //$(".newSchemaProperty").hide();
             $(template.find('#mapping')).removeClass('add-schema-show');
             $(template.find("#mapping")).find('.spinner').show();
             $(template.find('#preview')).find('.spinner').show();
@@ -432,15 +387,11 @@ Template.readCSV.events({
             return false;
         }
 
-
-        let ft = template.filetypes.get(); // all file type
+        let ft = template.filetypes.get();
         let activeFiletypeId = _.find(ft, function(d) { return d.isActive }).id;
-        if ($(template.find("#dpdSchema")).val() != '') {
-            genrateNewSchema(template);
-        }
-        let mapping = generateMapping(template); // generate new Mapping
-
+        let mapping = generateMapping(template);
         let diff = _.chain(mapping).filter(function(d) { return d.csvHeader == '' && !d.csvSysHeaderDetail.optional }).map(function(d) { return d.sysHeader }).value();
+
         if (diff.length > 0) {
             swal({
                 title: "Error!",
@@ -452,24 +403,18 @@ Template.readCSV.events({
             if ($(template.find("#dpdSchema")).val() == '') {
                 $(template.find('#btnNext')).addClass('inProgress');
                 $('.makeBlur').css("display","block");
-                insertSchema(template, function() {
+                insertSchema(template,ft, function() {
                     $(template.find('#mapping')).hide();
-                    insertCSVMapping(activeFiletypeId, template, function(e, res) {
-                        // upload csv file in db
-                        parseCSV(template.find('#csv-file').files[0], template, function() {
-
-                        });
+                    insertCSVMapping(activeFiletypeId, template,mapping, function(e, res) {
+                        parseCSV(template.find('#csv-file').files[0], template,mapping);
                     });
                 })
             } else {
                 $(template.find('#btnNext')).addClass('inProgress');
                 $('.makeBlur').css("display","block");
                 $(template.find('#mapping')).hide();
-                insertCSVMapping(activeFiletypeId, template, function(e, res) {
-                    // upload csv file in db
-                    parseCSV(template.find('#csv-file').files[0], template, function() {
-
-                    });
+                insertCSVMapping(activeFiletypeId, template,mapping, function(e, res) {
+                    parseCSV(template.find('#csv-file').files[0], template,mapping);
                 });
             }
         }
@@ -586,15 +531,9 @@ let getschemaType = function(schemaType) {
 
 
 
-let insertSchema = function(template, cb) {
-    // get current sheet
-    let ft = template.filetypes.get(); // all file type
+let insertSchema = function(template,ft, cb) {
     let activeFiletype = _.indexOf(ft, _.find(ft, function(d) { return d.isActive }));
-
     let header = template.headers.get();
-
-    // create new schema
-
     let NewHeaderSchema = "";
     _.each(header, function(d, index) {
         let propertyData = $("#property_" + index).data();
@@ -606,29 +545,20 @@ let insertSchema = function(template, cb) {
                 max: (propertyData.max == '') ? undefined : propertyData.max,
                 regEx: (propertyData.regEx == '') ? undefined : propertyData.regEx,
                 optional: (propertyData.optional == undefined) ? true : propertyData.optional,
-                // sDate: (propertyData.sDate == '') ? undefined : propertyData.sDate,
-                // eDate: (propertyData.eDate == '') ? undefined : propertyData.eDate,
-                // sTime: (propertyData.sTime == '') ? undefined : propertyData.sTime,
-                // eTime: (propertyData.eTime == '') ? undefined : propertyData.eTime,
                 defaultValue: (propertyData.defaultValue == '') ? undefined : propertyData.defaultValue,
                 label: (propertyData.label == '') ? d : propertyData.label,
                 allowedValues: (propertyData.allowedValues == '') ? undefined : propertyData.allowedValues
             };
-
-
             if ((getschemaType(_type)) != undefined) {
                 property.type = 'String';
                 property.regEx = getschemaType(_type);
             }
             NewHeaderSchema += "\"" + d + "\":{type:" + property.type + ",defaultValue:" + property.defaultValue + ",allowedValues:" + property.allowedValues + ",regEx:" + property.regEx + ",min:" + property.min + ",max:" + property.max + ",optional: " + property.optional + ",label:\"" + property.label + "\"},";
-
         } else {
             NewHeaderSchema += "\"" + d + "\":{type:" + _type + ",optional: true,setLabel: \"" + d + "\"},";
         }
-        //NewHeaderSchema += "\"" + d + "\":{type: String,optional: true,label: \"" + d + "\"},";
     });
     NewHeaderSchema = NewHeaderSchema.slice(0, -1);
-
     let data = {
         "name": $(template.find('#txtNewSchemaName')).editable('getValue')['txtNewSchemaName'],
         "schema": NewHeaderSchema,
@@ -641,11 +571,8 @@ let insertSchema = function(template, cb) {
         console.log('res', res);
         $(template.find("#dpdSchema")).children('option[value=' + res + ']').prop('selected', true);
         NewHeaderSchema = "{" + NewHeaderSchema + ",fileID: {type: String,label: 'file ID'},owner: {type: String,label: 'owner'},username: {type: String,label: 'username'}}";
-
         let newSchema = eval("new SimpleSchema(" + NewHeaderSchema + ")");
-
         ft[activeFiletype].schema = newSchema;
-
         ft[activeFiletype].collection.attachSchema(newSchema, { replace: true });
         cb();
     });
@@ -720,8 +647,6 @@ let csvFileChange = function(event, template) {
                 });
             });
         });
-
-        //parseCSV(_files[i], template); // parse csv to json using papa parse
     }
 }
 
@@ -1055,26 +980,10 @@ let resetAll = function(template) {
     template.mappingWithOutHeader.set([]);
     toastr.clear();
     template.headers.set([]);
-
-    // destroyXEditor
-
-    //let activefile = template.headers.get(); // get active file type data
-    //let _csvHeader = template.csvHeaders.get();
-    //let _dataTypes = template.dataTypes.get();
-
-    //console.log('dataTypes', _dataTypes);
-    //console.log('csvHeader', _csvHeader);
-    // create mapping
-    //activefile.forEach(function(result, index) {
-    //    let _val = getHeaderDistance(result.column, _csvHeader);
-    //    $(template.find('#dpdcsvheader_' + index)).editable("destroy");
-    //    //$(template.find('#dpddatatype_' + index)).editable("destroy");
-    //});
 }
 
 let getHeaderDistance = function(sysColumn, csvHeaders) {
     let res = csvHeaders[0];
-    // console.log(this.csvHeaders);
     let col = sysColumn.toLowerCase();
     csvHeaders.forEach(function(d) {
         res = Levenshtein.get(col.replace(/[^a-z0-9]/gi, ''), d.toLowerCase().replace(/[^a-z0-9]/gi, '')) < Levenshtein.get(col.replace(/[^a-z0-9]/gi, ''), res.toLowerCase().replace(/[^a-z0-9]/gi, '')) ? d : res;
@@ -1083,12 +992,10 @@ let getHeaderDistance = function(sysColumn, csvHeaders) {
     return res;
 }
 
-let insertCSVMapping = function(fileTypeID, template, cb) {
-
-    let mapping = generateMapping(template); // generate new Mapping
+let insertCSVMapping = function(fileTypeID, template,mapping, cb) {
     let _hasHeader = $(template.find('#hasheader')).prop('checked');
-
     let isExist = Csvfilemapping.findOne({ owner: Meteor.userId(), fileTypeID: fileTypeID, hasHeader: _hasHeader });
+
     if (isExist == undefined) {
         let _data = {
             mapping: mapping,
@@ -1165,7 +1072,7 @@ let getHeader = function(_file, template, cb) {
         skipEmptyLines: true,
         beforeFirstChunk: function(chunk) {
             let rows = CSVtoArray(chunk);
-            let headings = rows[0]; //rows[0].map(v => v.toLowerCase());
+            let headings = rows[0];
             if (!_hasHeader) {
                 let newHeaders = [];
                 headings.forEach(function(result, index) {
@@ -1175,9 +1082,6 @@ let getHeader = function(_file, template, cb) {
             } else {
                 template.csvHeaders.set(headings);
             }
-        },
-        complete: function(results) {
-            //console.log('results', results);
         },
         error: function(error, f) {
             console.log("ERROR:", error, f);
@@ -1203,27 +1107,19 @@ let getTransformVal = function(headings, row, transformStr, oldValue, index) {
     }
 }
 
-let generateDatawithNewHeader = function(chunk, _hasHeader, mapping, isPreview, template) {
-    let rows = CSVtoArray(chunk);
-
-    let headings = template.csvHeaders.get(); //  _.extend([], rows[0]);
-
-    let oldRows = CSVtoArray(chunk);
+let generateDatawithNewHeader = function(rows, _hasHeader, mapping, isPreview, template) { 
+    let headings = template.csvHeaders.get();
+    //var oldRows = jQuery.extend(true, {}, rows); 
     let activeHeaders = getActiveHeaders(template).slice(1, -1);
-    // let extraHeaders = _.reject(headings, function(d) { return _.indexOf(_.map(mapping, function(v) { return v.csvHeader }), d) != -1 })
-
     let newHeading = _.map(mapping, function(v) { return v.sysHeader });
-    //console.log('activeHeaders', activeHeaders);
-
     let newData = [];
-    //console.log('mapping', mapping);
     _.each(rows, function(row, index) {
         let newRow = [];
         _.each(mapping, function(d, inx) {
             let item = '';
             if (d.csvHeader != "") {
                 if (d.transform.trim() != '') {
-                    item = getTransformVal(headings, oldRows[index], d.transform.trim(), oldRows[index][inx], index);
+                    item = getTransformVal(headings, rows[index], d.transform.trim(), rows[index][inx], index);
                 } else {
                     item = row[_.indexOf(headings, d.csvHeader)];
                 }
@@ -1233,8 +1129,6 @@ let generateDatawithNewHeader = function(chunk, _hasHeader, mapping, isPreview, 
         newData.push(newRow);
     });
 
-    // set headers
-    //    console.log('mapping', mapping);
     _.each(mapping, function(d, inx) {
         if (_hasHeader) {
             newData[0][inx] = (isPreview || d.csvSysHeaderDetail == undefined) ? d.sysHeader : d.csvSysHeaderDetail.text;
@@ -1242,16 +1136,11 @@ let generateDatawithNewHeader = function(chunk, _hasHeader, mapping, isPreview, 
             newHeading[inx] = (isPreview || d.csvSysHeaderDetail == undefined) ? d.sysHeader : d.csvSysHeaderDetail.text;
         }
     });
-
-
-    //console.log('newData', newData);
-
     return (!_hasHeader ? (newHeading.join(',') + '\n') : "") + arrayToCSV(newData);
 }
 
 let generatePreview = function(_file, template, cb) {
     let _hasHeader = $(template.find('#hasheader')).prop('checked');
-    // generateMapping
     generateMapping(template);
     mapping = template.mapping.get();
 
@@ -1263,22 +1152,15 @@ let generatePreview = function(_file, template, cb) {
         skipEmptyLines: true,
         newline: "\n",
         beforeFirstChunk: function(chunk) {
-            //console.log('chunk', chunk);
-            let newrows = generateDatawithNewHeader(chunk, _hasHeader, mapping, true, template);
-            //console.log(newrows);
+            let rows = CSVtoArray(chunk);
+            let newrows = generateDatawithNewHeader(rows, _hasHeader, mapping, true, template);
             return newrows;
-        },
-        complete: function(results) {
-            //console.log('results', results);
-
         },
         error: function(error, f) {
             console.log("ERROR:", error, f);
         },
         chunk: function(results, streamer) {
-            //console.log('results', results);
             template.previewRec.set(results.data.slice(0, 5));
-            //template.previewRec.set(results.data);
             streamer.abort();
             cb();
             return;
@@ -1286,7 +1168,7 @@ let generatePreview = function(_file, template, cb) {
     });
 };
 
-let setNextFile = function(template, cb) {
+let setNextFile = function(template) {
     let ft = template.filetypes.get(); // all file type
     let activeFiletypeId = _.indexOf(ft, _.find(ft, function(d) { return d.isActive }));
     swal({
@@ -1305,7 +1187,6 @@ let setNextFile = function(template, cb) {
                     ft[activeFiletypeId].isDone = true;
                     template.filetypes.set(ft);
                     template.abortData.set(true);
-                    cb();
                 } else {
                     ft[activeFiletypeId].isActive = false;
                     ft[activeFiletypeId].isDone = true;
@@ -1314,25 +1195,18 @@ let setNextFile = function(template, cb) {
                     template.abortData.set(true);
                     resetAll(template);
                     Router.go('/upload/' + ft[activeFiletypeId + 1].id);
-                    cb();
                 }
             } else {
                 ft[activeFiletypeId].isActive = true;
                 ft[activeFiletypeId].isDone = true;
                 template.filetypes.set(ft);
                 template.abortData.set(true);
-                cb();
             }
         });
 }
 
-let parseCSV = function(_file, template, cb) {
+let parseCSV = function(_file, template,mapping) {
     let _hasHeader = $(template.find('#hasheader')).prop('checked');
-
-    // generateMapping
-    generateMapping(template);
-    let mapping = template.mapping.get();
-
     $(template.find('#btnNext')).find('.progress-inner').css({ 'width': '0%' });
     $(template.find('#btnNext')).find('.content').text('Start uploding...');
     let file = {
@@ -1347,15 +1221,12 @@ let parseCSV = function(_file, template, cb) {
         owner: Meteor.userId(),
         username: Meteor.user().username
     };
-
     Papa.LocalChunkSize = _file.size;
-
     Csvfiles.insert(file, function(e, res) {
         $('#buttonProceedNext').hide();
-        let fileID = res; // new file id
-        let ft = template.filetypes.get(); // all file type
-        let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
-        //console.log('fileID', fileID);
+        let fileID = res; 
+        let ft = template.filetypes.get();
+        let activeFiletype = _.find(ft, function(d) { return d.isActive }); 
         let chunks = 1;
         let totalRecords = 0;
         let uploadedRecords = 0;
@@ -1366,14 +1237,11 @@ let parseCSV = function(_file, template, cb) {
             encoding: "UTF-8",
             skipEmptyLines: true,
             newline: "\n",
-            //newline: "\r\n",
             complete: function(results) {
                 if (!abortChecked && progress == 100) {
                     updateJobMaster(activeFiletype.id, fileID, function() {
                         $('.makeBlur').css("display","none");
-                        setNextFile(template, function() {
-                            cb();
-                        });
+                        setNextFile(template);
                     });
                 }
             },
@@ -1381,18 +1249,13 @@ let parseCSV = function(_file, template, cb) {
                 console.log("ERROR:", error, f);
             },
             step: function(results, parser) {
-                //console.log("results", $.extend({}, results));
                 if (abortChecked) {
                     parser.abort();
                     return;
                 }
                 parser.pause();
                 insertCSVData(results.data[0], fileID, activeFiletype.collection, function() {
-
-                    //$("#errMessageFromSchema").text('');
                     toastr.clear();
-
-                    // calculate progress
                     ++uploadedRecords;
                     let newProgress = Math.round((uploadedRecords * 100) / totalRecords);
                     if (progress == newProgress) {
@@ -1400,11 +1263,9 @@ let parseCSV = function(_file, template, cb) {
                     } else {
                         $(template.find('#btnNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
                         $(template.find('#btnNext')).find('.content').text(newProgress + '% completed');
-                        
                         $(template.find('#buttonProceedNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
                         $(template.find('#buttonProceedNext')).find('.content').text(newProgress + '% completed');
                         Csvfiles.update(fileID, { $set: { progress: newProgress, uploadedRecords: uploadedRecords } }, function(e, res) {
-                            //console.log('csvupload');
                             parser.resume();
                         });
                     }
@@ -1413,56 +1274,10 @@ let parseCSV = function(_file, template, cb) {
             },
             beforeFirstChunk: function(chunk) {
                 let rows = CSVtoArray(chunk);
-                //console.log('rows.length', rows.length);
                 totalRecords = (_hasHeader) ? rows.length - 1 : rows.length - 0; // last row getting empty
                 Csvfiles.update(fileID, { $set: { totalNoOfRecords: totalRecords } }, function(e, res) {});
-                return generateDatawithNewHeader(chunk, _hasHeader, mapping, false, template);
+                return generateDatawithNewHeader(rows, _hasHeader, mapping, false, template);
             },
-            // chunk: function(results, streamer) {
-
-            //     if (!results)
-            //         return;
-
-            //     //console.log('finished', streamer.streamer._finished);
-            //     //console.log('streamer', streamer.streamer);
-
-            //     // calculate progress
-            //     let progress = Math.round((streamer.streamer._config.chunkSize * chunks) / streamer.streamer._input.size * 100);
-            //     progress = progress > 100 ? 100 : progress;
-            //     let noOfRecords = streamer.streamer._rowCount;
-
-            //     // insert chunk data in mongo db
-            //     streamer.pause();
-            //     //Meteor.call('products.insertCSVData', fileID, results.data, function() {
-            //     insertCSVData(fileID, results.data, template, progress, streamer, function() {
-            //         // update file progress
-            //         Csvfiles.update(fileID, {
-            //                 $set: { progress, noOfRecords }
-            //             },
-            //             function(e, res) {
-            //                 if (progress < 100) {
-            //                     //streamer.resume();
-            //                 } else {
-            //                     streamer.abort();
-            //                     cb(); // callback 'parseCSV' method
-            //                 }
-            //             });
-            //     });
-            //     //console.log("Chunk data:", results.data.length, results);
-
-            //     // update progress
-
-            //     // let existFiles = template.files.get();
-            //     // for (let i = 0; i < existFiles.length; i++) {
-            //     //     if (existFiles[i].name == streamer.streamer._input.name)
-            //     //         existFiles[i].progress = progress;
-            //     // }
-            //     // template.files.set(existFiles);
-            //     //$(template.find('#btnNext')).find('.progress-inner').css({ 'width': progress + '%' })
-            //     //$(template.find('#btnNext')).find('.content').text(progress + '% completed');
-            //     //console.log('progress', progress);
-            //     chunks++;
-            // }
         });
     });
 }
@@ -1471,9 +1286,6 @@ let getActiveHeaders = function(template) {
     let ft = template.filetypes.get(); // all file type
     let activeFiletype = _.find(ft, function(d) { return d.isActive }); // find active filetype
     let header = _.chain(activeFiletype.schema._schema).map(function(d, k) { d['text'] = k; return d; }).reject(function(d) { return d.text == 'fileID' || d.text == 'owner' || d.text == 'username' }).value();
-    // .each(function(d, k) { d['text'] = k; })
-    //header.unshift("Custom value");
-    //console.log('header', header);
     return _.uniq(header);
 }
 
@@ -1651,17 +1463,8 @@ let insertCSVData = function(data, fileID, collection, cb) {
     data['fileID'] = fileID;
     data['owner'] = Meteor.userId();
     data['username'] = Meteor.user().username;
-    // console.log('data', data);
-    // return;
-    //console.log('Sr_no', data.Sr_no);
     collection.insert(data, function(err, res) {
         if (err) {
-
-            //console.log(err);
-            //console.log('errmessage', err.message);
-            //console.log('err', err.invalidKeys[0].name);
-            
-            //console.log(typeObj);
             let allowedValuesObj = '';
             try {
                 let keyName = err.invalidKeys[0].name;
@@ -1671,25 +1474,21 @@ let insertCSVData = function(data, fileID, collection, cb) {
                     allowedValuesObj = " [ Allowed Values : " + typeObj.type.definitions[0].allowedValues.join(", ") + " ]";
                 }
             } catch (e) {};
-            //console.log(typeObj.definitions[0]);
-
-            //console.log('data', data);
             $("#upload-csv-zone,#preview").hide();
             $("#handson-Zone-during-upload").show();
             $('.makeBlur').css("display","none");
             $('#buttonProceedNext').show().find('.content').text('Proceed To Next');
             $('#btnNext').hide();
-            //toastr.error(err.message);
             $("#errMessageFromSchema").text(err.message);
             $("#allowMessageFromSchema").text(allowedValuesObj);
-
-
             renderHandsonTable(copedata, Object.keys(copedata), 'hotErrorDataDuringUpload', err, fileID, collection, cb);
         } else {
-            cb(); // callback
+            cb(); 
         }
     });
 }
+
+
 let errorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     td.style.border = "2px solid red";
@@ -1709,10 +1508,6 @@ let getHandsonHeader = function(headers, invalidKeys) {
 }
 let objHandsontable;
 let renderHandsonTable = function(dataObject, headers, eleName, error, fileID, collection, cb) {
-    //Csvfiles.update(fileID, {$set: { 'errorString' :  error }});
-    //  console.log(headers);
-    //console.log('error', error.invalidKeys);
-    //console.log('headers', headers);
     if (objHandsontable != undefined) {
         objHandsontable.destroy();
     }
