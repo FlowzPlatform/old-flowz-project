@@ -23,7 +23,6 @@ ul ul li {
 }
 
 input[type="checkbox"] {
-    position: absolute;
     left: -9999px;
 }
 
