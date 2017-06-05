@@ -402,6 +402,7 @@ Template.readCSV.events({
         } else {
             if ($(template.find("#dpdSchema")).val() == '') {
                 $(template.find('#btnNext')).addClass('inProgress');
+                $(template.find("#txtNewSchemaName")).hide();
                 $('.makeBlur').css("display","block");
                 insertSchema(template,ft, function() {
                     $(template.find('#mapping')).hide();
@@ -411,6 +412,7 @@ Template.readCSV.events({
                 })
             } else {
                 $(template.find('#btnNext')).addClass('inProgress');
+                $(template.find("#txtNewSchemaName")).hide();
                 $('.makeBlur').css("display","block");
                 $(template.find('#mapping')).hide();
                 insertCSVMapping(activeFiletypeId, template,mapping, function(e, res) {
@@ -546,7 +548,7 @@ let insertSchema = function(template,ft, cb) {
                 regEx: (propertyData.regEx == '') ? undefined : propertyData.regEx,
                 optional: (propertyData.optional == undefined) ? true : propertyData.optional,
                 defaultValue: (propertyData.defaultValue == '') ? undefined : propertyData.defaultValue,
-                label: (propertyData.label == '') ? d : propertyData.label,
+                label: (propertyData.label == undefined || propertyData.label == '' || propertyData.label == null) ? d : propertyData.label,
                 allowedValues: (propertyData.allowedValues == '') ? undefined : propertyData.allowedValues
             };
             if ((getschemaType(_type)) != undefined) {
