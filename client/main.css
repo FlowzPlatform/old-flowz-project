@@ -975,7 +975,6 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 
 #mapping .spinner {
     margin: 15px 0px 0px 15px;
-    display: none;
 }
 
 #mapping .progress-button {

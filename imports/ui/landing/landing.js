@@ -105,7 +105,7 @@ Template.landing.events({
             Router.go("upload")
         } else if (getStepStatus == "validation_running" || getStepStatus == "validation_completed") {
             Router.go("validation")
-        } else if (getStepStatus == "import_in_progress") {
+        } else if (getStepStatus == "import_in_progress" || getStepStatus == "import_to_confirm") {
             Router.go("import");
         } else {
             Router.go("/");
