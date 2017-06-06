@@ -24,8 +24,6 @@ Template.import.helpers({
       let qry={owner:Meteor.userId(),"masterJobStatus":masterJobStatusRunning};
       let job = CollUploadJobMaster.find(qry).fetch();
       job = job[0];
-      //console.log(job)
-      //Template.instance().jobQueue.set(job);
       return job ;
     },
     isImportToConfirm(status)
@@ -39,8 +37,6 @@ Template.import.helpers({
     isImportStart(status)
     {
         if (status == ImportRunning) {
-          //console.log($('#preview').find('.spinner'))
-          //$('#preview').find('.spinner').show()
           return true
         } else {
           return false
@@ -49,7 +45,6 @@ Template.import.helpers({
     isImportCompleted(status)
     {
         if (status == ImportCompleted) {
-          Router.go("/uploaderdashboard");
           return true
         } else {
           return false
@@ -95,6 +90,8 @@ Template.import.events({
                   let job = CollUploadJobMaster.find(qry).fetch()
                   job = job[0]
                   getESUser(job)
+                  toastr.success("Your data has been successfully imported.");
+                  Router.go("upload");
                 }
             });
     },
