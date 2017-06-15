@@ -1,3 +1,4 @@
+
 <template name="allBids">
 	{{> header}}
 	<div class="template-dashboard">
@@ -16,7 +17,7 @@
 
 
 
-<template name="feeds">
+<template name="feedsss">
 	<div style="height: 48px;margin-top: -38px;text-align: right;">
 		<!-- <button  id="grid"  class="btn btn-success">Grid</button>
 		<button  id="list"  class="btn btn-success">List</button> -->
@@ -27,133 +28,377 @@
 	</div>
 	<div class="template-posts viewDetail_font">
 		{{#each  posts}}
-		<div class="col-md-4">
-		<!-- {{> feed}} -->
-			<div class="template-post">
-				<div class="panel panel-default">
-						<div class="panel-heading">
-							<!-- <h3 class="panel-title">
-							</h3>
-							<span >
-								<div id={{_id}}></div>
-							</span> -->
-							<div class= "row">
-								<div   style="
-									    font-size: 18px;
-									    color: rgb(66, 58, 58);
-									    line-height: 18px;
-									    overflow: hidden;
-									    white-space: nowrap;
-									    text-overflow: ellipsis;
-									    padding-left: 5px;
-									    width: 90%;
-									"
-								>
-									{{title}}
-								</div>
-								{{> feed}}
-							</div>
-						</div>
-						<div class="panel-body">
-							<!-- <p class="text-center">
-								{{#with getDoc picture 'Attachments'}}
-									<img src="{{url}}" class="img-thumbnail img-rounded">
-								{{/with}}
-							</p> -->
-							<div class="media">
-								<a class="pull-left" href="#">
-									{{> avatar userId=owner shape="circle"}}
-								</a>
-								<div class="media-body">
-									<p>{{content}}</p>
-									<p>Starting bids from - {{currency}} {{StartingBid}}</p>
-									<p>Current Bid is - {{currency}} {{currentBid}}</p>
-									<p>Bid Increments:  - {{currency}} {{BidIncrementedBy}}</p>
-									{{#if $eq isBidEnds 'no'}}
-									<p>Bid Will End On - {{EndBidDate}}</p>
-		              <!-- <div id={{_id}}></div> -->
-										{{#if $eq owner User._id}}
-											{{> editOwnBids}}
-										{{else}}
-											<!-- {{> bid}} -->
-											<div class="bidDiv go-bottom">
-											  	<!-- <div style="float:left">
-												    <input id="bid" type="Number">
-												    <label for="name">Your Bid</label>
-													</div> -->
-													<div>
-														<button id="bidNow" name="{{_id._str}}" class="btn btn-success">BID NOW</button>
-													</div>
+			<div class="col-md-4">
+	            <div class="product-container">
+	                <div class="product-image">
+	                    <span class="hover-link"></span>
+	                    {{#if $eq owner User._id}}
+
+	                    	{{> editOwnBids}}
+
+						{{else}}
+	                    	<a class="product-link" id="bidNow" name="{{_id._str}}">Bid Now</a>
+
+	                    	<!-- {{> bid}} -->
+							<!-- <div class="bidDiv go-bottom">
+							  	<div style="float:left">
+								    <input id="bid" type="Number">
+								    <label for="name">Your Bid</label>
+									</div>
+									<div>
+										<button id="bidNow" name="{{_id._str}}" class="btn btn-success">BID NOW</button>
+									</div>
+							</div> -->
+							<div id="display-error">Please enter a bidding amount more than starting bid</div>
+							<!-- {{> autoBid}} -->
+							<!-- {{> bidNow}} -->
+							<div class="modal fade" id="bidNowModal{{_id._str}}">
+							    <div class="modal-dialog modal-sm">
+							    	<div class="modal-content">
+							        <div class="modal-header">
+							          <h5 class="modal-title">Bid to beat for</h5><h4 id= "title"></h4>
+							        </div>
+							        <div class="modal-body">
+										<div class="modalBody">
+											<span>Your Bid will be</span>
+										</div>
+
+										<div class="circle-text" style="left:125%">
+											<p id="totalBid{{_id._str}}" style="top: 7px; position: inherit;"></p>
+										</div>
+										<div class= "row" style="margin: 16px 17px;display:none">
+											<div  class="col-sm-6" style="margin: 4px -1px;text-align: center;font-size: 16px;font-style: italic;">
+												Set AutoBid On
 											</div>
-											<div id="display-error">Please enter a bidding amount more than starting bid</div>
-											<!-- {{> autoBid}} -->
-											<!-- {{> bidNow}} -->
-											<div class="modal fade" id="bidNowModal{{_id._str}}">
-											    <div class="modal-dialog modal-sm">
-											    	<div class="modal-content">
-											        <div class="modal-header">
-											          <h5 class="modal-title">Bid to beat for</h5><h4 id= "title"></h4>
-											        </div>
-											        <div class="modal-body" style="text-align:-webkit-center">
-														<div class="modalBody">
-															<span>Your Bid will be</span>
-														</div>
 
-														<div class="circle-text" >
-															<p id="totalBid{{_id._str}}" style="top: 7px; position: inherit;"></p>
-														</div>
-														<div class= "row" style="margin: 16px 17px;display:none">
-															<div  class="col-sm-6" style="margin: 4px -1px;text-align: center;font-size: 16px;font-style: italic;">
-																Set AutoBid On
-															</div>
-
-															<div class="col-sm-6">
-																<div class="slideThree">
-																	<input type="checkbox" value="None" id="slideThree{{_id._str}}" class="need" />
-																	<label for="slideThree{{_id._str}}"></label>
-																</div>
-															</div>
-														</div>
-														<div class="modalBody" style="display:none">
-														  	<div>
-																	<span>Set upper limit</span>
-															    <input id="upperLimit{{_id._str}}" placeHolder="Amount i.e 5000 or 10000" type="Number" disabled="true">
-																</div>
-														</div>
-														<div class="modalBody" style="display:none">
-														  	<div>
-																	<span>Number of Automatic Bids </span>
-															    <input id="incrementedBy{{_id._str}}" placeHolder="i.e 2 or 5 or 10" type="Number" disabled="true">
-																</div>
-														</div>
-													</div>
-											        <div class="modal-footer">
-											          	<button type="button" class="btn btn-primary" id="save">Bid</button>
-											            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-											        </div>
-											    	</div>
+											<div class="col-sm-6">
+												<div class="slideThree">
+													<input type="checkbox" value="None" id="slideThree{{_id._str}}" class="need" />
+													<label for="slideThree{{_id._str}}"></label>
 												</div>
 											</div>
-										{{/if}}
-
-										{{else}}
-											{{> bidEnded}}
-										{{/if}}
-
+										</div>
+										<div class="modalBody" style="display:none">
+										  	<div>
+													<span>Set upper limit</span>
+											    <input id="upperLimit{{_id._str}}" placeHolder="Amount i.e 5000 or 10000" type="Number" disabled="true">
+												</div>
+										</div>
+										<div class="modalBody" style="display:none">
+										  	<div>
+													<span>Number of Automatic Bids </span>
+											    <input id="incrementedBy{{_id._str}}" placeHolder="i.e 2 or 5 or 10" type="Number" disabled="true">
+												</div>
+										</div>
+									</div>
+							        <div class="modal-footer">
+							          	<button type="button" class="btn btn-primary" id="save">Bid</button>
+							            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+							        </div>
+							    	</div>
 								</div>
 							</div>
-						</div>
-						<!-- <div class="panel-footer">
-							{{> favoriteButton _id=_id}}
-							{{> commentFormToggle }}
-							{{> comments}}
-						</div> -->
-				</div>
-			</div>
-		</div>
-		{{else}}
-		<!-- {{> noData}} -->
+                    	{{/if}}
+
+
+                    	<img src="http://placehold.it/400x300" alt="Product">
+	                </div>
+	                <div class="timer-here">
+	                	{{> feed}}
+	                </div>
+	                <div class="product-description">
+	                    <div class="product-label">
+	                        <div class="product-name">
+	                            <h1>{{title}}</h1>
+	                            <br>
+	                            <!-- <p class="price" title="Current Bid">{{currency}} {{currentBid}}</p> -->
+	                            {{#if $eq isBidEnds 'no'}}
+	                            	<small style="font-size: 12px;">Ends: {{EndBidDate}}</small>
+                            	{{else}}
+									{{> bidEnded}}
+								{{/if}}
+	                        </div>
+	                    </div>
+	                    <div class="product-option">
+	                        <div class="product-size">
+	                            <h3>Starting Bid <i class="fa fa-play fa-fw" title="Starts Bidding From"></i> {{currency}} {{StartingBid}}
+	                            <br><span>Current Bid <i class="fa fa-stop fa-fw" title="Stops on"></i> {{currency}} {{currentBid}}</span></h3>
+	                            <p>Bid Increment: <i class="fa fa-plus-square fa-fw"></i> {{currency}} {{BidIncrementedBy}}</p>
+	                        </div>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+        {{else}}
 		<p>No Data Found</p	>
+		{{/each}}
+	</div>
+</template>
+
+<template name="feeds">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-countdown/2.0.2/jquery.countdown-ar.js"></script>
+	<div style="height: 48px;margin-top: -38px;text-align: right;">
+		<!-- <button  id="grid"  class="btn btn-success">Grid</button>
+		<button  id="list"  class="btn btn-success">List</button> -->
+		<div class="btn-group" style="margin-right: 16px;">
+	    <button type="button"  id="grid" class="btn gridListButtonGroup"><i class="fa fa-th" aria-hidden="true"></i></button>
+	    <button type="button" id="list" class="btn gridListButtonGroup"><i class="fa fa-list" aria-hidden="true"></i></button>
+	  </div>
+	</div>
+	<div class="template-posts">
+		{{#each  posts}}
+    		<div class="col-md-3">
+                <div class="product-container">
+                    <div class="product-image">
+                        <span class="hover-link"></span>
+                        {{#if $eq owner User._id}}
+                            {{> editOwnBids}}
+                        {{else}}
+
+													{{#if $eq isBidEnds 'no'}}
+                	        <div class="product-link" id="bidNow" data-toggle="modal" data-target="#bidNowModal{{_id._str}}" name="{{_id._str}}">Bid Now</div>
+													{{else}}
+													{{/if}}
+                                <!-- Bid Now Modal -->
+                                <div id="bidNowModal{{_id._str}}" class="modal fade" role="dialog">
+                                    <div class="modal-dialog">
+                                        <!-- Modal content-->
+                                        <div class="modal-content">
+                                          <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            <h4 class="modal-title">{{title}}</h4>
+                                          </div>
+                                          <form class="form-horizontal">
+                                          <div class="modal-body">
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="topData currentBid">
+                                                        <h4>Current Bid <span style="float: right;">{{currency}} {{currentBid}}</span></h4>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="topData bidIncrement">
+                                                        <h4>Bid Increment: <span style="float: right;">{{currency}} {{BidIncrementedBy}}</span></h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group" align="center">
+                                                <label class="control-label col-sm-2 col-md-offset-4" for="mybid">My Bid:</label>
+                                                <div class="col-sm-3">
+                                                  <input type="text" disabled class="form-control" id="totalBid{{_id._str}}" min="200"  data-toggle="tooltip" title="Your Bid will be">
+                                                </div>
+                                            </div>
+
+                                            <hr>
+
+                                            <!-- <div class="form-group" >
+                                                <label class="control-label col-sm-2 col-md-offset-4" for="mybid">Enable AutoBid:</label>
+                                                <div class="col-sm-2">
+                                                    <div class="material-switch" data-toggle="tooltip" title="Enable Autobid?">
+                                                        <input id="autoBid{{_id._str}}" name="autoBid" type="checkbox"/>
+                                                        <label for="autoBid" class="label-primary"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+
+                                            <div class="isAutobid">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-12" for="bid_incr_val">AutoBid Increment:</label>
+                                                            <div class="col-sm-12">
+                                                              <input type="number" class="form-control" id="bid_incr_val"  min="200" data-toggle="tooltip" title="Enter autobid Increment">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-12" for="upperLimit">Autobid Upper Limit:</label>
+                                                            <div class="col-sm-12">
+                                                              <input type="number" class="form-control" id="upperLimit" data-toggle="tooltip" title="Enter autobid upper limit">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4" for="cutOffDate">Cut Off Time:</label>
+                                                    <div class="col-sm-12">
+
+                                                        <div class="input-group date" id="cutOffTimePicker">
+                                                          <input type="text" class="form-control" data-toggle="tooltip" title="Set cutoff time"/>
+                                                          <span class="input-group-addon">
+                                                            <span class="glyphicon glyphicon-calendar"></span>
+                                                          </span>
+                                                        </div>
+
+                                                        <script type="text/javascript">
+                                                            $('#cutOffTimePicker').datetimepicker();
+                                                        </script>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group" style="display: none;">
+                                                    <label class="control-label col-sm-4" for="nbids">Number of Bids:</label>
+                                                    <div class="col-sm-12">
+                                                      <input type="number" class="form-control" id="nbids" >
+                                                    </div>
+                                                </div>
+                                            </div> -->
+
+
+
+																						<div class="form-group">
+                                                <label class="control-label col-sm-3 col-md-offset-3" style="padding-right: 10px; text-align: right;" for="mybid">Enable AutoBid:</label>
+                                                <div class="col-sm-2" style="padding-left: 0">
+                                                    <div class="material-switch" data-toggle="tooltip" title="Enable Autobid?" style="padding-top: 7px;">
+                                                        <input id="autoBid{{_id._str}}" class="autoBid" name="autoBid" type="checkbox"/>
+                                                        <label for="autoBid{{_id._str}}" class="label-primary"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+
+                                            <div class="isAutobid{{_id._str}}" id="autoBidding">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-12" for="bid_incr_val">AutoBid Increment:</label>
+                                                            <div class="col-sm-12">
+                                                              <input type="number" class="form-control" id="bid_incr_val"  min="200" data-toggle="tooltip" title="Enter autobid Increment">
+                                                              <!-- <div class="checkbox">
+                                                                <label><input type="checkbox" checked id="default_val" > Default Value</label>
+                                                              </div> -->
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label class="control-label col-sm-12" for="upperLimit">Autobid Upper Limit:</label>
+                                                            <div class="col-sm-12">
+                                                              <input type="number" class="form-control" id="upperLimit" data-toggle="tooltip" title="Enter autobid upper limit">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label class="control-label col-sm-4" for="cutOffDate">Cut Off Time:</label>
+                                                    <div class="col-sm-12">
+                                                        <!-- <div class="row">
+                                                            <div class="col-md-6">
+                                                                <input type="date" class="form-control" name="cutOffDate" id="cutOffDate" >
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <input type="time" class="form-control" name="cutOffTime" id="cutOffTime" >
+                                                            </div>
+                                                        </div> -->
+                                                        <div class="input-group date" id="cutOffTimePicker">
+                                                          <input type="text" class="form-control" data-toggle="tooltip" title="Set cutoff time"/>
+                                                          <span class="input-group-addon">
+                                                            <span class="glyphicon glyphicon-calendar"></span>
+                                                          </span>
+                                                        </div>
+
+                                                        <script type="text/javascript">
+                                                            $('#cutOffTimePicker').datetimepicker();
+                                                        </script>
+
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group" style="display: none;">
+                                                    <label class="control-label col-sm-4" for="nbids">Number of Bids:</label>
+                                                    <div class="col-sm-12">
+                                                      <input type="number" class="form-control" id="nbids" >
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                          </div>
+
+
+
+                                          <div class="modal-footer">
+                                            <button type="submit" id="save" class="btn btn-primary" data-dismiss="modal">Generate Bid</button>
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                          </div>
+                                          </form>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <!-- Modal Ends -->
+                        {{/if}}
+                    	<img src="https://www.notebookcheck.net/uploads/tx_nbc2/lenovo-laptop-y50-front-1_01.jpg" alt="Product">
+                    </div>
+
+										{{#if $eq isBidEnds 'no'}}
+										<div class="timer-here"  id="demo-clock{{_id._str}}" name="someTimer" style="color: white">
+                        {{setTimer _id._str EndBidDate}}
+                    </div>
+                    <p class="legendary"><small class="legend"><span>DD</span><span>HH</span><span>MM</span><span>SS</span></small></p>
+										{{else}}
+										{{/if}}
+
+
+
+                    <div class="product-description">
+                        <div class="product-label">
+                            <div class="product-name">
+
+															{{#if $eq isBidEnds 'no'}}
+                                <div class="row" style="padding-left: 15px">
+                                	<div class="col-md-6 col-xs-6" style="padding: 0;">
+                                		<strong>Current Bid:<br> <i class="fa fa-stop fa-fw" title="Stops on"></i> {{currency}} {{currentBid}}</strong>
+                                	</div>
+                                	<div class="col-md-6 col-xs-6" style="padding: 0;">
+                                		<strong>Bid Increment:<br> <i class="fa fa-plus-square fa-fw"></i> {{currency}} {{BidIncrementedBy}}</strong>
+                                	</div>
+                                </div>
+																{{else}}
+																<div class="row" style="padding-left: 15px">
+																	<div class="col-md-6 col-xs-6" style="padding: 0;">
+																		<strong>Sold Out Price:<br></strong>
+																	</div>
+																	<div class="col-md-6 col-xs-6" style="padding: 0;">
+                                		<strong><i class="fa fa-stop fa-fw" title="Stops on"></i> {{currency}} {{currentBid}}</strong>
+                                	</div>
+
+																</div>
+                                {{/if}}
+                                {{#if $eq isBidEnds 'no'}}
+                                    <p style="font-size: 12px; margin-top: 5px;">Ends: {{EndBidDate}}</p>
+                                {{else}}
+                                    <p style="font-size: 12px; margin: 5px 1px 0px;color:red">Auction Ended On :</p>
+																		<span style="font-size: 12px; margin-top: 5px;color:red">{{EndBidDate}}</span>
+                                {{/if}}
+                            </div>
+                        </div>
+                        <div class="product-option">
+                            <div class="product-size">
+                            	<h3>{{title}}</h3>
+                                <h5>Starting Bid <i class="fa fa-play fa-fw" title="Starts Bidding From"></i> {{currency}} {{StartingBid}} </h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+          {{else}}
+					<!-- {{ #if $eq productCount 0}}
+						No Data Found
+					{{else}} -->
+						<div class="loader"></div>
+					<!-- {{/if}} -->
+
 		{{/each}}
 	</div>
 </template>
@@ -166,18 +411,20 @@
 
 
 <template name="editOwnBids">
-	<small style="font-size: 1.2em;">
-		{{#afModal title="Update post" omitFields="createdAt,updatedAt,owner" class="text-primary" collection="Posts" operation="update" doc=_id}}
-			<i class="fa fa-pencil" buttonContent="Edit post"></i> {{_ "edit_bid"}}
+	<small style="font-size: 1.2em; position: absolute; top: 0; width: 100%;">
+		{{#afModal title="Update post" omitFields="createdAt,updatedAt,owner" class="text-default" collection="Posts" operation="update" doc=_id}}
+			<!-- <i class="fa fa-pencil" buttonContent="Edit post"></i> {{_ "edit_bid"}} -->
+			<div class="col-md-6" style="padding: 0; margin: 0;"><button class="btn btn-primary btn-block" style="border-radius: 0; font-style: normal;" buttonContent="Edit post">{{_ "edit_bid"}}</button></div>
 		{{/afModal}}
-		{{#afModal title="Delete post" class="text-danger" collection="Posts" operation="remove" doc=_id}}
-			<i class="fa fa-times" buttonContent="Edit post"></i> {{_ "delete"}}
+		{{#afModal title="Delete post" class="text-default" collection="Posts" operation="remove" doc=_id}}
+			<!-- <i class="fa fa-times" buttonContent="Edit post"></i> {{_ "delete"}} -->
+			<div class="col-md-6" style="padding: 0; margin: 0;"><button class="btn btn-danger btn-block" style="border-radius: 0; font-style: normal;" buttonContent="Edit post">{{_ "delete"}}</button></div>
 		{{/afModal}}
 	</small>
 </template>
 
 <template name="feed">
-	<div class="row" style="float : right">
+	<div class="row" style="margin-left: 22px;">
 	  <!-- <div id={{_id}}></div> -->
 		{{#if ended}}
 			<h4>Auction Ended</h4>

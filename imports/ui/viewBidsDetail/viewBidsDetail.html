@@ -3,7 +3,7 @@
    <div class="template-post">
       <div class="panel panel-default viewDetail_font">
 
-         <div class="panel-heading">
+         <!-- <div class="panel-heading">
             <div class= "row">
                <div  class="col-sm-6" style="
                   white-space: nowrap;
@@ -11,21 +11,17 @@
                   {{title}}
                </div>
                <div class="col-sm-6" style="text-align : right">
-                  <!-- <div id={{_id}}></div> -->
+
                   {{#if $eq viewDetails.isBidEnds 'yes'}}
                   <h4>Auction Ended</h4>
                   {{else}}
-                  <!-- {{> countdown}} -->
+
                   {{/if}}
                </div>
             </div>
-         </div>
-         <div class="panel-body">
-            <!-- <p class="text-center">
-               {{#with getDoc picture 'Attachments'}}
-                 <img src="{{url}}" class="img-thumbnail img-rounded">
-               {{/with}}
-               </p> -->
+         </div> -->
+         <!-- <div class="panel-body">
+
             <div class="media">
                <a class="pull-left" href="#">
                {{> avatar userId=owner shape="circle"}}
@@ -39,24 +35,246 @@
                   </p>
                   <p>Description - {{viewDetails.content}}</p>
                   {{#each viewDetails.bids}}
-                  <!-- {{> allBid}} -->
+
                   {{viewDetails.bids.isHighest}}
                   {{/each}}
                   {{#if $eq viewDetails.isBidEnds 'no'}}
                   <p>Bid Will End On - {{viewDetails.EndBidDate}}</p>
-                  <!-- <div id={{_id}}></div> -->
+
                   {{else}}
-                  <!--  {{> bidEnded}} -->
+
                   {{/if}}
                   {{> allbids}}
                </div>
             </div>
+         </div> -->
+
+
+
+
+
+         <div class="demo-preview">
+             <div class="product-detail-section">
+                 <div class="container">
+                     <div class="row">
+                         <div class="product-image-section col-xs-6">
+                             <div class="img-product-wrapper">
+                                 <div class="img-thumbs" style="display:none">
+                                     <div class="slim-scroll">
+                                         <div class="item active">
+                                             <a href="" title="" data-lg-img="https://res.cloudinary.com/vuvit03/image/upload/v1477069080/product/woman-legs-girl-grey.jpg" class="pic"><img src="https://res.cloudinary.com/vuvit03/image/upload/v1477069080/product/woman-legs-girl-grey.jpg" alt="" class="img-responsive" /></a>
+                                         </div>
+                                         <div class="item">
+                                             <a href="javascript:void(0)" title="" data-lg-img="https://res.cloudinary.com/vuvit03/image/upload/v1477069079/product/pexels-photo.jpg" class="pic"><img src="https://res.cloudinary.com/vuvit03/image/upload/v1477069079/product/pexels-photo.jpg" alt="" class="img-responsive" /></a>
+                                         </div>
+                                         <div class="item">
+                                             <a href="javascript:void(0)" title="" data-lg-img="https://res.cloudinary.com/vuvit03/image/upload/v1477069078/product/healthy-light-woman-legs.jpg" class="pic"><img src="https://res.cloudinary.com/vuvit03/image/upload/v1477069078/product/healthy-light-woman-legs.jpg" alt="" class="img-responsive" /></a>
+                                         </div>
+                                         <div class="item">
+                                             <a href="javascript:void(0)" title="" data-lg-img="https://res.cloudinary.com/vuvit03/image/upload/v1477069079/product/city-woman-feet-legsasdasd.jpg" class="pic"><img src="https://res.cloudinary.com/vuvit03/image/upload/v1477069079/product/city-woman-feet-legsasdasd.jpg" alt="" class="img-responsive" /></a>
+                                         </div>
+                                         <div class="item">
+                                             <a href="javascript:void(0)" title="" data-lg-img="https://res.cloudinary.com/vuvit03/image/upload/v1477069078/product/city-woman-feet-legs.jpg" class="pic"><img src="https://res.cloudinary.com/vuvit03/image/upload/v1477069078/product/city-woman-feet-legs.jpg" alt="" class="img-responsive" /></a>
+                                         </div>
+                                     </div>
+                                 </div>
+                                 <div class="lg-img-view" style="padding-left: 0px">
+                                     <div class="inner">
+                                         <a href="https://res.cloudinary.com/vuvit03/image/upload/v1477069080/product/woman-legs-girl-grey.jpg" class="fancy-view">
+                                             <img src="http://image.promoworld.ca/migration-api-hidden-new/web/images/5/20-44570-black.jpg" alt="" class="large-view" />
+                                         </a>
+
+                                     </div>
+
+                                 </div>
+                                 <div class="clearfix"></div>
+                             </div>
+                         </div>
+                         <div class="product-description-section col-xs-6">
+                             <div class="product-detail-wrapper">
+                                 <h1 class="product-name">{{viewDetails.title}}</h1>
+                                 <div class="group">
+                                     <div class="order-count"><span>No of Bids placed  </span><strong>{{viewDetails.bids.length}} </strong><span></span></div>
+                                 </div>
+                                 <div class="price-section has-safe">
+                                     <div class="sale-label">Ending Soon!</div>
+                                     <div class="price-div"><strong class="price"><small>Current Bid:</small> {{viewDetails.currency}} {{fixedDecimal viewDetails.currentBid}}</strong><span>Starting price: <strong>{{viewDetails.currency}} {{fixedDecimal viewDetails.StartingBid}}</strong></span><span>Incremented By: <strong>{{viewDetails.currency}} {{fixedDecimal viewDetails.BidIncrementedBy}}</strong></span></div>
+                                     <div class="clearfix"></div>
+                                 </div>
+                                 <div class="description">
+                                     <div class="left-col">
+                                         <ul class="list">
+                                            <li><span>{{viewDetails.content}}</span></li>
+                                             <li><span>Fabric/Synthetic</span></li>
+                                             <li><span>Made in the USA and Imported</span></li>
+                                             <li><span>Classic runner with mesh underlay and puffed logo overlay at sides</span></li>
+                                             <li><span>Breathable mesh upper with reflective hits for visibility</span></li>
+                                             <li><span>XT-600 Carbon Rubber outsole</span></li>
+                                         </ul>
+                                     </div>
+                                     <div class="right-col"></div>
+                                     <div class="clearfix"></div>
+                                 </div>
+                                 <!-- <div class="form-group">
+                                     <button class="btn btn-wishlist"><i class="fa fa-trash"></i> End Auction</button>
+
+                                 </div> -->
+
+                             </div>
+                         </div>
+                     </div>
+
+
+                <div class="panel-group" id="accordion">
+                  {{#if viewDetails.bids.length}}
+                  {{#each viewDetails.bids}}
+     				    <div class="panel panel-default">
+
+     				        <div data-toggle="collapse" data-parent="#accordion" href="#{{ incremented @index}}" class="panel-heading">
+     				            <h4 class="panel-title expand">
+     					           	<div class="right-arrow pull-right">+</div>
+     					          	<a href="#"> # Bid No - {{ incremented @index}} </a>
+     					        </h4>
+     				        </div>
+     				        <div id="{{ incremented @index}}" class="panel-collapse collapse">
+     				            <div class="panel-body">
+     				            	<div class="table-responsive">
+     				            		<table class="table table-bordered table-striped table-hover bidders-table">
+     				            			<thead>
+     				            				<tr>
+     				            					<td>Key</td>
+     				            					<td>Value</td>
+     				            				</tr>
+     				            			</thead>
+     				            			<tbody>
+
+     				            				<tr>
+     				            					<td>Bidder ID</td>
+     				            					<td>{{bidderId}}</td>
+     				            				</tr>
+     				            				<tr>
+     				            					<td>Current Bid </td>
+     				            					<td>{{currency}} {{currentBid}}</td>
+     				            				</tr>
+                                <tr>
+     				            					<td>Previous Bid </td>
+     				            					<td>{{currency}} {{fixedDecimal previousBid}}</td>
+     				            				</tr>
+     				            				<tr>
+     				            					<td>Bid Time</td>
+     				            					<td>{{biddingTime}}</td>
+     				            				</tr>
+     				            			</tbody>
+     				            		</table>
+     				            	</div>
+     				            </div>
+     				        </div>
+
+     				    </div>
+                {{/each}}
+                {{else}}
+                <div style="text-align:Center">
+                   <h4>There is no bids placed for this product yet.</h4>
+                </div>
+                {{/if}}
+     				    <!-- <div class="panel panel-default">
+     				        <div data-toggle="collapse" data-parent="#accordion" href="#collapse2" class="panel-heading">
+     				            <h4 class="panel-title expand">
+     				            	<div class="right-arrow pull-right">+</div>
+     					          	<a href="#">Arya Stark</a>
+     					        </h4>
+     				        </div>
+     				        <div id="collapse2" class="panel-collapse collapse">
+     				            <div class="panel-body">
+     				            	<div class="table-responsive">
+     				            		<table class="table table-bordered table-striped table-hover bidders-table">
+     				            			<thead>
+     				            				<tr>
+     				            					<td>Key</td>
+     				            					<td>Value</td>
+     				            				</tr>
+     				            			</thead>
+     				            			<tbody>
+     				            				<tr>
+     				            					<td>Full Name</td>
+     				            					<td>Arya Stark</td>
+     				            				</tr>
+     				            				<tr>
+     				            					<td>Bidder ID</td>
+     				            					<td>123456</td>
+     				            				</tr>
+     				            				<tr>
+     				            					<td>Bid Value</td>
+     				            					<td>$123.5</td>
+     				            				</tr>
+     				            				<tr>
+     				            					<td>Quantity</td>
+     				            					<td>5</td>
+     				            				</tr>
+     				            			</tbody>
+     				            		</table>
+     				            	</div>
+     				            </div>
+     				        </div>
+     				    </div> -->
+     				    <!-- <div class="panel panel-default">
+     				        <div data-toggle="collapse" data-parent="#accordion" href="#collapse3" class="panel-heading">
+     				            <h4 class="panel-title expand">
+     					            <div class="right-arrow pull-right">+</div>
+     					          	<a href="#">Daenerys Targaryen</a>
+     					        </h4>
+     				        </div>
+     				        <div id="collapse3" class="panel-collapse collapse">
+     				            <div class="panel-body">
+     				            	<div class="table-responsive">
+     				            		<table class="table table-bordered table-striped table-hover bidders-table">
+     				            			<thead>
+     				            				<tr>
+     				            					<td>Key</td>
+     				            					<td>Value</td>
+     				            				</tr>
+     				            			</thead>
+     				            			<tbody>
+     				            				<tr>
+     				            					<td>Full Name</td>
+     				            					<td>Daenerys Targaryen</td>
+     				            				</tr>
+     				            				<tr>
+     				            					<td>Bidder ID</td>
+     				            					<td>123456</td>
+     				            				</tr>
+     				            				<tr>
+     				            					<td>Bid Value</td>
+     				            					<td>$123.5</td>
+     				            				</tr>
+     				            				<tr>
+     				            					<td>Quantity</td>
+     				            					<td>5</td>
+     				            				</tr>
+     				            			</tbody>
+     				            		</table>
+     				            	</div>
+     				            </div>
+     				        </div>
+     				    </div> -->
+     				</div>
+
+
+     			</div>
+
+             </div>
+
          </div>
-         <!-- <div class="panel-footer">
-            {{> favoriteButton _id=_id}}
-            {{> commentFormToggle }}
-            {{> comments}}
-            </div> -->
+
+
+
+
+
+
+
+
+
+
       </div>
    </div>
 </template>

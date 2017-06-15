@@ -50,7 +50,8 @@ if (Meteor.isClient) {
                     _id: carryForowordThis._id
                 }, {
                     $set: {
-                        isBidEnds: 'yes'
+                        isBidEnds: 'yes',
+                        EndBidDate : new Date()
                     }
                 });
                 var title = Posts.find({

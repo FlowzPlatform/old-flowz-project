@@ -130,9 +130,58 @@ Template.body.helpers({
 Template.feeds.helpers({
   posts: function () {
     return Posts.find({});
+  },
+  productCount: function() {
+    return Posts.find().count()
+  },
+  setTimer: function(id, endDate){
+    console.log(id, endDate);
+    var countDownDate = new Date(endDate).getTime();
+
+    var x = setInterval(function() {
+
+      // Get todays date and time
+      var now = new Date().getTime();
+
+      // Find the distance between now an the count down date
+      var distance = countDownDate - now;
+
+      // Time calculations for days, hours, minutes and seconds
+      var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      days = days < 10 ? '0'+days : days;
+      hours = hours < 10 ? '0'+hours : hours;
+      minutes = minutes < 10 ? '0'+minutes : minutes;
+      seconds = seconds < 10 ? '0'+seconds : seconds;
+
+      // Display the result in the element with id="demo"
+      document.getElementById("demo-clock" + id).innerHTML = "<p>Ends In: <span class='timings'>" + days + " : " + hours + " : "
+      + minutes + " : " + seconds + "</span></p>";
+
+      // If the count down is finished, write some text
+      if (distance < 0) {
+        clearInterval(x);
+        document.getElementById("demo-clock" + id).innerHTML = "EXPIRED";
+      }
+    }, 1000);
   }
+
 })
 Template.feeds.events({
+
+  'click .autoBid' : function(event){
+     console.log('event');
+     if (document.getElementById('autoBid' + this._id._str).checked) {
+         $('.isAutobid' + this._id._str).css('display', 'block')
+     }else{
+         $('.isAutobid' + this._id._str).css('display', 'none')
+     }
+   },
+
+
     'click #list': function(event) {
       $(".col-md-4").addClass("col-md-12");
       $(".col-md-4").addClass("grid");
@@ -151,10 +200,10 @@ Template.feeds.events({
         Session.set('itemId',event.target.name);
         console.log(Session.get('itemId'));
         var total = (Session.get("currentAuction").currentBid) + (Session.get("currentAuction").BidIncrementedBy);
-        document.getElementById("title").innerHTML = this.title;
+        //  document.getElementById("title").innerHTML = this.title;
         var totalId = "totalBid"+this._id._str;
         console.log(totalId);
-        document.getElementById(totalId).innerHTML = this.currency + " " + total.toFixed(2);
+        document.getElementById(totalId).value = this.currency + " " + total.toFixed(2);
         //document.getElementById("totalBid").innerHTML = this.currency + " " + total;
         $('#bidNowModal'+Session.get('itemId')).modal('show');
     },
@@ -183,15 +232,16 @@ Template.feeds.events({
         console.log(currentAuction);
         console.log('bidder ' + Meteor.userId());
         console.log("owner " + currentAuction._id);
-
+        var objId = 'ObjectId('+currentAuction._id+')';
+        console.log("objId" , new Meteor.Collection.ObjectID());
         // #### update current bid in mongo START
-          Posts.update({
-              _id: currentAuction._id
-          }, {
-              $set: {
-                  currentBid: total
-              }
-          })
+        Posts.update({
+            _id: currentAuction._id
+        }, {
+            $set: {
+                currentBid: total
+            }
+        })
         // #### update current bid in mongo END
 
         //#### update bids Array in mongo START

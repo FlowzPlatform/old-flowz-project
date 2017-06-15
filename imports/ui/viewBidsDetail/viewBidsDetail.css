@@ -48,3 +48,6 @@ input[type="checkbox"]:checked+.bidDetailLabel {
     font-style: italic;
     font-size: 17px;
 }
+.media-body p{font-style: normal;}
+.media-body p span{font-weight:bold;font-size:15px;}
+.wrapper ul li .bidDetailLabel{border-radius:3px;padding:5px 10px;}

@@ -52,6 +52,22 @@
    </div>
 </template>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <template name="post">
    <div class="template-post ">
       <div class="panel panel-default jump-response">
@@ -78,15 +94,15 @@
                      <p>Total Bids</p>
                   </div>
                   <div class="col-md-3 dashboard_data">
-                     <span class="numberOfBids">{{currency}}{{StartingBid}}</span>
+                     <span class="numberOfBids">{{currency}}{{ fixedDecimal StartingBid}}</span>
                      <p>Starting Bid</p>
                   </div>
                   <div class="col-md-3 dashboard_data">
-                     <span class="numberOfBids">{{currency}}{{currentBid}}</span>
+                     <span class="numberOfBids">{{currency}}{{fixedDecimal currentBid}}</span>
                      <p>Current Bid</p>
                   </div>
                   <div class="col-md-3 dashboard_data">
-                     <span class="numberOfBids">{{currency}} {{BidIncrementedBy}}</span>
+                     <span class="numberOfBids">{{currency}}{{fixedDecimal BidIncrementedBy}}</span>
                      <p> Increment </p>
                   </div>
                </div>
