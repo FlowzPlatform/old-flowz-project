@@ -12,6 +12,48 @@ Meteor.startup(function() {
 })
 
 
+Template.registerHelper("generateImage" , function(data){
+
+//  return "http:/image.promoworld.ca/migration-api-hidden-new/web/images/5/20-49020-black.jpg";
+  // console.log("generateImage",data);
+  // var hashPass ;
+  // async function make_basic_auth(user, password) {
+  //     var tok = user + ':' + password;
+  //     var hash = btoa(tok);
+  //     hashPass = "Basic " +hash;
+  //   //  return "Basic " + hash;
+  // }
+  //
+  // var auth = make_basic_auth('elastic', 'zxQVMGQ55MsachkMtab1QTSh');
+
+  //console.log(hashPass);
+  var uri = "https://64a39762993c8b809aa354dd65ace301.us-east-1.aws.found.io:9243/pdm/_search/?q=sku:" + data;
+  //return "http:/image.promoworld.ca/migration-api-hidden-new/web/images/5/74016-closeout-orange.jpg";
+   $.ajax({
+      url: uri,
+      type: 'get',
+      dataType: 'json',
+      beforeSend: function(req) {
+          req.setRequestHeader('Authorization', "Basic ZWxhc3RpYzp6eFFWTUdRNTVNc2FjaGtNdGFiMVFUU2g=");
+      }
+  }).done(function(dataa) {
+
+  //  console.log("http://image.promoworld.ca/migration-api-hidden-new/web/images/"+dataa.hits.hits[0]._source.default_image);
+    //return "http:image.promoworld.ca/migration-api-hidden-new/web/images/"+data.hits.hits[0]._source.default_image ;
+    var genImg = "http://image.promoworld.ca/migration-api-hidden-new/web/images/"+dataa.hits.hits[0]._source.default_image;
+
+    document.getElementById(data).src =  genImg;
+    //return genImg;
+
+
+  }).fail(function(err) {
+      console.log(err);
+      return null;
+  })
+
+})
+
+
 
 Template.feed.onRendered(function() {
 
