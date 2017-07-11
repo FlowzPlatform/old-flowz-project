@@ -27,15 +27,16 @@ if (Meteor.isServer) {
 const ImportCompleted = 'import_completed'
 const masterJobStatusCompleted = 'completed'
   Meteor.methods({
+
     // The method expects a valid IPv4 address
     'getESUser': function (jobQueue) {
       let objOptions = {
         // host: 'localhost',
         // port: '9200',
         // auth: 'elastic:changeme',
-        host: 'e128e59136400347637da727965922e5.us-east-1.aws.found.io',
+        host: '554babe34aa78d4ac60745ab85148d81.us-east-1.aws.found.io',
         port: '9243',
-        auth: 'elastic:OHQ0CzscklU0ttV59JicgNyH',
+        auth: 'elastic:is7DAuqM84il8D3abxCqftdN',
         path: '_xpack/security/user/' + jobQueue.username
         // This is the only line that is new. `headers` is an object with the headers to request
         // headers: {'custom': 'Custom Header Demo works'}
@@ -53,7 +54,7 @@ const masterJobStatusCompleted = 'completed'
       else {
         ESUserData.metadata.user_version_history = []
       }
-      let NewVersionNo = 'sup' + ESUserData.metadata.id + '_' + versionNo
+      let NewVersionNo = 'sup' + ESUserData.metadata.id + '-' + versionNo
       ESUserData.metadata.user_version_history.push(NewVersionNo)
       ESUserData.metadata.sid = NewVersionNo
       console.log("====Updated EsUser:",ESUserData)
