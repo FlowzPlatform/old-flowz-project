@@ -36,7 +36,7 @@ import { ProductPriceHeaders } from '../../../lib/headers/product_price.js'
 import { ProductImprintDataHeaders } from '../../../lib/headers/product_imprint_data.js'
 import { ProductImageHeaders } from '../../../lib/headers/product_images.js'
 import { ProductShippingHeaders } from '../../../lib/headers/product_shipping.js'
-import { ProductAdditionalChargeHeaders } from '../../../lib/headers/product_additional_charge.js'
+import { ProductAdditionalChargesHeaders } from '../../../lib/headers/product_additional_charge.js'
 import { ProductVariationPricingHeaders } from '../../../lib/headers/product_variation_pricing.js'
 
 let arrHeader = [];
@@ -53,7 +53,7 @@ let fileTypes =
     { id: 'ProductImprintData', name: 'Imprint Data', isDone: false, isActive: false, header: ProductImprintDataHeaders, collection: CollProductImprintData },
     { id: 'ProductImage', name: 'Image', isDone: false, isActive: false, header: ProductImageHeaders, collection: CollProductImage },
     { id: 'ProductShipping', name: 'Shipping', isDone: false, isActive: false, header: ProductShippingHeaders, collection: CollProductShipping },
-    { id: 'ProductAdditionalCharges', name: 'Additional Charges', isDone: false, isActive: false, header: ProductAdditionalChargeHeaders, collection: CollProductAdditionalCharges },
+    { id: 'ProductAdditionalCharges', name: 'Additional Charges', isDone: false, isActive: false, header: ProductAdditionalChargesHeaders, collection: CollProductAdditionalCharges },
     { id: 'ProductVariationPrice', name: 'Variation Price', isDone: false, isActive: false, header: ProductVariationPricingHeaders, collection: CollProductVariationPrice }
 ];
 
@@ -304,9 +304,10 @@ Meteor.UploadJob = {
 }
 
 
-
+let jobCreatedLog = 0
 Meteor.validatorFunctions = {
     instantiateJobQueue: async function(){
+      jobCreatedLog = 0
       // fetch owner job which import is running status
       let qry={owner:Meteor.userId(),"masterJobStatus":"running","stepStatus":ImportRunning};
       jobQueue = CollUploadJobMaster.find(qry).fetch()
@@ -562,10 +563,16 @@ function setImportJobQueue (jobData) {
             // etc...
           })
         })
+        console.log('JobQueue Generated')
         resolve('JobQueue Generated')
       }
     } catch (e) {
-      reject('job not generate')
+      console.log(e)
+      jobCreatedLog ++
+      // setImportJobQueue (jobData)
+      if(jobCreatedLog == 3) {
+       reject('job_not_generate')
+      }
     }
   })
 }

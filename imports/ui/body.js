@@ -51,7 +51,7 @@ Template.imageUpload.onRendered(function() {
 
     // this is how you get the response from the ajax call.
     this.dropzone.on('addedfile', function(file) {
-        console.log("fileName:", file);
+        // console.log("fileName:", file);
     });
     this.dropzone.on('complete', function(file) {
         var uploader = new Slingshot.Upload("myFileUploads");
@@ -60,24 +60,24 @@ Template.imageUpload.onRendered(function() {
             if (error) {
                 // Log service detailed response.
                 console.error('Error uploading');
-                console.log(error);
+                // console.log(error);
             } else {
-                console.log("success");
+                // console.log("success");
             }
         });
-        console.log(file);
+        // console.log(file);
     });
 
     this.dropzone.on("uploadprogress", function(file, progress) {
         // Update progress bar with the value in the variable "progress", which
         // is the % total upload progress from 0 to 100
 
-        console.log("progress:", progress);
+        // console.log("progress:", progress);
 
     });
 
     this.dropzone.on('queuecomplete', function() {
-        console.log("queuecomplete");
+        // console.log("queuecomplete");
 
 
         //location.reload();
@@ -570,12 +570,12 @@ let insertSchema = function(template,ft, cb) {
         "username": Meteor.user().username
     };
     CollUploaderSchema.insert(data, function(e, res) {
-        console.log('res', res);
+        // console.log('res', res);
         $(template.find("#dpdSchema")).children('option[value=' + res + ']').prop('selected', true);
         NewHeaderSchema = "{" + NewHeaderSchema + ",fileID: {type: String,label: 'file ID'},owner: {type: String,label: 'owner'},username: {type: String,label: 'username'}}";
         let newSchema = eval("new SimpleSchema(" + NewHeaderSchema + ")");
         ft[activeFiletype].schema = newSchema;
-        ft[activeFiletype].collection.attachSchema(newSchema, { replace: true });
+        ft[activeFiletype].collection.attachSchema(newSchema, { mutate: true,replace: true });
         cb();
     });
 }
@@ -601,7 +601,7 @@ let generateAddSchema = function(template) {
     // generate header using with new schema
     let header = _.chain(ft[activeFiletype].schema._schema).reject(function(d, k) { return k == 'fileID' || k == 'owner' || k == 'username' }).map(function(d) { return d.label.toLowerCase() }).value();
 
-    ft[activeFiletype].collection.attachSchema(newSchema, { replace: true });
+    ft[activeFiletype].collection.attachSchema(newSchema, {mutate: true, replace: true });
 
     // set new headers
     template.headers.set(header);
@@ -667,7 +667,7 @@ let genrateSchema = function(template) {
     // generate header using with new schema
     let header = _.chain(ft[activeFiletype].schema._schema).reject(function(d, k) { return k == 'fileID' || k == 'owner' || k == 'username' }).map(function(d) { return d.label.toLowerCase() }).value();
 
-    ft[activeFiletype].collection.attachSchema(newSchema, { replace: true });
+    ft[activeFiletype].collection.attachSchema(newSchema, {mutate: true, replace: true });
 
     // set new headers
     template.headers.set(header);
@@ -697,7 +697,7 @@ let genrateNewSchema = function(template) {
 
     ft[activeFiletype].schema = newSchema;
 
-    ft[activeFiletype].collection.attachSchema(newSchema, { replace: true });
+    ft[activeFiletype].collection.attachSchema(newSchema, {mutate: true, replace: true });
 
 }
 
@@ -720,7 +720,7 @@ let generateMapping = function(template) {
     let sysHeaders = template.headers.get();
 
     let activefile = getActiveHeaders(template); // get active file type data
-    //    console.log('activefile', activefile);
+    //    // console.log('activefile', activefile);
     // create mapping
     sysHeaders.forEach(function(result, index) {
         mapping.push({
@@ -746,7 +746,7 @@ let generateXEditor = function(template, cb) {
     let activefile = template.headers.get(); //_.map(getActiveHeaders(template), function(d) { return (d.label == undefined) ? '' : d.label }); // get active file type data
 
     let schemaLabel = _.map(getActiveHeaders(template), function(d) { return (d.label == undefined) ? '' : d.label.toLowerCase() });
-    //console.log('schemaLabel', schemaLabel);
+    //// console.log('schemaLabel', schemaLabel);
 
     let _csvHeader = template.csvHeaders.get();
     let _hasHeader = $(template.find('#hasheader')).prop('checked');
@@ -776,7 +776,7 @@ let generateXEditor = function(template, cb) {
             _val = getHeaderDistance(result, _csvHeader);
         }
 
-        //console.log('result', result.toLowerCase());
+        //// console.log('result', result.toLowerCase());
         $(template.find('#dpdsysheader_' + index)).editable("destroy");
         if (_.indexOf(schemaLabel, result) == -1 || $(template.find("#dpdSchema")).val() == '') {
             $(template.find('#dpdsysheader_' + index)).editable({
@@ -800,11 +800,11 @@ let generateXEditor = function(template, cb) {
 
         if ($(template.find("#dpdSchema")).val() == '') {
             $(template.find('#dpdSchemaType_' + index)).editable({
-                type: 'select',
+                type: 'select',emptytext: '--NA--',
                 value: 'String',
                 source: schemaTypes,
                 success: function(response, newValue) {
-                    console.log(newValue);
+                    // console.log(newValue);
                     var content_type = '#property_content_' + newValue;
                     $("#property_" + index).data('bs.popover').options.content = $(content_type).html();
                 }
@@ -911,7 +911,7 @@ let generateXEditor = function(template, cb) {
 
     //     if (existMapping.length > 0) {
     //         let sysHeaderObj = _.chain(existMapping).find(function(d) { return d.csvHeader == result }).value();
-    //         //console.log('sysHeaderObj', sysHeaderObj);
+    //         //// console.log('sysHeaderObj', sysHeaderObj);
     //         if (sysHeaderObj.csvSysHeaderDetail != undefined) {
     //             _val = result == sysHeaderObj.csvSysHeaderDetail.column ? sysHeaderObj.csvSysHeaderDetail.text : '';
     //         }
@@ -941,7 +941,7 @@ let generateXEditor = function(template, cb) {
 
     //     if (existMapping.length > 0) {
     //         let sysHeaderObj = _.chain(existMapping).find(function(d) { return d.csvHeader == result }).value();
-    //         //console.log('sysHeaderObj', sysHeaderObj);
+    //         //// console.log('sysHeaderObj', sysHeaderObj);
     //         if (sysHeaderObj.transform != undefined) {
     //             let code = sysHeaderObj.transform;
     //             $(template.find('#txtCustomJavascript_' + index)).attr('data-code', code).attr('title', 'Edit').parent('td').addClass('has-edit').children('.transform-function').text(code).attr('title', code);
@@ -953,7 +953,7 @@ let generateXEditor = function(template, cb) {
 }
 
 let changeXEditorValue = function(template) {
-    //console.log('success');
+    //// console.log('success');
     $(template.find('#preview')).find('.spinner').show();
     setTimeout(function() {
         generatePreview(template.find('#csv-file').files[0], template, function() {
@@ -1061,7 +1061,7 @@ let arrayToCSV = function(row) {
         }
         row[i] = row[i].join(',');
     }
-    //console.log('row', row);
+    //// console.log('row', row);
     return row.join('\n');
 }
 
@@ -1086,7 +1086,7 @@ let getHeader = function(_file, template, cb) {
             }
         },
         error: function(error, f) {
-            console.log("ERROR:", error, f);
+            // console.log("ERROR:", error, f);
         },
         chunk: function(results, streamer) {
             streamer.abort();
@@ -1109,9 +1109,9 @@ let getTransformVal = function(headings, row, transformStr, oldValue, index) {
     }
 }
 
-let generateDatawithNewHeader = function(rows, _hasHeader, mapping, isPreview, template) { 
+let generateDatawithNewHeader = function(rows, _hasHeader, mapping, isPreview, template) {
     let headings = template.csvHeaders.get();
-    //var oldRows = jQuery.extend(true, {}, rows); 
+    //var oldRows = jQuery.extend(true, {}, rows);
     let activeHeaders = getActiveHeaders(template).slice(1, -1);
     let newHeading = _.map(mapping, function(v) { return v.sysHeader });
     let newData = [];
@@ -1159,7 +1159,7 @@ let generatePreview = function(_file, template, cb) {
             return newrows;
         },
         error: function(error, f) {
-            console.log("ERROR:", error, f);
+            // console.log("ERROR:", error, f);
         },
         chunk: function(results, streamer) {
             template.previewRec.set(results.data.slice(0, 5));
@@ -1226,9 +1226,9 @@ let parseCSV = function(_file, template,mapping) {
     Papa.LocalChunkSize = _file.size;
     Csvfiles.insert(file, function(e, res) {
         $('#buttonProceedNext').hide();
-        let fileID = res; 
+        let fileID = res;
         let ft = template.filetypes.get();
-        let activeFiletype = _.find(ft, function(d) { return d.isActive }); 
+        let activeFiletype = _.find(ft, function(d) { return d.isActive });
         let chunks = 1;
         let totalRecords = 0;
         let uploadedRecords = 0;
@@ -1248,33 +1248,47 @@ let parseCSV = function(_file, template,mapping) {
                 }
             },
             error: function(error, f) {
-                console.log("ERROR:", error, f);
+                // console.log("ERROR:", error, f);
             },
             step: function(results, parser) {
                 if (abortChecked) {
                     parser.abort();
                     return;
                 }
-                parser.pause();
-                insertCSVData(results.data[0], fileID, activeFiletype.collection, function() {
+                let t0,t1
+                t0 = performance.now()
+                //console.log("====before push parser.pause===", t0)
+                if(!parser.paused()) {
+                   parser.pause();
+                }
+                insertCSVData(results.data[0], fileID, activeFiletype.collection, activeFiletype, function() {
                     toastr.clear();
-                    ++uploadedRecords;
-                    let newProgress = Math.round((uploadedRecords * 100) / totalRecords);
+                    ++uploadedRecords
+                    let newProgress = Math.round((uploadedRecords * 100) / totalRecords)
                     if (progress == newProgress) {
+                      if(parser.paused()) {
                         parser.resume();
+                      }
+                        let v1 = performance.now()
+                  //      console.log("====parser.resume ==1=", v1-t0)
                     } else {
                         $(template.find('#btnNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
                         $(template.find('#btnNext')).find('.content').text(newProgress + '% completed');
                         $(template.find('#buttonProceedNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
                         $(template.find('#buttonProceedNext')).find('.content').text(newProgress + '% completed');
                         Csvfiles.update(fileID, { $set: { progress: newProgress, uploadedRecords: uploadedRecords } }, function(e, res) {
-                            parser.resume();
+                          if(parser.paused()) {
+                              parser.resume();
+                          }
+                          let v1 = performance.now()
+                            //console.log("====parser.resume ==2=", v1-t0)
                         });
                     }
                     progress = newProgress;
                 });
             },
             beforeFirstChunk: function(chunk) {
+              //alert("beforeFirstChunk")
                 let rows = CSVtoArray(chunk);
                 totalRecords = (_hasHeader) ? rows.length - 1 : rows.length - 0; // last row getting empty
                 Csvfiles.update(fileID, { $set: { totalNoOfRecords: totalRecords } }, function(e, res) {});
@@ -1292,14 +1306,14 @@ let getActiveHeaders = function(template) {
 }
 
 Template.readCSV.onCreated(function() {
-    //console.log(Router.current().params.id);
-    //console.log(this);
+    //// console.log(Router.current().params.id);
+    //// console.log(this);
     // if (this.data == undefined) {
     //     Router.go('/');
     // }
-    //console.log(Meteor.userId());
+    //// console.log(Meteor.userId());
     //let masterJob = this.data;
-    //console.log('schema', _.chain(ProductInformationSchema._schema).filter(function(d) { return d.optional }).map(function(d) { return d.label }).value());
+    //// console.log('schema', _.chain(ProductInformationSchema._schema).filter(function(d) { return d.optional }).map(function(d) { return d.label }).value());
     let masterJob = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running' });
     let a =
         toastr.options = {
@@ -1375,7 +1389,7 @@ Template.readCSV.helpers({
     },
     // distance() {
     //     let res = this.csvHeaders[0];
-    //     // console.log(this.csvHeaders);
+    //     // // console.log(this.csvHeaders);
     //     let col = this.col;
     //     this.csvHeaders.forEach(function(d) {
     //         res = Levenshtein.get(col, d) < Levenshtein.get(col, res) ? d : res;
@@ -1459,35 +1473,117 @@ let updateJobMaster = function(filename, fileID, cb) {
     });
 }
 
+let insertOtherCSVData = function(data, fileID, collection,fileSchemaObj, cb) {
+  // console.log("====insertOtherCSVData====");
+  let copedata = $.extend({}, data);
+  let schemaObj = fileSchemaObj.schema;
+  // console.log(schemaObj);
+  let skipOptions = {"removeEmptyStrings":false,"skipCast": [ 'product_id','sr_no' ]}
 
-let insertCSVData = function(data, fileID, collection, cb) {
+
+  let result = schemaObj.validate( data, { skipCast: [ 'sr_no','product_id' ] }, function( err, newP, errors ){
+    if(err)
+    {
+      // console.log("Err!");
+      // console.log( err );
+    } else {
+      // console.log("Res!");
+      // console.log( newP );
+    }
+  })
+  // console.log(result)
+
+  complexSchema.validate( p, { skipCast: [ 'age' ] }, function( err, newP, errors ){
+    // ...
+  });
+
+  // collection.simpleSchema().namedContext().validate(data, skipOptions, function (err, newerP, errors) {
+  //   if(err)
+  //   {
+  //     // console.log("Err!");
+  //     // console.log( err );
+  //   } else {
+  //     if( errors.length ){
+  //       // console.log("Validation errors!");
+  //       // console.log( errors );
+  //     } else {
+  //       // console.log("newerP:");
+  //       // console.log( newerP );
+  //     }
+  //   }
+  // })
+
+  // try {
+  //   //data.sr_no = String(data.sr_no)
+  //   //data.product_id = String(data.product_id)
+  //   schemaObj.clean(data,{"autoConvert":true,"removeEmptyStrings":true,"skipCast": [ 'product_id','sr_no' ] })
+  //   if(schemaObj.validate(data,{},{"removeEmptyStrings":false,"skipCast": [ 'product_id','sr_no' ]})) {
+  //     let Obj = CollUploadJobMaster.findOne({ owner: Meteor.userId(), masterJobStatus: 'running', stepStatus: 'upload_pending' });
+  //
+  //     let ObjPI = CollProductInformation.findOne({ fileID: Obj.ProductInformation.id,'sku':data.sku});
+  //     if(ObjPI[fileSchemaObj.id].length>0) {
+  //       ObjPI[fileSchemaObj.id].push(data)
+  //     } else {
+  //       ObjPI[fileSchemaObj.id]=[];
+  //       ObjPI[fileSchemaObj.id].push(data)
+  //     }
+  //     CollProductInformation.upsert(ObjPI._id, { $set: ObjPI }, function() {
+  //       alert("data updated res");
+  //         cb();
+  //     });
+  //   }
+  // } catch(err) {
+  //   let allowedValuesObj = '';
+  //   $("#upload-csv-zone,#preview").hide();
+  //   $("#handson-Zone-during-upload").show();
+  //   $('.makeBlur').css("display","none");
+  //   $('#buttonProceedNext').show().find('.content').text('Proceed To Next');
+  //   $('#btnNext').hide();
+  //   $("#errMessageFromSchema").text(err.message);
+  //   $("#allowMessageFromSchema").text(allowedValuesObj);
+  //   renderHandsonTable(copedata, Object.keys(copedata), 'hotErrorDataDuringUpload', err, fileID, collection, fileSchemaObj, cb);
+  // }
+}
+
+let insertCSVData = function(data, fileID, collection,fileSchemaObj, cb) {
+    let t0,t1
+    t0 = performance.now()
+    console.log("====insertCSVData fun=1==", t0)
     let copedata = $.extend({}, data);
     data['fileID'] = fileID;
     data['owner'] = Meteor.userId();
     data['username'] = Meteor.user().username;
-    collection.insert(data, function(err, res) {
-        if (err) {
-            let allowedValuesObj = '';
-            try {
-                let keyName = err.invalidKeys[0].name;
-                let schemaObj = eval("ProductInformationSchema");
-                let typeObj = eval("schemaObj._schema." + keyName);
-                if (typeObj.type.definitions[0] && typeObj.type.definitions[0].allowedValues) {
-                    allowedValuesObj = " [ Allowed Values : " + typeObj.type.definitions[0].allowedValues.join(", ") + " ]";
-                }
-            } catch (e) {};
-            $("#upload-csv-zone,#preview").hide();
-            $("#handson-Zone-during-upload").show();
-            $('.makeBlur').css("display","none");
-            $('#buttonProceedNext').show().find('.content').text('Proceed To Next');
-            $('#btnNext').hide();
-            $("#errMessageFromSchema").text(err.message);
-            $("#allowMessageFromSchema").text(allowedValuesObj);
-            renderHandsonTable(copedata, Object.keys(copedata), 'hotErrorDataDuringUpload', err, fileID, collection, cb);
-        } else {
-            cb(); 
-        }
-    });
+
+    // if(fileSchemaObj.id!='ProductInformation') {
+    //   insertOtherCSVData(data, fileID, collection,fileSchemaObj, cb);
+    // }
+    // else {
+      collection.insert(data,{ validationContext: "insertForm",mutate: true, modifier: false }, function(err, res) {
+          if (err) {
+              let allowedValuesObj = '';
+              try {
+                  let keyName = err.invalidKeys[0].name;
+                  let schemaObj = fileSchemaObj.schema;
+                  let typeObj = eval("schemaObj._schema." + keyName);
+                  if (typeObj.type.definitions[0] && typeObj.type.definitions[0].allowedValues) {
+                      allowedValuesObj = " [ Allowed Values : " + typeObj.type.definitions[0].allowedValues.join(", ") + " ]";
+                  }
+              } catch (e) {};
+              $("#upload-csv-zone,#preview").hide();
+              $("#handson-Zone-during-upload").show();
+              $('.makeBlur').css("display","none");
+              $('#buttonProceedNext').show().find('.content').text('Proceed To Next');
+              $('#btnNext').hide();
+              $("#errMessageFromSchema").text(err.message);
+              $("#allowMessageFromSchema").text(allowedValuesObj);
+              renderHandsonTable(copedata, Object.keys(copedata), 'hotErrorDataDuringUpload', err, fileID, collection, fileSchemaObj, cb);
+          } else {
+              cb();
+              t1 = performance.now()
+              console.log("====insertCSVData fun=2==", t1-t0)
+          }
+      });
+    //  }
 }
 
 
@@ -1509,12 +1605,12 @@ let getHandsonHeader = function(headers, invalidKeys) {
     return newHeaders;
 }
 let objHandsontable;
-let renderHandsonTable = function(dataObject, headers, eleName, error, fileID, collection, cb) {
+let renderHandsonTable = function(dataObject, headers, eleName, error, fileID, collection, collectionId, cb) {
     if (objHandsontable != undefined) {
         objHandsontable.destroy();
     }
     let newHeaders = getHandsonHeader(headers, error.invalidKeys);
-    //console.log('newHeaders', newHeaders);
+    //// console.log('newHeaders', newHeaders);
     let hotSettings = {
         data: dataObject,
         columns: newHeaders,
@@ -1528,9 +1624,9 @@ let renderHandsonTable = function(dataObject, headers, eleName, error, fileID, c
         afterChange: function(changes, source) {
             //updateErrorData(changes, source, dataObject, fileID);
             $("#buttonProceedNext").unbind('click').click(function() {
-                //console.log('afterchange', dataObject);
+                //// console.log('afterchange', dataObject);
                 $('.makeBlur').css("display","block");
-                insertCSVData(dataObject, fileID, collection, cb);
+                insertCSVData(dataObject, fileID, collection, collectionId, cb);
             });
         }
     };
