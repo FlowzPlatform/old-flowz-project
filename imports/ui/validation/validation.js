@@ -57,6 +57,8 @@ let fileTypes =
     { id: 'ProductVariationPrice', name: 'Variation Price', isDone: false, isActive: false, header: ProductVariationPricingHeaders, collection: CollProductVariationPrice }
 ];
 
+let myJobs = JobCollection('OBImportJobQueue')
+
 let secoundTimeValidate = [];
 Template.validation.events({
     'click #validation_start' (event) {
@@ -311,7 +313,7 @@ Meteor.validatorFunctions = {
       // fetch owner job which import is running status
       let qry={owner:Meteor.userId(),"masterJobStatus":"running","stepStatus":ImportRunning};
       jobQueue = CollUploadJobMaster.find(qry).fetch()
-      console.log("instantiateJobQueue")
+      // console.log("instantiateJobQueue")
       jobQueue=jobQueue[0]
       if(jobQueue) {
         await setImportJobQueue(jobQueue)
@@ -329,7 +331,7 @@ Meteor.validatorFunctions = {
         }
       }
       let updResult = CollUploadJobMaster.update({_id: guid}, query, {}, async function (error,result) {
-        console.log("==========instantiateJobQueue====error===========")
+        // console.log("==========instantiateJobQueue====error===========")
         if (!error) {
           await Meteor.validatorFunctions.instantiateJobQueue()
         }
@@ -534,7 +536,7 @@ function setImportJobQueue (jobData) {
   return new Promise((resolve, reject) => {
     try {
       if (Meteor.isClient) {
-        let myJobs = JobCollection('OBImportJobQueue')
+
         Meteor.startup(function () {
           Meteor.subscribe('allJobs')
           // Create a job:
@@ -563,16 +565,11 @@ function setImportJobQueue (jobData) {
             // etc...
           })
         })
-        console.log('JobQueue Generated')
+        // console.log('JobQueue Generated')
         resolve('JobQueue Generated')
       }
     } catch (e) {
-      console.log(e)
-      jobCreatedLog ++
-      // setImportJobQueue (jobData)
-      if(jobCreatedLog == 3) {
-       reject('job_not_generate')
-      }
+      reject('job_not_generate')
     }
   })
 }

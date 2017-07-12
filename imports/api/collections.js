@@ -25,4 +25,3 @@ export const Csvfilemapping = new Mongo.Collection(collectionPrefix + 'CSVFileMa
 
 export const CollCloseOutPromoRFQSent = new Mongo.Collection('closeOutPromoRFQSent');
 export const CollCloseOutPromoRFQDiscussion = new Mongo.Collection('closeOutPromoRFQDiscussion');
-
