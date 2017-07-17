@@ -840,7 +840,11 @@ function findInValidData(sheetName, currentRuleIdx, arrRules,sheetHeaders, callb
     {
       setValidationProgress(sheetName,currentRuleIdx, arrRules.length);
     }
+    console.log("****************Hellooo");
+    if(sheetHeaders[(currentRule + 1)]){
     delete(sheetHeaders[(currentRule + 1)].renderer);
+  }
+    console.log("#############");
     if (fromValidate == 'mongo') {
         findInvalidDataFromMongo(sheetName, currentRuleIdx, arrRules,sheetHeaders, callback);
     } else {
