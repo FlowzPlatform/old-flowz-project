@@ -374,7 +374,8 @@ Meteor.validatorFunctions = {
                             delete(arrHeader[sheetName][index].renderer);
                         }
                     });
-                    //console.log(arrHeader[sheetName]);
+                    console.log(arrHeader[sheetName]);
+                    console.log(sheetName);
                     renderHandsonTable(sheetName,productData, arrHeader[sheetName], divNameOfhandsontable);
                 }
             });
