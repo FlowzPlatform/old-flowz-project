@@ -664,7 +664,8 @@ let genrateSchema = function(template) {
     let schemaJSON = CollUploaderSchema.findOne({ owner: Meteor.userId(), _id: template.find('#dpdSchema').value }); // get schema json
     // create new schema
     schemaJSON.schema = "{" + schemaJSON.schema + ",fileID: {type: String,label: 'file ID'},owner: {type: String,label: 'owner'},username: {type: String,label: 'username'}}";
-    let newSchema = eval("new SimpleSchema(" + schemaJSON.schema + ")");
+    // let newSchema = eval("new SimpleSchema(" + schemaJSON.schema + ")");
+    let newSchema = eval("new SimpleSchema(" + schemaJSON.schema + ",{clean: {filter: true,autoConvert: true,removeEmptyStrings: true,trimStrings: true,getAutoValues: true,removeNullsFromArrays: true,},})");
     ft[activeFiletype].schema = newSchema;
 
     // generate header using with new schema
@@ -696,7 +697,7 @@ let genrateNewSchema = function(template) {
 
     schemaJSON.schema = "{" + schemaJSON.schema + "," + NewHeaderSchema + "fileID: {type: String,label: 'file ID'},owner: {type: String,label: 'owner'},username: {type: String,label: 'username'}}";
 
-    let newSchema = eval("new SimpleSchema(" + schemaJSON.schema + ")");
+    let newSchema = eval("new SimpleSchema(" + schemaJSON.schema + ", {clean: {filter: true,autoConvert: true,removeEmptyStrings: true,trimStrings: true,getAutoValues: true,removeNullsFromArrays: true,},})");
 
     ft[activeFiletype].schema = newSchema;
 
@@ -1241,6 +1242,8 @@ let parseCSV = function(_file, template,mapping) {
         let totalRecords = 0;
         let uploadedRecords = 0;
         let progress = 0;
+        let read_write = 0;
+        let uploaderBatchSize = 100;
         Papa.parse(_file, {
             header: true,
             dynamicTyping: true,
@@ -1251,7 +1254,7 @@ let parseCSV = function(_file, template,mapping) {
                 if (!abortChecked && progress == 100) {
                     updateJobMaster(activeFiletype.id, fileID, function() {
                         $('.makeBlur').css("display","none");
-                        setNextFile(template);
+                    //     // setNextFile(template);
                     });
                 }
             },
@@ -1265,17 +1268,67 @@ let parseCSV = function(_file, template,mapping) {
                 }
                 let t0,t1
                 t0 = performance.now()
+
+                let options = {
+                  modifier: false,
+                  upsert:false
+                }
                 //console.log("====before push parser.pause===", t0)
-                // if(!parser.paused()) {
+                // if(read_write >=10 && !parser.paused()) {
                 //    parser.pause();
+                //    console.log("Parser paused........");
                 // }
+                read_write++;
+                if(read_write >= uploaderBatchSize && !parser.paused()) {
+                   parser.pause();
+                   console.log("Parser paused........");
+                }
+                // activeFiletype.collection.validate(results.data[0],options,function(){
+                //   if(!true){
+                //     parser.pause();
+                //   }
+                // });
+                // console.log("&&&&&&&&&&&",activeFiletype.collection.simpleSchema(),"&&&&&&&&&&&");
+              //  var validateValue = activeFiletype.collection.simpleSchema().namedContext("insertForm").validate(results.data[0], {modifier: false,keys:['price_1']})
+              //  if(!validateValue.isValid()){
+              //    console.log("..........................................error");
+              //  }
+              //  console.log( validateValue,results.data[0].sku);
+              activeFiletype.schema.clean(results.data[0]);
+              var validateValue = activeFiletype.schema.newContext();
+              validateValue.validate({$set:results.data[0]},{modifier: true});
+              console.log(".......................................",validateValue.isValid());
+              console.log("--------------------------------------------",validateValue.validationErrors());
+              // if(!validateValue.isValid()){
+              //   console.log("..........................................error");
+              // }
+              console.log( validateValue,results.data[0].sku);
+
+
                  insertCSVData(results.data[0], fileID, activeFiletype.collection, activeFiletype, function() {
                     toastr.clear();
                     ++uploadedRecords
+                    read_write--;
 
                     let newProgress = Math.round((uploadedRecords * 100) / totalRecords)
+                    console.log(progress);
                     console.log(newProgress);
+                    // if(uploadedRecords == totalRecords/2){
+                    //   console.log("#####################",uploadedRecords);
+                    //   parser.pause();
+                    // }
+                    $(template.find('#btnNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
+                    $(template.find('#btnNext')).find('.content').text(newProgress + '% completed');
+                    $(template.find('#buttonProceedNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
+                    $(template.find('#buttonProceedNext')).find('.content').text(newProgress + '% completed');
+                    if(read_write <= 0 && parser.paused()) {
+                      parser.resume();
+                    }
                     if (progress == newProgress) {
+                      // if(uploadedRecords == totalRecords/2){
+                      //   console.log("#####################",uploadedRecords);
+                      //   parser.pause();
+                      // }
                       // parser.abort();
                       // if(parser.paused()) {
                       //   parser.resume();
@@ -1285,19 +1338,24 @@ let parseCSV = function(_file, template,mapping) {
                       $(template.find('#btnNext')).find('.content').text(newProgress + '% completed');
                       $(template.find('#buttonProceedNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
                       $(template.find('#buttonProceedNext')).find('.content').text(newProgress + '% completed');
-                      console.log()
+                      // console.log()
+                      // if(parser.paused()) {
+                      //   parser.resume();
+                      //   console.log("Parser resumed");
+                      // }
 
                         let v1 = performance.now()
                   //      console.log("====parser.resume ==1=", v1-t0)
                     } else {
                       console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-                        $(template.find('#btnNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
+                        $(template.find('#btnNext')).find('.progress-inner').css({ 'width': newProgress+ '%' })
                         $(template.find('#btnNext')).find('.content').text(newProgress + '% completed');
                         $(template.find('#buttonProceedNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
                         $(template.find('#buttonProceedNext')).find('.content').text(newProgress + '% completed');
                         Csvfiles.update(fileID, { $set: { progress: newProgress, uploadedRecords: uploadedRecords } }, function(e, res) {
                           // if(parser.paused()) {
-                          //     parser.resume();
+                          //   parser.resume();
+                          //   console.log("Parser resumed");
                           // }
                           let v1 = performance.now()
                             //console.log("====parser.resume ==2=", v1-t0)
@@ -1306,8 +1364,18 @@ let parseCSV = function(_file, template,mapping) {
                     progress = newProgress;
                     console.log(uploadedRecords)
                     console.log(totalRecords);
-                    if(uploadedRecords == totalRecords){
+                    // if(parser.paused()) {
+                    //   parser.resume();
+                    //   console.log("Parser resumed");
+                    // }
+                    if(uploadedRecords == totalRecords && read_write <= 0){
                       parser.abort();
+                      // updateJobMaster(activeFiletype.id, fileID, function() {
+                      //     $('.makeBlur').css("display","none");
+                          setNextFile(template);
+                          // parser.abort();
+                      // });
+                      // parser.abort();
                     }
                 });
             },
@@ -1569,8 +1637,9 @@ let insertOtherCSVData = function(data, fileID, collection,fileSchemaObj, cb) {
   //   renderHandsonTable(copedata, Object.keys(copedata), 'hotErrorDataDuringUpload', err, fileID, collection, fileSchemaObj, cb);
   // }
 }
-
+// console.log("##########################",fileSchemaObj);
 let insertCSVData = function(data, fileID, collection,fileSchemaObj, cb) {
+
 
 
     let t0,t1
@@ -1586,6 +1655,28 @@ let insertCSVData = function(data, fileID, collection,fileSchemaObj, cb) {
     //   insertOtherCSVData(data, fileID, collection,fileSchemaObj, cb);
     // }
     // else {
+  // let options = {
+  //   modifier: false,
+  //   upsert:false
+  // }
+    // collection.validate(data,options,function(){
+    //   if(!true){
+    //     parser.pause();
+    //   }
+    // });
+    // collection.simpleSchema().namedContext("insertForm").validate(data, {modifier: false},function(){
+    //   console.log("....................validate method called..............")
+    //   if(!true){
+    //     parser.pause();
+    //   }
+    // });
+    // var validateValue = fileSchemaObj.namedContext("collection");
+    // if(!validateValue.isValid()){
+    //   console.log("..........................................error");
+    // }
+    // console.log( validateValue,results.data[0].sku);
+
+
       collection.insert(data,{ validationContext: "insertForm",mutate: true, modifier: false }, function(err, res) {
           if (err) {
               let allowedValuesObj = '';
