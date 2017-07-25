@@ -25,6 +25,8 @@ import './body.html';
 
 
 let abortChecked = false;
+let arrayOfErrors = [];
+let flag;
 let editor;
 Template.registerHelper('formatDate', function(date) {
     return moment(date).format('lll');
@@ -1216,6 +1218,8 @@ let setNextFile = function(template) {
         });
 }
 
+let parserObj;
+
 let parseCSV = function(_file, template,mapping) {
     let _hasHeader = $(template.find('#hasheader')).prop('checked');
     $(template.find('#btnNext')).find('.progress-inner').css({ 'width': '0%' });
@@ -1267,22 +1271,20 @@ let parseCSV = function(_file, template,mapping) {
                     return;
                 }
                 let t0,t1
+                parserObj = parser;
                 t0 = performance.now()
 
-                let options = {
-                  modifier: false,
-                  upsert:false
-                }
+                // let options = {
+                //   modifier: false,
+                //   upsert:false
+                // }
                 //console.log("====before push parser.pause===", t0)
-                // if(read_write >=10 && !parser.paused()) {
+                // read_write++;
+                // if(read_write >= uploaderBatchSize && !parser.paused()) {
+                // if(!parser.paused()){
                 //    parser.pause();
                 //    console.log("Parser paused........");
                 // }
-                read_write++;
-                if(read_write >= uploaderBatchSize && !parser.paused()) {
-                   parser.pause();
-                   console.log("Parser paused........");
-                }
                 // activeFiletype.collection.validate(results.data[0],options,function(){
                 //   if(!true){
                 //     parser.pause();
@@ -1294,25 +1296,27 @@ let parseCSV = function(_file, template,mapping) {
               //    console.log("..........................................error");
               //  }
               //  console.log( validateValue,results.data[0].sku);
-              activeFiletype.schema.clean(results.data[0]);
-              var validateValue = activeFiletype.schema.newContext();
-              validateValue.validate({$set:results.data[0]},{modifier: true});
-              console.log(".......................................",validateValue.isValid());
-              console.log("--------------------------------------------",validateValue.validationErrors());
+              // activeFiletype.schema.clean(results.data[0]);
+              // var validateValue = activeFiletype.schema.newContext();
+              // validateValue.validate({$set:results.data[0]},{modifier: true});
+              // console.log(".......................................",validateValue.isValid());
+              // console.log("--------------------------------------------",validateValue.validationErrors());
               // if(!validateValue.isValid()){
               //   console.log("..........................................error");
               // }
-              console.log( validateValue,results.data[0].sku);
+              // console.log( validateValue,results.data[0].sku);
 
 
                  insertCSVData(results.data[0], fileID, activeFiletype.collection, activeFiletype, function() {
                     toastr.clear();
                     ++uploadedRecords
-                    read_write--;
+                    // read_write--;
 
                     let newProgress = Math.round((uploadedRecords * 100) / totalRecords)
                     console.log(progress);
                     console.log(newProgress);
+
+
                     // if(uploadedRecords == totalRecords/2){
                     //   console.log("#####################",uploadedRecords);
                     //   parser.pause();
@@ -1321,9 +1325,10 @@ let parseCSV = function(_file, template,mapping) {
                     $(template.find('#btnNext')).find('.content').text(newProgress + '% completed');
                     $(template.find('#buttonProceedNext')).find('.progress-inner').css({ 'width': newProgress + '%' })
                     $(template.find('#buttonProceedNext')).find('.content').text(newProgress + '% completed');
-                    if(read_write <= 0 && parser.paused()) {
-                      parser.resume();
-                    }
+                    // if(read_write <= 0 && parser.paused()) {
+                    // if(parser.paused()){
+                    //   parser.resume();
+                    // }
                     if (progress == newProgress) {
                       // if(uploadedRecords == totalRecords/2){
                       //   console.log("#####################",uploadedRecords);
@@ -1364,11 +1369,15 @@ let parseCSV = function(_file, template,mapping) {
                     progress = newProgress;
                     console.log(uploadedRecords)
                     console.log(totalRecords);
-                    // if(parser.paused()) {
-                    //   parser.resume();
-                    //   console.log("Parser resumed");
+                    // if(flag == 'false'){
+                    //   parser.pause();
                     // }
-                    if(uploadedRecords == totalRecords && read_write <= 0){
+                    if(flag== true && parser.paused()) {
+                      parserObj.resume();
+                      console.log("Parser resumed");
+                    }
+                    // if(uploadedRecords == totalRecords && read_write <= 0){
+                    if(uploadedRecords == totalRecords){
                       parser.abort();
                       // updateJobMaster(activeFiletype.id, fileID, function() {
                       //     $('.makeBlur').css("display","none");
@@ -1680,12 +1689,27 @@ let insertCSVData = function(data, fileID, collection,fileSchemaObj, cb) {
       collection.insert(data,{ validationContext: "insertForm",mutate: true, modifier: false }, function(err, res) {
           if (err) {
               let allowedValuesObj = '';
+              flag = false;
+              if(!parserObj.paused()){
+              parserObj.pause();
+             }
+              // arrayOfErrors.push(data);
+              // for(i=0; i<=arrayOfErrors.length; i++){
+                // displayError(arrayOfErrors,err,fileSchemaObj,fileID, collection,cb);
+                // arrayOfErrors[i].pop();
+              // }
+                // console.log("-----------------------------",arrayOfErrors,arrayOfErrors.length);
+              //   // arrayOfErrors.length = 0;
+
+
               try {
                   let keyName = err.invalidKeys[0].name;
                   let schemaObj = fileSchemaObj.schema;
                   let typeObj = eval("schemaObj._schema." + keyName);
+                  // console.log("++++++++++++++++++++++++++++++++++",typeObj);
                   if (typeObj.type.definitions[0] && typeObj.type.definitions[0].allowedValues) {
                       allowedValuesObj = " [ Allowed Values : " + typeObj.type.definitions[0].allowedValues.join(", ") + " ]";
+                      console.log(allowedValuesObj);
                   }
               } catch (e) {};
               $("#upload-csv-zone,#preview").hide();
@@ -1696,14 +1720,52 @@ let insertCSVData = function(data, fileID, collection,fileSchemaObj, cb) {
               $("#errMessageFromSchema").text(err.message);
               $("#allowMessageFromSchema").text(allowedValuesObj);
               renderHandsonTable(copedata, Object.keys(copedata), 'hotErrorDataDuringUpload', err, fileID, collection, fileSchemaObj, cb);
+
           } else {
               cb();
               t1 = performance.now()
               console.log("====insertCSVData fun=2==", t1-t0);
           }
       });
+      // for(i=0; i<=arrayOfErrors.length; i++){
+      //   displayError(arrayOfErrors,fileSchemaObj,fileID, collection,cb);
+      //   // arrayOfErrors[i].pop();
+      // }
+        // console.log("-----------------------------",arrayOfErrors,arrayOfErrors.length);
     }
     //  }
+// }
+
+// let displayError = async function(dataa,err,fileSchemaObj,fileID, collection,cb) {
+//   console.log(dataa);
+//   // let copedata = $.extend({}, dataa);
+//   // console.log(copedata);
+//    for(i=0; i<=dataa.length; i++){
+//   try {
+//       let allowedValuesObj = '';
+//       let keyName = err.invalidKeys[0].name;
+//       console.log(keyName);
+//       let schemaObj = fileSchemaObj.schema;
+//       console.log(schemaObj);
+//       let typeObj = eval("schemaObj._schema." + keyName);
+//       console.log(typeObj);
+//       // if (typeObj.type.definitions[0] && typeObj.type.definitions[0].allowedValues) {
+//       //   console.log(typeObj.type.definitions);
+//       //   console.log(typeObj.type.definitions.allowedValues);
+//       //    allowedValuesObj = " [ Allowed Values : " + typeObj.type.definitions[0].allowedValues.join(", ") + " ]";
+//       // }
+//   } catch (e) {};
+//   $("#upload-csv-zone,#preview").hide();
+//   $("#handson-Zone-during-upload").show();
+//   $('.makeBlur').css("display","none");
+//   $('#buttonProceedNext').show().find('.content').text('Proceed To Next');
+//   $('#btnNext').hide();
+//   $("#errMessageFromSchema").text(err.message);
+//   // $("#allowMessageFromSchema").text(allowedValuesObj);
+//   console.log( Object.keys(dataa[i]));
+//
+//   await renderHandsonTable(dataa[i], Object.keys(dataa[i]), 'hotErrorDataDuringUpload',err, fileID, collection, fileSchemaObj, cb);
+// }
 // }
 
 
@@ -1726,6 +1788,7 @@ let getHandsonHeader = function(headers, invalidKeys) {
 }
 let objHandsontable;
 let renderHandsonTable = function(dataObject, headers, eleName, error, fileID, collection, collectionId, cb) {
+  // console.log("------------------------------------IN RENDERHANDSON TABLE -------------------------------------");
     if (objHandsontable != undefined) {
         objHandsontable.destroy();
     }
@@ -1745,6 +1808,7 @@ let renderHandsonTable = function(dataObject, headers, eleName, error, fileID, c
             //updateErrorData(changes, source, dataObject, fileID);
             $("#buttonProceedNext").unbind('click').click(function() {
                 // console.log('afterchange', dataObject);
+                flag = true;
                 $('.makeBlur').css("display","block");
                 insertCSVData(dataObject, fileID, collection, collectionId, cb);
             });
