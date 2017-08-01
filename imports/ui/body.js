@@ -1284,6 +1284,7 @@ let parseCSV = function(_file, template,mapping) {
                 }
 
                  insertCSVData(results.data[0], fileID, activeFiletype.collection, activeFiletype, function() {
+                   console.log("------------------",results.data[0],"-------------");
                     toastr.clear();
                     ++uploadedRecords
                     read_write--;
@@ -1608,6 +1609,7 @@ let insertCSVData = function(data, fileID, collection,fileSchemaObj, cb) {
 
     t0 = performance.now()
     console.log("====insertCSVData fun=1==", t0)
+    console.log("***********",data,"***********");
     let copedata = $.extend({}, data);
     data['fileID'] = fileID;
     data['owner'] = Meteor.userId();
@@ -1638,7 +1640,7 @@ let insertCSVData = function(data, fileID, collection,fileSchemaObj, cb) {
     // }
     // console.log( validateValue,results.data[0].sku);
 
-
+      console.log("&&&&&&&&&&&&&&&&",collection,"&&&&&&&&&&&&&&&&&&&&&");
       collection.insert(data,{ validationContext: "insertForm",mutate: true, modifier: false }, function(err, res) {
           if (err) {
               let allowedValuesObj = '';
@@ -1677,7 +1679,7 @@ let insertCSVData = function(data, fileID, collection,fileSchemaObj, cb) {
       });
 
     }
-  
+
 
 
 let errorRenderer = function(instance, td, row, col, prop, value, cellProperties) {
