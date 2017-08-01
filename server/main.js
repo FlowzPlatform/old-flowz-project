@@ -34,9 +34,9 @@ const masterJobStatusCompleted = 'completed'
         // host: 'localhost',
         // port: '9200',
         // auth: 'elastic:changeme',
-        host: '554babe34aa78d4ac60745ab85148d81.us-east-1.aws.found.io',
+        host: '9d89b0632a794a289b08f4de77dbf09a.us-east-1.aws.found.io',
         port: '9243',
-        auth: 'elastic:is7DAuqM84il8D3abxCqftdN',
+        auth: 'elastic:4t4AplzzRsGmarJ6txoSHJIX',
         path: '_xpack/security/user/' + jobQueue.username
         // This is the only line that is new. `headers` is an object with the headers to request
         // headers: {'custom': 'Custom Header Demo works'}
