@@ -1,13 +1,16 @@
+
+
 <template name="landing">
    {{> header}}
+
    <div class="landing_container">
       {{#if currentUser}}
 
         <!-- {{#if getStatusFromMasterStepStatus}} -->
-        {{#if getStatusFromMasterCount}}
+        {{#if getStatusFromMaster.count}}
           {{#each getStatusFromMaster}}
-          <div id="landingPageStatusReport" class="clearfix">
-            <h3>Welcome back  {{username}}</h3>
+          <div id="landingPageStatusReport" class="clearfix" style="overflow:auto">
+            <h3 style="text-transform:uppercase">Welcome back, {{username}}</h3>
             <p>Following is the latest status of your file upload process.You can continue with your current status or abort the whole process to start again</p>
             <table border='1|1' style='margin:auto;width:850px; border:solid 1px #ccc; border-collapse: collapse;'>
               <tr style='color:#4e4e4e; font-size:16px; font-weight:bold; padding:5px; background-color: #f5f5f5;'>
@@ -15,34 +18,56 @@
                   uploadType
                 </td>
                 <td style='color:#000; font-size:14px; padding:5px;word-break: break-all;'>
-                  {{uploadType}}
+                  <div class="upload-type">
+                    <span>
+                        <i class="fa {{#if $eq uploadType "replace"}} fa-dot-circle-o {{else}} fa-circle-o {{/if}}"></i>
+                      Replace
+                    </span>
+                    <span>
+                      <i class="fa {{#if $eq uploadType "append"}} fa-dot-circle-o {{else}} fa-circle-o {{/if}}"></i>
+                      Append
+                    </span>
+                    <span>
+                      <i class="fa {{#if $eq uploadType "upsert"}} fa-dot-circle-o {{else}} fa-circle-o {{/if}}"></i>
+                      Upsert
+                    </span>
+                    <span>
+                      <i class="fa {{#if $eq uploadType "update"}} fa-dot-circle-o {{else}} fa-circle-o {{/if}}"></i>
+                      Update
+                    </span>
+                  </div>
                 </td>
               </tr>
                 <tr style='color:#4e4e4e; font-size:16px; font-weight:bold; padding:5px; background-color: #f5f5f5;'>
                   <td style='color:#000; font-size:14px; padding:5px;word-break: break-all;'>
                     Started Process at
                   </td>
-                  <td style='color:#000; font-size:14px; padding:5px;word-break: break-all;'>
+                  <td style='color:#000; font-size:14px; padding:5px;word-break: break-all; font-weight:500'>
                     {{createdAt}}
                   </td>
                 </tr>
               </table>
 
               {{#if hasStatus}}
-              <table border='1|1' style='background-color: #192231;color: #fff;margin:auto;width:850px; border:solid 1px #ccc; border-collapse: collapse;'>
-                <th style="text-align:center">File</th><th style="text-align:center">Upload Status</th><th style="text-align:center">validation Status</th>
+              <table border='1|1'  style='background-color: #192231;color: #fff;margin:auto;width:850px; border:solid 1px #ccc; border-collapse: collapse;'>
+                <th style="text-align:center">File</th><th style="text-align:center">Upload Status</th><th style="text-align:center">Validation Status</th><th style="text-align:center">Import Status</th>
               {{#each hasStatus}}
 
-              <tr  style='color:#4e4e4e; font-size:16px; font-weight:bold; padding:5px; background-color: #f5f5f5;'>
+              <tr id="we" style='color:#4e4e4e; font-size:16px; font-weight:bold; padding:5px; background-color: #f5f5f5;'>
 
                 <td style='color:#000; font-size:14px; padding:5px;word-break: break-all;'>
                    {{sheetName}}
                 </td>
-                <td style='color:#000; font-size:14px; padding:5px;word-break: break-all;'>
-                  {{uploadStatus}}
+                <td style='color:#000; font-size:14px; padding:5px;word-break: break-all;text-transform:capitalize;'>
+
+                  {{#if $eq uploadStatus "completed"}}<i class="fa fa-check-circle" style="color:green;color: #008000;font-size: 1.3em;" aria-hidden="true"></i>{{else}}{{uploadStatus}}{{/if}}
+                </td>
+                <td style='color:#000; font-size:14px; padding:5px;word-break: break-all;text-transform:capitalize;'>
+
+                  {{#if $eq validateStatus "completed"}}<i class="fa fa-check-circle" style="color:green;color: #008000;font-size: 1.3em;text-transform:capitalize;" aria-hidden="true"></i>{{else}}{{validateStatus}}{{/if}}   
                 </td>
                 <td style='color:#000; font-size:14px; padding:5px;word-break: break-all;'>
-                  {{validationStatus}}
+                  Pending
                 </td>
 
               </tr>
@@ -57,57 +82,56 @@
           </div>
           {{/each}}
         {{else}}
-        <div class="right">
+        <div class="right col-md-6 col-sm-12 col-xs-12 col-md-offset-3">
         <h3>Choose a method for upload the data</h3>
         <form id="myform">
            <ul class="mySection">
-              <li class="btn" data-something="replace">
-                 <input type="radio" class="show_infoDiv" id="r1" name="myOptions"  value="replace"  />
-                 <img src="tick.png" class="selected_tick1" alt="">
-                 <label  class="dropbtn" for="r1">
-                 REPLACE
-                 </label>
-              </li>
-              <li class="btn" data-something="append">
-                 <input type="radio" class="show_infoDiv" id="r2" name="myOptions" value="append" />
-                 <img src="tick.png" class="selected_tick2" alt="">
-                 <label class="dropbtn" for="r2">
-                 APPEND
-                 </label>
-              </li>
-              <li class="btn" data-something="upsert">
-                 <input type="radio" class="show_infoDiv" id="r3" name="myOptions"  value="upsert" />
-                 <img src="tick.png" class="selected_tick3" alt="">
-                 <label class="dropbtn" for="r3">
-                 UPSERT
-                 </label>
-              </li>
-              <li class="btn" data-something="update">
-                 <input type="radio" class="show_infoDiv" id="r4" name="myOptions"  value="update" />
-                 <img src="tick.png" class="selected_tick4" alt="">
-                 <label class="dropbtn" for="r4">
-                 UPDATE
-                 </label>
-              </li>
+              <div class="row">
+                <li class="btn col-md-3" data-something="replace">
+                   <input type="radio" class="show_infoDiv" id="r1" name="myOptions"  value="replace"  />
+                   <img src="tick.png" class="selected_tick1" alt="">
+                   <label  class="dropbtn" for="r1">
+                   REPLACE
+                   </label>
+                </li>
+                <li class="btn col-md-3" data-something="append">
+                   <input type="radio" class="show_infoDiv" id="r2" name="myOptions" value="append" />
+                   <img src="tick.png" class="selected_tick2" alt="">
+                   <label class="dropbtn" for="r2">
+                   APPEND
+                   </label>
+                </li>
+                <li class="btn col-md-3" data-something="upsert">
+                   <input type="radio" class="show_infoDiv" id="r3" name="myOptions"  value="upsert" />
+                   <img src="tick.png" class="selected_tick3" alt="">
+                   <label class="dropbtn" for="r3">
+                   UPSERT
+                   </label>
+                </li>
+                <li class="btn col-md-3" data-something="update">
+                   <input type="radio" class="show_infoDiv" id="r4" name="myOptions"  value="update" />
+                   <img src="tick.png" class="selected_tick4" alt="">
+                   <label class="dropbtn" for="r4">
+                   UPDATE
+                   </label>
+                </li>
+              </div>
+              
            </ul>
-           <div id="dv" class="clearfix" style="display:none">
+           <div id="dv" class="clearfix col-md-10 col-md-offset-1 col-sm-12 col-xs-12" style="display:none">
               <button type="button" class="close" id ="close_info_div">×</button>
               <img class="bulb" src="idea.png" />
               <p id="get"></p>
            </div>
-           <button class="progress-button" type="button" id="getOptions" data-style="top-line" data-horizontal="">Submit</button>
+           <div class="landing_progress">
+              <button class="progress-button" type="button" id="getOptions" data-style="top-line" data-horizontal="">Proceed</button>
+           </div>
            <div id="display-error">Please choose a method of your choice.</div>
         </form>
         </div>
         {{/if}}
-
-
-
-
-
-
-
-
       {{/if}}
+
    </div>
+
 </template>

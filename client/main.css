@@ -63,6 +63,18 @@
 #preview table td>div,
 #preview table th {
     white-space: nowrap;
+}
+
+#preview table td>div {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.preview table td>div,
+.preview table td,
+.preview table th {
+    white-space: nowrap;
     max-width: 150px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -102,7 +114,11 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 
 .progress-button[disabled],
 .progress-button[disabled].state-loading {
-    cursor: default;
+    cursor: not-allowed;
+    filter: alpha(opacity=65);
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    opacity: .65;
 }
 
 .progress-button .content {
@@ -763,6 +779,11 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
     color: #494e6b;
 }
 
+.nav-tabs-vertical>li.done>a {
+    background: #1fb58f;
+    color: #fff;
+}
+
 .nav-tabs-vertical>li.active>a {
     background: #494e6b;
     color: #fff;
@@ -773,11 +794,6 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 .nav-tabs-vertical>li.active>a:active,
 .nav-tabs-vertical>li.active>a:visited {
     background: #494e6b;
-    color: #fff;
-}
-
-.nav-tabs-vertical>li.done>a {
-    background: #1fb58f;
     color: #fff;
 }
 
@@ -814,10 +830,14 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 
 /*****************  login button *********************/
 
-#login-buttons #login-name-link {
+#login-buttons .login-link-text {
     color: #fff;
     text-decoration: none;
-    padding: 15px 15px;
+}
+
+#login-buttons #login-name-link {
+    text-decoration: none;
+    /*padding: 15px 15px;*/
     line-height: 20px;
     position: relative;
     display: block;
@@ -955,7 +975,6 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 
 #mapping .spinner {
     margin: 15px 0px 0px 15px;
-    display: none;
 }
 
 #mapping .progress-button {
@@ -1162,8 +1181,352 @@ src: url('../fonts/icomoon/icomoon.eot?#iefix') format('embedded-opentype'), url
 
 .transform-function {
     white-space: nowrap;
-    max-width: 300px;
+    max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
     padding-left: 5px;
+    float: left;
+    padding-right: 5px;
+}
+
+.remove-custom-javascript {
+    display: none;
+}
+
+.view-mapping table tr td.has-edit:hover .remove-custom-javascript {
+    display: block;
+}
+
+.panel-heading h3 {
+    margin: 0px;
+}
+
+.panel-heading .options {
+    float: right;
+}
+
+.panel-heading .options>a>i {
+    font-size: 30px;
+}
+
+.imageOrFileDiv {
+    display: flex;
+    width: 50%;
+    height: 41px;
+    margin: 10px;
+}
+
+.imageOrFileButton {
+    width: 30%;
+    background-color: #fff;
+    color: #494e6b;
+}
+
+.imageOrFileButton:focus {
+    background-color: #494e6b;
+    color: #fff;
+}
+
+.imageOrFileButton.active {
+    background-color: #494e6b !important;
+    color: #fff !important;
+}
+
+.dropzone {
+    /* min-height: 150px; */
+    border: 2px dashed rgb(73, 78, 107);
+    background: white;
+    padding: 20px 20px;
+    height: 198px !important;
+    overflow-y: auto !important;
+}
+
+.dz-message span .first {
+    color: gray !important;
+    font-size: 1.7em !important;
+}
+
+.dz-message span .second {
+    color: #b7b7b7 !important;
+    font-size: 1em !important;
+}
+
+#mapping.add-schema-show .newSchemaProperty {
+    display: table-cell;
+}
+
+#mapping .newSchemaProperty {
+    display: none;
+}
+
+
+/***************************  rfq-view ********************************/
+
+.rfq-view {
+    position: relative;
+}
+
+.rfq-view .nav {
+    border-right: 1px solid #ccc;
+    position: absolute;
+    top: -20px;
+    left: 0;
+    height: calc(100vh - 50px);
+    background: rgba(221, 221, 221, 0.2);
+    width: 325px;
+}
+
+.rfq-view .nav li:first-child {
+    border-top: 1px solid #ccc;
+}
+
+.rfq-view .nav li {
+    border-bottom: 1px solid #ccc;
+    padding: 7px 7px 7px 30px;
+    cursor: pointer;
+}
+
+.rfq-view .nav li>i {
+    position: absolute;
+    left: 5px;
+    top: 10px;
+}
+
+.rfq-view .nav li.active {
+    background: #ccc;
+}
+
+.rfq-view .rfq-discussion {
+    margin-left: 340px;
+}
+
+.rfq-view .rfq-discussion .media {
+    padding: 0px 20px 0px 0px;
+}
+
+.rfq-view .rfq-discussion .media .media-body {
+    border: 1px solid #d1d5da;
+    position: relative;
+    overflow: visible;
+}
+
+.rfq-view .rfq-discussion .media .media-body .media-heading {
+    background: #f6f8fa;
+    padding: 8px;
+    font-size: 15px;
+    border-bottom: 1px solid #d1d5da;
+}
+
+.rfq-view .rfq-discussion .media .media-body>div {
+    padding: 10px;
+}
+
+.rfq-view .rfq-discussion .media .media-body::before,
+.rfq-view .rfq-discussion .media .media-body::after {
+    position: absolute;
+    top: 11px;
+    right: 100%;
+    left: -16px;
+    display: block;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    content: " ";
+    border-color: transparent;
+    border-style: solid solid outset;
+}
+
+.rfq-view .rfq-discussion .media .media-body::after {
+    margin-top: 1px;
+    margin-left: 2px;
+    border-width: 7px;
+    border-right-color: #f6f8fa;
+}
+
+.rfq-view .rfq-discussion .media .media-body::before {
+    border-width: 8px;
+    border-right-color: #d1d5da;
+}
+
+.rfq-view .rfq-discussion .reply-form {
+    padding: 20px 0px 20px 0px;
+    border-top: 1px solid #ccc;
+    margin-top: 10px;
+    margin-right: 20px;
+}
+
+
+/*
+.rfq-view .rfq-discussion .reply-form textarea {
+    float: left;
+    width: 88%;
+    height: 85px;
+}*/
+
+.rfq-view .rfq-discussion {
+    height: calc(100vh - 75px);
+    overflow-y: auto;
+}
+
+#tblPreview {
+    max-height: 43vh;
+    display: block;
+    overflow: auto;
+}
+
+#tblPreview thead {
+    display: table-header-group;
+}
+
+#tblPreview tbody {
+    display: table-row-group;
+}
+
+
+/*Nav Tabs*/
+
+.nav-tabs1 {
+    border-bottom: 2px solid #DDD;
+    margin-bottom: 15px;
+}
+
+.nav-tabs1>li.active>a,
+.nav-tabs1>li.active>a:focus,
+.nav-tabs1>li.active>a:hover {
+    border-width: 0;
+    background-color: #eee;
+}
+
+.nav-tabs1>li>a {
+    border: none;
+    color: #666;
+}
+
+.nav-tabs1>li.active>a,
+.nav-tabs1>li>a:hover {
+    border: none;
+    color: #4285F4 !important;
+    background: transparent;
+}
+
+.nav-tabs1>li>a::after {
+    content: "";
+    background: #4285F4;
+    height: 2px;
+    position: absolute;
+    width: 100%;
+    left: 0px;
+    bottom: -1px;
+    transition: all 250ms ease 0s;
+    transform: scale(0);
+}
+
+.nav-tabs1>li.active>a::after,
+.nav-tabs1>li:hover>a::after {
+    transform: scale(1);
+}
+
+.tab-nav>li>a::after {
+    background: #21527d none repeat scroll 0% 0%;
+    color: #fff;
+}
+
+
+/*****************************  dashboard css  **************************************/
+
+.bg-aqua {
+    background-color: #00c0ef !important;
+    color: #fff !important;
+}
+
+.small-box {
+    border-radius: 2px;
+    position: relative;
+    display: block;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.small-box>.inner {
+    padding: 10px;
+}
+
+.small-box h3,
+.small-box p {
+    z-index: 5;
+}
+
+.small-box h3 {
+    font-size: 38px;
+    font-weight: bold;
+    margin: 0 0 10px 0;
+    white-space: nowrap;
+    padding: 0;
+}
+
+.small-box p {
+    font-size: 15px;
+}
+
+.small-box .icon {
+    -webkit-transition: all .3s linear;
+    -o-transition: all .3s linear;
+    transition: all .3s linear;
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    z-index: 0;
+    font-size: 90px;
+    color: rgba(0, 0, 0, 0.15);
+}
+
+.small-box>.small-box-footer {
+    position: relative;
+    text-align: center;
+    padding: 3px 0;
+    color: #fff;
+    color: rgba(255, 255, 255, 0.8);
+    display: block;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+}
+
+.bg-red {
+    background-color: #dd4b39 !important;
+    color: #fff !important;
+}
+
+.bg-yellow {
+    color: #fff !important;
+    background-color: #f39c12 !important;
+}
+
+.bg-green {
+    color: #fff !important;
+    background-color: #00a65a !important;
+}
+
+#dv {
+    margin: 2% 15%;
+}
+
+ul.mySection label {
+    width: 310px;
+}
+
+.makeBlur{
+    height: 100%;
+    width: 100%;
+    background-color: #fff;
+    position: absolute;
+    opacity: 0.7;
+    display: none ;
+}
+
+.makeBlur i{
+   margin-top: 75px;
+}
+#preview .makeBlur{
+    width: calc(100% - 30px);
 }

@@ -1,0 +1,28 @@
+.clscompleted td{
+    background-color: #dff0d8!important;
+    color: black!important;
+}
+
+.clsrunning td{
+    background-color: #fcf8e3!important;
+    color: black!important;
+}
+
+.clspending {
+    background-color: #f5f5f5!important;
+    color: black!important;
+}
+
+.ht_clone_top table thead tr th{
+    background-color: #f2dede!important;
+    color: black!important;
+}
+
+.ht_clone_top_left_corner table thead tr th div.relative {
+  background-color: #f2dede!important;
+  color: black!important;
+}
+
+.txtTransFormCapital {
+  text-transform: capitalize;
+}

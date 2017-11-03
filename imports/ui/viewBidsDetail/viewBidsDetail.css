@@ -1,0 +1,53 @@
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.bidDetailLabel {
+    display: block;
+    cursor: pointer;
+    padding: 10px;
+    border: 1px solid #fff;
+    border-bottom: none;
+    background-color: #bfd8d2;
+}
+
+.bidDetailLabel:hover {
+    background: #26C281;
+}
+
+ul ul li {
+    padding: 10px;
+    background: rgba(216, 216, 216, 0.52);
+}
+
+input[type="checkbox"] {
+    left: -9999px;
+}
+
+input[type="checkbox"]~ul {
+    height: 0;
+    transform: scaleY(0);
+}
+
+input[type="checkbox"]:checked~ul {
+    height: 100%;
+    transform-origin: top;
+    transition: transform .2s ease-out;
+    transform: scaleY(1);
+}
+
+input[type="checkbox"]:checked+.bidDetailLabel {
+    background: #26C281;
+    border-bottom: 1px solid #fff;
+}
+
+.viewDetail_font {
+    color: #503a3a;
+    font-style: italic;
+    font-size: 17px;
+}
+.media-body p{font-style: normal;}
+.media-body p span{font-weight:bold;font-size:15px;}
+.wrapper ul li .bidDetailLabel{border-radius:3px;padding:5px 10px;}

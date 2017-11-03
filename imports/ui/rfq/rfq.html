@@ -1,0 +1,72 @@
+<template name="rfq">
+    {{> header}}
+    <div class="">
+        {{#if currentUser}}
+            <div class="rfq-view">
+                <ul class="nav">
+                    {{#each rfq}}
+                        <li class="rfq_id {{#if $eq _id rfqdiscussion._id}} active {{/if}}" data-id={{formatId _id}}> <i class="{{rfqStatusIcon rfqId}}"></i>  <span> {{formatId _id}} </span> </li>
+                    {{/each}}
+                </ul>
+                <div class="rfq-discussion">
+                    {{#each rfq}}
+                        {{#if StatusCheck _id rfqdiscussion._id}}
+                            <div class="rfq-messages">
+                                {{#each discussion}}
+                                    <div class="media">
+                                        <div class="media-left">
+                                            <img src="https://www.w3schools.com/bootstrap/img_avatar1.png" class="media-object" style="width:32px">
+                                        </div>
+                                        <div class="media-body">
+                                            <h4 class="media-heading">{{getUsername from}}</h4>
+                                            <div>{{{message}}}</div>
+                                        </div>
+                                    </div>
+                                {{/each}}
+                            </div>
+                            {{#if discussion}}
+                                <div class="reply-form">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            {{> tinymce id="txtReply"}}
+                                            <button id="btnReply" style="margin-top:5px;" class="progress-button progress-button-small pull-right" data-style="top-line" data-horizontal="">
+                                                <span class="content"><i class="fa fa-reply"></i>&nbsp;Reply</span>
+                                                <span class="progress">
+                                                    <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                                </span>
+                                            </button>
+                                            {{#if isCustomer}}
+                                                {{#if isPending rfqId}}
+                                                    <button id="btnApprove" style="margin-top:5px;" class="progress-button progress-button-small pull-right" data-style="top-line" data-horizontal="">
+                                                        <span class="content"><i class="fa fa-check"></i>&nbsp;Approve</span>
+                                                        <span class="progress">
+                                                            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                                        </span>
+                                                    </button>
+                                                    <button id="btnReject" style="margin-top:5px;" class="progress-button progress-button-small progress-button-danger pull-right" data-style="top-line" data-horizontal="">
+                                                        <span class="content"><i class="fa fa-ban"></i>&nbsp;Reject</span>
+                                                        <span class="progress">
+                                                            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                                        </span>
+                                                    </button>
+                                                {{/if}}
+                                            {{/if}}
+                                        </div>
+                                    </div>
+                                </div>
+                            {{/if}}
+                        {{/if}}
+                    {{/each}}
+                    
+                    {{#if $not rfqdiscussion._id}}
+                        <h1 class="text-center">No conversion</h1>
+                    {{/if}}
+                </div>
+            </div>
+        {{/if}}
+    </div>
+</template>
+
+<template name="tinymce">
+    <textarea class="tinymce" id="{{id}}"></textarea>
+</template>

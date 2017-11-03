@@ -1,0 +1,21 @@
+{
+    "AWSAccessKeyId": "Your AWS access key Id",
+    "AWSSecretAccessKey": "Your AWS secret access key",
+    "AWSBucket": "AWS bucket name",
+    "AWSRegion": "AWS region",
+    "AWSCfdomain": "AWS Cf domain",
+    "DRKeyId": "Your DR Key Id",
+    "DRSecretAccessKey": "Your DR Secret Access Key",
+    "DRToken": "DR token",
+    "FTHost": "FTP Host Name",
+    "FTPort": "FTP Port Name",
+    "FTUser": "FTP user",
+    "FTPass": "FTP password",
+    "public": {
+        "elasticsearch": {
+            "host": "elastic search host ",
+            "username": "elastic search user name",
+            "password": "elastic search password"
+        }
+    }
+}

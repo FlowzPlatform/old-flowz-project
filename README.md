@@ -1,51 +1,24 @@
-http://meteortips.com/second-meteor-tutorial/user-accounts/
+****** Install npm
+
+npm install
 
 
-________________________________________________________________
+******* Add meteor
+ meteor add
 
 
-=> steps 
+ ******* set mongo url
 
-upload 
-validate 
-import
+ Windows : set MONGO_URL=mongodb://139.59.35.45:27017/closeoutpromo
 
 
-upload steps
+ ******* set rethink url
 
-has header
-
-1. noheader
-2. provided header
-
-header mapping with ower header and csv file header
-and store in user profile
-
-=> fast-levenshtein (string edit distance)
+ Windows : set RETHINK_URL=rethinkdb://139.59.35.45:28016/test
 
 
-ower header | csv header | datatype
+ ******* Run
 
-________________________________________________________________
+ ubntu : export MONGO_URL='mongodb://139.59.35.45:27017/closeoutpromo' env RETHINK_URL=rethinkdb://139.59.35.45:28016/test
 
-keen ui
-Element ui
-josn editor
-
-https://vitalets.github.io/x-editable/
-
-https://tympanus.net/Development/ProgressButtonStyles/
-
-
-https://designschool.canva.com/blog/website-color-schemes/   #46
-
-https://tympanus.net/Development/AnimatedCheckboxes/
-
-#494e68
-#98878f
-#985e6d
-#192231
-
-
-
-
+ meteor  --settings settings.json

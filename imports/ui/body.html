@@ -5,19 +5,27 @@
         <nav class="navbar navbar-default">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <a class="navbar-brand" href="#">CSV Upload</a>
+                    <a class="navbar-brand" href="#">Closeout-Promo</a>
                 </div>
                 <ul class="nav navbar-nav pull-right">
-                    <li class="active"><a href="/">Home</a></li>
-                    <li class=""><a href="/upload">Upload</a></li>
-                    <li><a href="/history">History</a></li>
-                    <li>{{> loginButtons}}</li>
+                    <li><a href="http://localhost:3001/">Home</a></li>
+                    <li class="{{#if $eq getCurrentRouter "dashboard"}} active {{/if}}"><a href="/">Dashboard</a></li>
+                    {{#if isCustomer}}
+                        <li class="{{#if $or ($eq getCurrentRouter "landing") ($eq getCurrentRouter "upload") ($eq getCurrentRouter "import") ($eq getCurrentRouter "validation")}} active {{/if}}"><a href="/uploaderdashboard">Upload</a></li>
+                        <!--<li class=""><a href="/upload">Upload</a></li>-->
+                        <li class="{{#if $eq getCurrentRouter "history"}} active {{/if}}"><a href="/history">History</a></li>
+                    {{/if}}
+                    <li class="{{#if $eq getCurrentRouter "rfq"}} active {{/if}}"><a href="/rfq">RFQ</a></li>
+                    <li class="{{#if $eq getCurrentRouter "bidding"}} active {{/if}}"><a href="/bidding">My Auctions</a></li>
+                    <li class="{{#if $eq getCurrentRouter "allbids"}} active {{/if}}"><a href="/allBids">All Bids</a></li>
+                    <li><a>{{> loginButtons}}</a></li>
                 </ul>
             </div>
         </nav>
 </template>
 
 <template name="readCSV">
+    <script src="js/placeholder.js"></script>
     {{> header}}
     <div class="">
         {{#if currentUser}}
@@ -25,44 +33,43 @@
                 {{> uploadStep}}
             </div>
             {{> EditorPage}}
-            <div class="product-file-upload-tab-block">
+            <div class="product-file-upload-tab-block" style="position: relative;">
                 <ul class="nav nav-tabs nav-tabs-vertical" role="tablist">
                     {{#each filetypes}}
-                        <li role="presentation" class="{{#if isActive}}active{{/if}} {{#if isDone}}done{{/if}}"><a href="#"><i class="fa fa-check-circle-o"></i>{{name}}</a></li>
+                        <li role="presentation" class="{{#if isActive}}active{{/if}} {{#if isDone}}done{{/if}}"><a href="#{{id}}" class="sheets" role="tab" data-toggle="tab"><i class="fa fa-check-circle-o"></i>{{name}}</a></li>
                     {{/each}}
                 </ul>
+
+                <div style="margin-top: 20px;position: absolute;top: 300px;">
+                    {{#if isActiveStep2}}
+                        <button class="progress-button progress-button-small pull-right" id="btngostep2" data-style="top-line" data-horizontal="">
+                            <span class="content">Start validation&nbsp;<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i></span>
+                        </button>
+                    {{else}}
+                        <button title="Please upload atleast product information files before start validation." class="progress-button progress-button-small pull-right" id="btngostep2" data-style="top-line" data-horizontal="" disabled="disabled">
+                            <span class="content">Start validation&nbsp;<i class="fa fa-arrow-circle-o-right" aria-hidden="true"></i></span>
+                        </button>
+                    {{/if}}
+                </div>
+
                 <div class="tab-content">
                     <div role="tabpanel" class="tab-pane active">
-                        <div id="upload-csv-zone">
-                            <div class="file-zone">
-                                <span class="dz-message">Drop files here or click to upload.<br/>
-                                    <small>(only csv files are valid.)</small>
-                                </span>
-                                <div class="dz-spinner">
-                                    {{> spinner}}
+                        {{#if $and previewCollection.length abortData}}
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <div class="options">
+                                        <a id="btnAbortRecord" href="#"  class="text-danger" title="Remove all records."><i class="fa fa-times-circle-o"></i></a>
+                                    </div>
+                                    <h3 style="text-transform: capitalize;"> Uploaded records of {{currentSheetName}}  </h3>
                                 </div>
-                                <input type="file" id="csv-file" name="files" accept=".csv"/>
-                            </div>
-                            
-                        </div>
-                        <div class="clearfix"></div>
-                        <!--<button type="submit" class="btn btn-primary btnReadCsv">Read</button>-->
-                        <div id="preview"  class="row" style="display: none;">
-                            <div class="col-md-12">
-                                <div class="pull-left">
-                                    <h3 style="margin-top: 0px;">Preview</h3>
-                                </div>
-                                <div class="pull-left">
-                                    {{> spinner}}
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="table-responsive" style="margin-bottom: 10px;border-right: 1px solid #ccc;">
-                                    {{#if previewRec.length}}
-                                        <table class="table table-bordered table-hover">
+                                <div class="panel-body">
+
+                                    <div class="preview">
+
+                                        <!--<table class="table table-bordered table-hover">
                                             <thead>
                                                 <tr>
-                                                    {{#each getJsonKeys previewRec.[0]}}
+                                                    {{#each getJsonKeys previewCollection.[0]}}
                                                         <th>
                                                             {{this}}
                                                         </th>
@@ -70,7 +77,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {{#each previewRec}}
+                                                {{#each previewCollection}}
                                                     <tr>
                                                         {{#each  getJsonValues this}}
                                                             <td title="{{this}}"><div> {{this}} </div></td>
@@ -78,124 +85,581 @@
                                                     </tr>
                                                 {{/each}}
                                             </tbody>
-                                        </table>
-                                    {{/if}}
-                                    <!--{{> reactiveTable  class="table table-bordered table-hover" multiColumnSort='false' showNavigation='never' showFilter=false collection=previewRec }}-->
+                                        </table>-->
+                                        {{> tblPreview id='tblPreview'  collection=previewCollection  fields=fields}}
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-12">
-                                <label>
-                                    <input type="checkbox" id="hasheader" checked="checked" /> Has header
-                                </label>
-                                <button id="btnNext" style="margin-left:5px;" class="progress-button progress-button-small pull-right" data-style="top-line" data-horizontal="">
-                                    <span class="content">Proceed</span>
-                                    <span class="progress">
-                                        <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
-                                    </span>
-                                </button>
-                                {{> buttonAbort}}
-                            </div>
-                        </div>
-                        <div class="clearfix"></div>
-                        <div id="handson-Zone-during-upload">
-                            <div class="handson-table">
-                                <div id="hotErrorDataDuringUpload"></div>
-                            </div>
-                            <span id="errMessageFromSchema" class="pull-left text-danger"></span>
-                            <button style="margin-left:5px;" class="progress-button progress-button-small pull-right" id="buttonProceedNext" data-style="top-line" data-horizontal="">
-                                <span class="content">Proceed To Next</span>
-                                <span class="progress">
-                                    <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
-                                </span>
-                            </button>
-                            {{> buttonAbort}}
-                        </div>
-                        <div class="clearfix"></div>
-                        <div class="row">
-                            <div id="mapping" class="col-md-12" style="display: none;">
-                                <div class="pull-left">
-                                    <h3>Headers mapping</h3>
-                                </div>
-                                <div class="pull-left">
-                                    {{> spinner}}
-                                </div>
-                                <div class="view-mapping">
-                                    <table class="table table-bordered table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Column Index</th>
-                                                <th>CSV header</th>
-                                                <th>System headers</th>
-                                                <th>Transform</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {{#each csvHeaders}}
-                                                <tr>
-                                                    {{#let rowIndex=@index}}
-                                                        <td style="width: 12%" class="text-center">{{rowIndex}}</td>
-                                                        <td style="width: 30%">
-                                                            <span id="dpdcsvheader_{{rowIndex}}"  selected="selected" data-column="{{this}}" style="text-transform:capitalize">{{this}}</span>
-                                                            <!--<span id="dpdsysheader_{{rowIndex}}"  selected="selected" data-column="{{column}}" style="text-transform:capitalize">{{text}}</span>-->
-                                                        </td>
-                                                        <td style="width: 30%">
-                                                            <a href="#" id="dpdsysheader_{{rowIndex}}" class="dpdsysheader" data-type="select" data-inputclass="form-control"></a>
-                                                            <!--<a href="#" id="dpdcsvheader_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
-                                                        </td>
-                                                        <td style="width: 30%">
-                                                            <!-- Trigger the modal with a button -->
-                                                            <a href="#" id="txtCustomJavascript_{{rowIndex}}" data-toggle="modal" data-target="#javascripEditorModal" data-header="{{column}}" data-code="" title="Click here to add code." style="float: left;"><i class="fa fa-pencil-square-o"></i></a>
-                                                            <div class="transform-function"></div>
-                                                            <!--<a href="#" id="dpddatatype_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
-                                                        </td>
-                                                    {{/let}}
-                                                </tr>
-                                            {{/each}}
-                                            <tr>
-                                                <td colspan="3" style="text-align: center;">
-                                                    <a href="#" id="addNewHeader">Add new</a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        <!--<table  class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        File name
-                                    </th>
-                                    <th style="width: 150px;">
-                                        Progress
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{#each files}}
-                                    <tr>
-                                        <td>
-                                            {{name}}
-                                        </td>
-                                        <td >
-                                            <div class="progress">
-                                                <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar"
-                                                aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{progress}}%">
-                                                    {{progress}}%
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {{/each}}
-                            </tbody>
-                        </table>-->
+                        {{else}}
+                            {{#if isImagesTab}}
+                                <!-- <div class="imageOrFileDiv">
+                                        <button class="imageOrFileButton" type="button" id="btnUploadCsv">Upload File</button>
+                                        <button class="imageOrFileButton" type="button" id="btnUploadImage">Upload Image</button>
+                                </div> -->
 
+                                <ul class="nav nav-tabs nav-tabs1" role="tablist">
+                                    <li role="presentation" class="active">
+                                        <a href="#home" aria-controls="home" role="tab" id="btnUploadCsv" data-toggle="tab">Upload File</a>
+                                    </li>
+                                    <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" id="btnUploadImage" data-toggle="tab">Upload Image</a></li>
+                                </ul>
+
+                            {{/if}}
+                            <div id="uploadCsv">
+                                <div style="margin-bottom:5px;">
+                                    <form class="form-inline">
+                                        <div class="form-group">
+                                            <label>Select schema</label>
+                                            <select class="form-control" id="dpdSchema">
+                                                {{#each schema}}
+                                                    <option value="{{_id}}">{{name}}</option>
+                                                {{/each}}
+                                                <option value="">--Add new--</option>
+                                            </select>
+                                            <a href="#" id="txtNewSchemaName" type="text" style="display:none;">Untitled schema</a>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div id="upload-csv-zone">
+
+
+                                    <div class="file-zone">
+                                        <span class="dz-message">Drop <span style="color: #494e6b">"{{currentSheetName}}"</span> files here<br/>
+                                            <small>(only csv files are valid.)</small>
+                                        </span>
+                                        <div class="dz-spinner">
+                                            {{> spinner}}
+                                        </div>
+                                        <input type="file" id="csv-file" name="files" accept=".csv"/>
+                                    </div>
+
+                                </div>
+                                <div class="clearfix"></div>
+                                <!--<button type="submit" class="btn btn-primary btnReadCsv">Read</button>-->
+                                <div id="preview"  class="row" style="display: none;position: relative;">
+                                    <div class="col-md-12">
+                                        <div class="pull-left">
+                                            <h3 style="margin-top: 0px;text-transform: capitalize;">Preview of {{currentSheetName}}</h3>
+                                        </div>
+                                        <div class="pull-left">
+                                            {{> spinner}}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="makeBlur" align="center"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
+                                        <div class="table-responsive" style="margin-bottom: 10px;border-right: 1px solid #ccc;">
+                                            {{#if previewRec.length}}
+                                                <table class="table table-bordered table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            {{#each getJsonKeys previewRec.[0]}}
+                                                                <th>
+                                                                    {{this}}
+                                                                </th>
+                                                            {{/each}}
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {{#each previewRec}}
+                                                            <tr>
+                                                                {{#each  getJsonValues this}}
+                                                                    <td title="{{this}}"><div> {{this}} </div></td>
+                                                                {{/each}}
+                                                            </tr>
+                                                        {{/each}}
+                                                    </tbody>
+                                                </table>
+                                            {{/if}}
+                                            <!--{{> reactiveTable  class="table table-bordered table-hover" multiColumnSort='false' showNavigation='never' showFilter=false collection=previewRec }}-->
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <label style="display:inline-block">
+                                            <input type="checkbox" style="position:unset;" id="hasheader" checked="checked" /> Has header
+                                        </label>
+                                        <button id="btnNext" style="margin-left:5px;" class="progress-button progress-button-small pull-right" data-style="top-line" data-horizontal="">
+                                            <span class="content">Proceed</span>
+                                            <span class="progress">
+                                                <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                            </span>
+                                        </button>
+                                        {{> buttonAbort}}
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div>
+                                <div id="handson-Zone-during-upload" >
+                                    <div class="handson-table" style="position: relative;">
+                                        <div class="makeBlur" style="z-index: 99" align="center"><i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i></div>
+                                        <div id="hotErrorDataDuringUpload"></div>
+                                    </div>
+                                    <div id="errMessageFromSchema" class="bg-danger" style="font-weight: 600;padding: 8px;margin-bottom: 10px;"></div>
+                                    <div id="allowMessageFromSchema" class="pull-left text-success" style="margin-left:10px;"></div>
+
+                                    <button style="margin-left:5px;" class="progress-button progress-button-small pull-right" id="buttonProceedNext" data-style="top-line" data-horizontal="">
+                                        <span class="content">Proceed To Next</span>
+                                        <span class="progress">
+                                            <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
+                                        </span>
+                                    </button>
+                                    {{> buttonAbort}}
+                                </div>
+                                <div class="clearfix"></div>
+                                <div class="row">
+                                    <div id="mapping" class="col-md-12" style="display: none;">
+                                        <div class="pull-left">
+                                            <h3 style="text-transform: capitalize;">Headers mapping of {{currentSheetName}}</h3>
+                                        </div>
+                                        <div class="pull-left">
+                                            {{> spinner}}
+                                        </div>
+                                        <div class="view-mapping">
+                                            <table class="table table-bordered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <!--<th>Column Index</th>-->
+                                                        <th>System headers</th>
+                                                        <th>CSV header</th>
+                                                        <th>Transform</th>
+                                                        <th class="newSchemaProperty">Type</th>
+                                                        <th class="newSchemaProperty">Property</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {{#each headers}}
+                                                        <tr>
+                                                            {{#let rowIndex=@index}}
+                                                                <!--<td style="width: 12%" class="text-center">{{rowIndex}}</td>-->
+                                                                <td style="width: 20%">
+                                                                    <!--<span id="dpdsysheader_{{rowIndex}}"  selected="selected" data-column="{{this}}" style="text-transform:capitalize">{{this}}</span>-->
+                                                                    <a href="#" id="dpdsysheader_{{rowIndex}}" data-type="text" data-inputclass="form-control">{{this}}</a>
+                                                                    <!--<span id="dpdsysheader_{{rowIndex}}"  selected="selected" data-column="{{column}}" style="text-transform:capitalize">{{text}}</span>-->
+                                                                </td>
+                                                                <td style="width: 20%">
+                                                                    <a href="#" id="dpdcsvheader_{{rowIndex}}" class="dpdsysheader" data-inputclass="form-control"></a>
+                                                                    <!--<a href="#" id="dpdcsvheader_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
+                                                                </td>
+                                                                <td style="width: 20%">
+                                                                    <!-- Trigger the modal with a button -->
+                                                                    <a href="#" id="txtCustomJavascript_{{rowIndex}}" data-toggle="modal" data-target="#javascripEditorModal" data-header="{{rowIndex}}" data-code="" title="Add custom code." style="float: left;"><i class="fa fa-pencil-square-o"></i></a>
+                                                                    <div class="transform-function"></div>
+                                                                    <a href="#" class="text-danger remove-custom-javascript" title="Remove"><i class="fa fa-times-circle-o"></i></a>
+                                                                    <!--<a href="#" id="dpddatatype_{{rowIndex}}" data-type="select" data-inputclass="form-control"></a>-->
+                                                                </td>
+                                                                <td  style="width:20%;" class="newSchemaProperty">
+                                                                    <a href="#" id="dpdSchemaType_{{rowIndex}}" data-inputclass="form-control"></a>
+                                                                </td>
+                                                                <td style="width:20%;" class="newSchemaProperty">
+                                                                    <a data-placement="top" data-toggle="popover" data-title="Property" data-container="body" type="button" data-html="true" href="#" id="property_{{rowIndex}}"><i class="fa fa-edit"></i></a>
+
+                                                                </td>
+                                                            {{/let}}
+                                                        </tr>
+                                                    {{/each}}
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div style="text-align: center;border: 1px solid #ddd;background: #f9f9f9;padding: 5px 0px;">
+                                            <a href="#" id="addNewHeader" class="text-success text-bold" style="border-bottom: dashed 1px #3c763d;"><strong style="padding-right: 10px;">Add new custom header</strong></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{#if isImagesTab}}
+                                <div id="uploadImage" style="display: none">
+                                    {{> imageUpload}}
+                                </div>
+                            {{/if}}
+
+                        {{/if}}
                     </div>
                 </div>
             </div>
         {{/if}}
      </div>
+
+    <script id="property_content_String" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Max Length</div>
+                            <input id="txtMax" type="number"  class="form-control" placeholder="Ex:100"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control" placeholder='e.g. ["A","B"]'/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Default</div>
+                            <input id="default" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">RegEx</div>
+                            <input id="txtRegEx" type="string"  class="form-control" placeholder="Ex: /^[a-z0-9A-Z_]{3,15}$/" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="property_content_Number" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Min</div>
+                            <input id="txtMin" type="number" class="form-control" placeholder="Ex: 0"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Max</div>
+                            <input id="txtMax" type="number"  class="form-control" placeholder="Ex:100"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Default</div>
+                            <input id="default" type="number"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="property_content_Boolean" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">Default
+                            <select id="default" class="form-control">
+                            <option selected value="true">True</option>
+                            <option value="false">False</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="property_content_Date" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Start</div>
+                            <input id="sDate" type="date" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">End</div>
+                            <input id="eDATE" type="date"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Default</div>
+                            <input id="default" type="date"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="property_content_Email" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Default</div>
+                            <input id="default" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="property_content_URL" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Default</div>
+                            <input id="default" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="property_content_Time" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Start Time</div>
+                            <input id="sTime" type="time" class="form-control" placeholder="Ex: 0"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">End Time</div>
+                            <input id="eTime" type="time"  class="form-control" placeholder="Ex:100"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Default</div>
+                            <input id="default" type="time"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="property_content_Phone" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Default</div>
+                            <input id="default" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+    <script id="property_content_Pin-code" type="html">
+        <form>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Allowed Values</div>
+                            <input id="allowedValue" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Default</div>
+                            <input id="default" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <div class="input-group-addon">Label</div>
+                            <input id="setLabel" type="text"  class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label><input  id="ckbSchemaOptional" type="checkbox" checked/> optional </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button data-popoverdismiss="true" type="button" class="btn btn-default pull-right" style="margin-left:3px;"><i class="fa fa-times"></i></button>
+                        <button id="saveProperty" type="button" class="btn btn-primary pull-right"><i class="fa fa-check"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </script>
+
+</template>
+
+
+<template name="tblPreview">
+    <div class="col-md-2" >
+        <button id="btnDeleteRow" class="progress-button progress-button-danger progress-button-small" disabled="disabled" style="margin: 5px 0 0 0;"><span><i class="fa fa-trash"></i>&nbsp; Delete</span> </button>
+    </div>
+    {{> reactiveTable id=id class="table table-bordered table-hover"  collection=collection showNavigation='auto' showFilter=true fields=fields rowsPerPage=7 showRowCount=true}}
 </template>
 
 
@@ -212,16 +676,16 @@
 <template name="uploadStep">
     <div id="steps-block" class="step-progress">
         <ol class="progress">
-            <li class="is-active" data-step="1"> Upload </li>
-            <li data-step="2"> Validate </li>
-            <li data-step="3" class="progress__last"> Import </li>
+            <li class="is-active" data-step="1"> <a href="/upload"> Upload </a> </li>
+            <li data-step="2"> <a href="#"> Validate </a> </li>
+            <li data-step="3" class="progress__last"> <a href="#"> Import </a> </li>
         </ol>
     </div>
 </template>
 
 
 <template name="buttonAbort">
-    <button style="display: none;" class="progress-button progress-button-small progress-button-danger pull-right" id="btnAbort" data-style="top-line" data-horizontal="">
+    <button style="display: block;" class="progress-button progress-button-small progress-button-danger pull-right" id="btnAbort" data-style="top-line" data-horizontal="">
         <span class="content">Abort</span>
         <span class="progress">
             <span class="progress-inner notransition" style="width: 0%; opacity: 1;"></span>
@@ -241,12 +705,26 @@
                 <h4 class="modal-title">Write your custom javascript</h4>
             </div>
             <div class="modal-body">
-                <textarea id="customJavascript" name="customJavascript"></textarea>
-                <!--{{> CodeMirror id="customJavascript" name="customJavascript" options=editorOptions code=editorCode}}-->
+                <div style="border: 1px solid #ddd">
+                    <textarea id="customJavascript" name="customJavascript"  placeholder="Code goes here..."></textarea>
+                    <!--{{> CodeMirror id="customJavascript" name="customJavascript" options=editorOptions code=editorCode}}-->
+                </div>
             </div>
             <div class="modal-footer">
                 <button id="btnSaveCustomjavascript" type="button" class="progress-button progress-button-small">Save</button>
             </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template name="imageUpload">
+  <div class="" id="content">
+        <div class="row" id="title_row">
+            <div class="col-md-12">
+                <!--<div  id="page_menu" class="pull-right">
+                </div>-->
+                <form action="/" class="dropzone" id="my-awesome-dropzone"></form>
             </div>
         </div>
     </div>
